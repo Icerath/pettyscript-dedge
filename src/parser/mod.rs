@@ -11,7 +11,7 @@ use crate::{
 };
 use nom::{
     branch::alt,
-    bytes::complete::{tag, take_while, take_till},
+    bytes::complete::{tag, take_while},
     character::complete::{char, digit1, one_of},
     combinator::{cut, map, opt, recognize, value},
     multi::{many0, separated_list0},
@@ -30,17 +30,18 @@ use crate::NomErr;
 type ParseErr = PettyParseError;
 
 pub fn parse(input: &str) -> Result<Node, NomErr> {
-    final_parser(map(nodes, Node::Group))(input.trim())
+    final_parser(map(nodes, Node::Group))(input)
 }
 fn nodes(input: &str) -> IRes<Box<[Node]>> {
     map(many0(node), Vec::into_boxed_slice)(input)
 }
 #[inline]
 fn node(input: &str) -> IRes {
-    sp(err(
+    let (rem, output) = sp(err(
         alt((statement, map(block, Node::Group), terminated_expr)),
         PettyParseError::Node,
-    ))(input)
+    ))(input)?;
+    Ok((eat_comments(rem), output))
 }
 fn terminated_expr(input: &str) -> IRes {
     err(

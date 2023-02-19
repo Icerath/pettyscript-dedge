@@ -42,7 +42,7 @@ mod parser_tests {
     }
     #[test]
     fn test_line_comments() {
-        let source = "//Hello!\none = 1;//Two\n//Comments\ntwo = 2;";
+        let source = "//Hello!\none = 1;//Two\n//Comments\ntwo = 2;//End";
         let expected = r#"[set_eq { name: "one", body: 1 }, set_eq { name: "two", body: 2 }]"#;
         let output = parse(source).unwrap();
         assert_eq!(format!("{output:?}"), expected);
