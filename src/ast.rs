@@ -132,8 +132,8 @@ impl fmt::Debug for Node {
             Self::ReturnState(expr) => f.debug_tuple("return").field(expr).finish(),
             Self::SetEq(ident, expr) => f
                 .debug_struct("set_eq")
-                .field("name", ident)
-                .field("body", expr)
+                .field("left", ident)
+                .field("right", expr)
                 .finish(),
             Self::WhileLoop(condition, expr) => f
                 .debug_struct("while")
