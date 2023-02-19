@@ -11,7 +11,7 @@ use crate::{
 };
 use nom::{
     branch::alt,
-    bytes::complete::{tag, take_while},
+    bytes::complete::{tag, take_while, take_till},
     character::complete::{char, digit1, one_of},
     combinator::{cut, map, opt, recognize, value},
     multi::{many0, separated_list0},
@@ -106,13 +106,14 @@ fn fold_exprs(initial: Node, remainder: Vec<(BinOp, Node)>) -> Node {
         Node::BinExpr(op, Box::new((acc, expr)))
     })
 }
-fn eat_comments(i: &str) -> &str {
-    let trimmed = i.trim_start();
-    if !trimmed.starts_with("//") {
-        return trimmed;
+fn eat_comments(mut input: &str) -> &str {
+    input = input.trim();
+    while input.trim_start().starts_with("//") {
+        let end_of_comment = input.find('\n').map_or(input.len(), |idx| idx + 1);
+        input = &input[end_of_comment..];
+        input = input.trim();
     }
-    let end_of_comment = trimmed.find('\n').map_or(i.len(), |idx| idx + 1);
-    &i[end_of_comment..]
+    input
 }
 fn ident(i: &str) -> IRes<String> {
     err(
