@@ -1,4 +1,4 @@
-ints = 1;
+ints = !1;
 floats = 1.5;
 strings = "Hello, World!";
 lists = [1, 1.5, "Hello, World!"];

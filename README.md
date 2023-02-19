@@ -5,7 +5,7 @@ Learning to write my own interpreted language for fun.
 - [ ] Multiline Comments
 - [x] Literals
 - [x] Binary Expressions
-- [ ] Unary Expressions
+- [x] Unary Expressions
 - [x] Variable Assignment
 - [x] Function Calls
 - [x] Function Definitions

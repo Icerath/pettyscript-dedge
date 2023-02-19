@@ -5,6 +5,7 @@ pub enum Node {
     Literal(Literal),
     Group(Box<[Node]>),
     BinExpr(BinOp, Box<(Node, Node)>),
+    UnaryOp(UnaryOp, Box<Node>),
     Ident(String),
     FuncCall(String, Box<[Node]>),
     IfState(Box<Node>, Box<[Node]>),
@@ -33,6 +34,14 @@ pub enum BinOp {
     IsEq,
     NotEq,
 }
+
+#[derive(Debug, PartialEq)]
+pub enum UnaryOp {
+    Not,
+    Neg,
+    Plus,
+}
+
 #[derive(PartialEq)]
 pub enum Literal {
     Int(i128),
@@ -86,6 +95,11 @@ impl fmt::Debug for Node {
                 .field("left", &nodes.0)
                 .field("op", op)
                 .field("right", &nodes.1)
+                .finish(),
+            Self::UnaryOp(op, node) => f
+                .debug_struct("unary_expr")
+                .field("op", op)
+                .field("inner", node)
                 .finish(),
             Self::BreakState => write!(f, "break"),
             Self::Empty => write!(f, "empty"),

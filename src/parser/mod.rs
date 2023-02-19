@@ -1,9 +1,12 @@
 mod bin_expr;
+mod statements;
 mod tests;
+
 use bin_expr::bin_expr;
+use statements::statement;
 
 use crate::{
-    ast::{BinOp, Literal, Node},
+    ast::{BinOp, Literal, Node, UnaryOp},
     error::PettyParseError,
 };
 use nom::{
@@ -33,85 +36,47 @@ fn nodes(input: &str) -> IRes<Box<[Node]>> {
     map(many0(node), Vec::into_boxed_slice)(input)
 }
 #[inline]
-fn node(i: &str) -> IRes<Node> {
+fn node(input: &str) -> IRes {
     sp(err(
         alt((statement, map(block, Node::Group), terminated_expr)),
         PettyParseError::Node,
-    ))(i)
+    ))(input)
 }
-
-fn terminated_expr(i: &str) -> IRes<Node> {
+fn terminated_expr(input: &str) -> IRes {
     err(
         alt((set_equals, node_value)).terminated(cut(spar(';'))),
         ParseErr::TermExpr,
-    )(i)
+    )(input)
 }
-fn set_equals(i: &str) -> IRes {
+fn set_equals(input: &str) -> IRes {
     map(
         separated_pair(sp(ident), spar('='), node_expr),
         |(ident, expr)| Node::SetEq(ident, Box::new(expr)),
-    )(i)
+    )(input)
 }
 #[inline]
-fn node_expr(i: &str) -> IRes<Node> {
+fn node_expr(i: &str) -> IRes {
     err(sp(alt((bin_expr, node_value))), ParseErr::Expr)(i)
 }
-fn node_value(i: &str) -> IRes<Node> {
+fn node_value(input: &str) -> IRes {
+    alt((unary_expr, node_value_raw))(input)
+}
+fn node_value_raw(input: &str) -> IRes {
     alt((
         literal.map(Node::Literal),
         function_call,
         sp(ident).map(Node::Ident),
-    ))(i)
+    ))(input)
 }
-#[inline]
-fn statement(i: &str) -> IRes<Node> {
-    alt((
-        if_statement,
-        while_statement,
-        for_loop,
-        break_statement,
-        return_statement,
-        function_def,
-    ))(i)
-}
-fn function_def(i: &str) -> IRes<Node> {
-    preceded(
-        keyword_name("fn"),
-        cut(tuple((sp(ident), function_params, block))),
-    )
-    .map(|(ident, params, block)| Node::FuncDef(ident, params, block))
-    .parse(i)
-}
-fn if_statement(i: &str) -> IRes<Node> {
-    preceded(keyword_name("if"), cut(pair(node_expr, block)))
-        .map(|(n1, n2)| Node::IfState(Box::new(n1), n2))
-        .parse(i)
-}
-fn while_statement(i: &str) -> IRes<Node> {
-    preceded(keyword_name("while"), cut(pair(node_expr, block)))
-        .map(|(n1, n2)| Node::WhileLoop(Box::new(n1), n2))
-        .parse(i)
-}
-fn for_loop(i: &str) -> IRes<Node> {
-    preceded(
-        keyword_name("for"),
-        cut(tuple((terminated(sp(ident), spar(':')), node_expr, block))),
-    )
-    .map(|(name, expr, block)| Node::ForLoop(name, Box::new(expr), block))
-    .parse(i)
-}
-fn break_statement(i: &str) -> IRes<Node> {
-    let (rem, _) = pair(keyword_name("break"), cut(spar(';')))(i)?;
-    Ok((rem, Node::BreakState))
-}
-fn return_statement(i: &str) -> IRes<Node> {
-    delimited(
-        keyword_name("return"),
-        opt(preceded(one_of(" \n"), node_expr)),
-        cut(spar(';')),
-    )
-    .map(|node| Node::ReturnState(Box::new(node.unwrap_or(Node::Literal(Literal::Null)))))
-    .parse(i)
+fn unary_expr(input: &str) -> IRes {
+    let unary_op = sp(alt((
+        map(char('!'), |_| UnaryOp::Not),
+        map(char('+'), |_| UnaryOp::Plus),
+        map(char('-'), |_| UnaryOp::Neg),
+    )));
+    map(pair(unary_op, node_value), |(op, node)| {
+        Node::UnaryOp(op, Box::new(node))
+    })(input)
 }
 fn function_params(i: &str) -> IRes<Box<[String]>> {
     let (rem, nodes) = sp(delimited(
@@ -121,7 +86,7 @@ fn function_params(i: &str) -> IRes<Box<[String]>> {
     ))(i)?;
     Ok((rem, nodes.into_boxed_slice()))
 }
-fn function_call(i: &str) -> IRes<Node> {
+fn function_call(i: &str) -> IRes {
     pair(
         sp(ident),
         delimited(spar('('), function_args, cut(spar(')'))),
@@ -220,19 +185,6 @@ fn sp<'a, O, E, P: Parser<&'a str, O, E>>(
     move |i: &'a str| parser.parse(eat_comments(i))
 }
 
-fn keyword_name<'a>(name: &'static str) -> impl FnMut(&'a str) -> IRes<&'a str> {
-    move |i: &'a str| {
-        let (rem, output) = sp(tag(name))(i)?;
-        if rem.starts_with(is_ident_char) {
-            Err(nom::Err::Error(nom::error::ParseError::from_error_kind(
-                rem,
-                nom::error::ErrorKind::AlphaNumeric,
-            )))
-        } else {
-            Ok((rem, output))
-        }
-    }
-}
 fn err<'a, O, P: Parser<&'a str, O, NomErr<'a>>>(
     mut parser: P,
     msg: PettyParseError,

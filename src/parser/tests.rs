@@ -31,6 +31,16 @@ mod parser_tests {
         assert_eq!(format!("{output:?}"), expected);
     }
     #[test]
+    fn test_unary_expr() {
+        let source = "--1 + !i";
+        let expected = concat!(
+            r#"expr { left: unary_expr { op: Neg, inner: unary_expr { op: "#,
+            r#"Neg, inner: 1 } }, op: Add, right: unary_expr { op: Not, inner: Ident("i") } }"#
+        );
+        let output = bin_expr(source).unwrap().1;
+        assert_eq!(format!("{output:?}"), expected);
+    }
+    #[test]
     fn test_direct_ast() {
         let source = "condition = 1 - get_pi() < 10 / 3 && get_pi() == 3.141516;";
         let output = parse(source).unwrap();
