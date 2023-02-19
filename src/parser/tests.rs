@@ -4,7 +4,7 @@ mod parser_tests {
     #[test]
     fn test_set_equals() {
         let source = "var = 10;";
-        let expected = r#"[set_eq { name: "var", body: 10 }]"#;
+        let expected = r#"[set_eq { left: "var", right: 10 }]"#;
         let output = parse(source).unwrap();
         assert_eq!(format!("{output:?}"), expected);
     }
@@ -12,7 +12,7 @@ mod parser_tests {
     fn test_set_equals_expr() {
         let source = "two_pi = pi() * 2;";
         let expected = concat!(
-            r#"[set_eq { name: "two_pi", body: expr { left: "#,
+            r#"[set_eq { left: "two_pi", right: expr { left: "#,
             r#"func { name: "pi", args: [] }, op: Mul, right: 2 } }]"#
         );
         let output = parse(source).unwrap();
@@ -43,7 +43,7 @@ mod parser_tests {
     #[test]
     fn test_line_comments() {
         let source = "//Hello!\none = 1;//Two\n//Comments\ntwo = 2;//End";
-        let expected = r#"[set_eq { name: "one", body: 1 }, set_eq { name: "two", body: 2 }]"#;
+        let expected = r#"[set_eq { left: "one", right: 1 }, set_eq { left: "two", right: 2 }]"#;
         let output = parse(source).unwrap();
         assert_eq!(format!("{output:?}"), expected);
     }
