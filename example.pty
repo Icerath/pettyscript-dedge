@@ -1,0 +1,24 @@
+ints = 1;
+floats = 1.5;
+strings = "Hello, World!";
+lists = [1, 1.5, "Hello, World!"];
+nulls = null;
+bools = true;
+binary_operations = 1 + 2 - 3 * 4 / 5;
+function_calls();
+// unary operators - TODO
+fn functon_definitions(arg1, arg2) {
+    condition = 1 < 2;
+    if condition {
+        print("if statement");
+    }
+    for item : ["list", "of", "items"] {
+        print("For Loop", item);
+    }
+    count = 0;
+    while count < 10 {
+        print("While Loop", count);
+        break;
+    }
+    return "statement";
+}
