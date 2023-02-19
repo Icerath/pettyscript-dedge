@@ -20,7 +20,7 @@ Learning to write my own interpreted language for fun.
 - [ ] Last semicolon is optional
 - [ ] Variable Type Hinting
 - [ ] Function Type Hinting
-- [ ] Format Grammer
+- [ ] Formal Grammer
 - [ ] Tests
 - [ ] Finish Writing Task List
 
