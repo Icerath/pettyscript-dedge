@@ -6,16 +6,17 @@ pub enum Node {
     Group(Box<[Node]>),
     BinExpr(BinOp, Box<(Node, Node)>),
     UnaryOp(UnaryOp, Box<Node>),
-    Ident(String),
-    FuncCall(String, Box<[Node]>),
+    Ident(Box<str>),
+    FuncCall(Box<str>, Box<[Node]>),
     IfState(Box<Node>, Box<[Node]>),
     WhileLoop(Box<Node>, Box<[Node]>),
-    ForLoop(String, Box<Node>, Box<[Node]>),
+    ForLoop(Box<str>, Box<Node>, Box<[Node]>),
     ReturnState(Box<Node>),
     BreakState,
-    FuncDef(String, Box<[String]>, Box<[Node]>),
+    FuncDef(Box<str>, Box<[Box<str>]>, Box<[Node]>),
+    StructDef(Box<str>, Box<[Box<str>]>),
     Empty,
-    SetEq(String, Box<Node>),
+    SetEq(Box<str>, Box<Node>),
 }
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum BinOp {
@@ -35,7 +36,7 @@ pub enum BinOp {
     NotEq,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum UnaryOp {
     Not,
     Neg,
@@ -106,7 +107,7 @@ impl fmt::Debug for Node {
             Self::ForLoop(ident, expr, block) => f
                 .debug_struct("for_loop")
                 .field("target", ident)
-                .field("expr", expr)
+                .field("iter", expr)
                 .field("body", block)
                 .finish(),
             Self::FuncCall(ident, args) => f
@@ -138,6 +139,11 @@ impl fmt::Debug for Node {
                 .debug_struct("while")
                 .field("condition", condition)
                 .field("body", expr)
+                .finish(),
+            Self::StructDef(name, params) => f
+                .debug_struct("struct")
+                .field("name", name)
+                .field("params", params)
                 .finish(),
         }
     }

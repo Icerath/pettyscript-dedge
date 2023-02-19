@@ -79,12 +79,8 @@ fn unary_expr(input: &str) -> IRes {
         Node::UnaryOp(op, Box::new(node))
     })(input)
 }
-fn function_params(i: &str) -> IRes<Box<[String]>> {
-    let (rem, nodes) = sp(delimited(
-        spar('('),
-        terminated(separated_list0(spar(','), sp(ident)), opt(spar(','))),
-        spar(')'),
-    ))(i)?;
+fn params(input: &str) -> IRes<Box<[Box<str>]>> {
+    let (rem, nodes) = terminated(separated_list0(spar(','), sp(ident)), opt(spar(',')))(input)?;
     Ok((rem, nodes.into_boxed_slice()))
 }
 fn function_call(i: &str) -> IRes {
@@ -116,12 +112,12 @@ fn eat_comments(mut input: &str) -> &str {
     }
     input
 }
-fn ident(i: &str) -> IRes<String> {
+fn ident(i: &str) -> IRes<Box<str>> {
     err(
         recognize(tuple((alt((alpha, char('_'))), take_while(is_ident_char)))),
         ParseErr::Ident,
     )
-    .map(str::to_owned)
+    .map(|s| s.to_owned().into_boxed_str())
     .parse(i)
 }
 fn literal(i: &str) -> IRes<Literal> {

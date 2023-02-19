@@ -15,7 +15,7 @@ Learning to write my own interpreted language for fun.
 - [x] For Loop
 - [x] While Loop
 - [x] Break and Return keywords
-- [ ] Struct Definitions
+- [x] Struct Definitions
 - [ ] Struct Initialization from Self type
 - [ ] Last semicolon is optional
 - [ ] Variable Type Hinting

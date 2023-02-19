@@ -1,7 +1,7 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
-pub fn statement(i: &str) -> IRes<Node> {
+pub fn statement(input: &str) -> IRes {
     alt((
         if_statement,
         while_statement,
@@ -9,27 +9,41 @@ pub fn statement(i: &str) -> IRes<Node> {
         break_statement,
         return_statement,
         function_def,
-    ))(i)
+        struct_def,
+    ))(input)
 }
-fn function_def(i: &str) -> IRes<Node> {
+fn function_def(i: &str) -> IRes {
     preceded(
         keyword_name("fn"),
-        cut(tuple((sp(ident), function_params, block))),
+        cut(tuple((
+            sp(ident),
+            delimited(spar('('), params, spar(')')),
+            block,
+        ))),
     )
     .map(|(ident, params, block)| Node::FuncDef(ident, params, block))
     .parse(i)
 }
-fn if_statement(i: &str) -> IRes<Node> {
+fn struct_def(input: &str) -> IRes {
+    preceded(
+        keyword_name("struct"),
+        cut(map(
+            pair(sp(ident), delimited(spar('{'), params, spar('}'))),
+            |(name, params)| Node::StructDef(name, params),
+        )),
+    )(input)
+}
+fn if_statement(i: &str) -> IRes {
     preceded(keyword_name("if"), cut(pair(node_expr, block)))
         .map(|(n1, n2)| Node::IfState(Box::new(n1), n2))
         .parse(i)
 }
-fn while_statement(i: &str) -> IRes<Node> {
+fn while_statement(i: &str) -> IRes {
     preceded(keyword_name("while"), cut(pair(node_expr, block)))
         .map(|(n1, n2)| Node::WhileLoop(Box::new(n1), n2))
         .parse(i)
 }
-fn for_loop(i: &str) -> IRes<Node> {
+fn for_loop(i: &str) -> IRes {
     preceded(
         keyword_name("for"),
         cut(tuple((terminated(sp(ident), spar(':')), node_expr, block))),
@@ -37,11 +51,11 @@ fn for_loop(i: &str) -> IRes<Node> {
     .map(|(name, expr, block)| Node::ForLoop(name, Box::new(expr), block))
     .parse(i)
 }
-fn break_statement(i: &str) -> IRes<Node> {
+fn break_statement(i: &str) -> IRes {
     let (rem, _) = pair(keyword_name("break"), cut(spar(';')))(i)?;
     Ok((rem, Node::BreakState))
 }
-fn return_statement(i: &str) -> IRes<Node> {
+fn return_statement(i: &str) -> IRes {
     delimited(
         keyword_name("return"),
         opt(preceded(one_of(" \n"), node_expr)),

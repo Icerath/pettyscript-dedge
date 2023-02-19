@@ -52,7 +52,7 @@ mod parser_tests {
         let source = "condition = 1 - get_pi() < 10 / 3 && get_pi() == 3.141516;";
         let output = parse(source).unwrap();
         let expected = Node::Group(Box::new([Node::SetEq(
-            String::from("condition"),
+            "condition".to_owned().into_boxed_str(),
             Box::new(Node::BinExpr(
                 BinOp::And,
                 Box::new((
