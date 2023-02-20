@@ -98,6 +98,23 @@ mod parser_tests {
         assert_expected(source, vec![expected]);
     }
     #[test]
+    fn test_simple_function() {
+        let source = r#"fn greet(name) { print("Hello " + name); }"#;
+        let expected = Node::func_def(
+            "greet",
+            vec!["name"],
+            vec![Node::func_call(
+                "print",
+                vec![Node::bin_expr(
+                    BinOp::Add,
+                    Node::literal("Hello "),
+                    Node::ident("name"),
+                )],
+            )],
+        );
+        assert_expected(source, vec![expected]);
+    }
+    #[test]
     fn test_simple_class() {
         let source = "class Point(x, y);";
         let expected = Node::class_def("Point", vec!["x", "y"], vec![]);
