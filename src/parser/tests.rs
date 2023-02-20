@@ -155,6 +155,18 @@ mod parser_tests {
     }
     #[test]
     fn test_function_type_hints() {
-
+        let source = "fn squared(num: int) {
+            return num * num;
+        }";
+        let expected = Node::func_def(
+            "squared",
+            vec!["num"],
+            vec![Node::ReturnState(Box::new(Node::bin_expr(
+                BinOp::Mul,
+                Node::ident("num"),
+                Node::ident("num"),
+            )))],
+        );
+        assert_expected(source, vec![expected]);
     }
 }

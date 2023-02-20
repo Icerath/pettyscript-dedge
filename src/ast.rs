@@ -178,8 +178,8 @@ impl Node {
     pub fn class_def(name: &str, fields: Vec<&str>, methods: Vec<Node>) -> Self {
         Self::ClassDef(name.into(), vec_box_str(fields), methods.into_boxed_slice())
     }
-    pub fn func_def(name: &str, params: Vec<&str>, methods: Vec<Node>) -> Self {
-        Self::FuncDef(name.into(), vec_box_str(params), methods.into_boxed_slice())
+    pub fn func_def(name: &str, params: Vec<&str>, block: Vec<Node>) -> Self {
+        Self::FuncDef(name.into(), vec_box_str(params), block.into_boxed_slice())
     }
 }
 fn vec_box_str(input: Vec<&str>) -> Box<[Box<str>]> {
