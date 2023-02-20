@@ -14,7 +14,10 @@ mod parser_tests {
     #[test]
     fn test_set_equals_expr() {
         let source = "two_pi = pi() * 2;";
-        let expected = Node::set_eq("two_pi", Node::bin_expr(BinOp::Mul, Node::func_call("pi", vec![]), Node::literal(2)));
+        let expected = Node::set_eq(
+            "two_pi",
+            Node::bin_expr(BinOp::Mul, Node::func_call("pi", vec![]), Node::literal(2)),
+        );
         assert_expected(source, vec![expected]);
     }
     #[test]
@@ -91,6 +94,37 @@ mod parser_tests {
                     Node::literal(3.141_516),
                 ),
             ),
+        );
+        assert_expected(source, vec![expected]);
+    }
+    #[test]
+    fn test_simple_class() {
+        let source = "class Point(x, y);";
+        let expected = Node::class_def("Point", vec!["x", "y"], vec![]);
+        assert_expected(source, vec![expected]);
+    }
+    #[test]
+    fn test_class_methods() {
+        let source = "
+            class Point(x, y) {
+                fn add(self, other) {
+                    return Point(self.x + other.x, self.y + other.y);
+                }
+            }";
+        let expected = Node::class_def(
+            "Point",
+            vec!["x", "y"],
+            vec![Node::func_def(
+                "add",
+                vec!["self", "other"],
+                vec![Node::ReturnState(Box::new(Node::func_call(
+                    "Point",
+                    vec![
+                        Node::bin_expr(BinOp::Add, Node::ident("self.x"), Node::ident("other.x")),
+                        Node::bin_expr(BinOp::Add, Node::ident("self.y"), Node::ident("other.y")),
+                    ],
+                )))],
+            )],
         );
         assert_expected(source, vec![expected]);
     }

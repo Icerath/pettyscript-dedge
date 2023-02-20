@@ -175,6 +175,19 @@ impl Node {
     pub fn set_eq(ident: &str, value: Node) -> Self {
         Self::SetEq(ident.into(), Box::new(value))
     }
+    pub fn class_def(name: &str, fields: Vec<&str>, methods: Vec<Node>) -> Self {
+        Self::ClassDef(name.into(), vec_box_str(fields), methods.into_boxed_slice())
+    }
+    pub fn func_def(name: &str, params: Vec<&str>, methods: Vec<Node>) -> Self {
+        Self::FuncDef(name.into(), vec_box_str(params), methods.into_boxed_slice())
+    }
+}
+fn vec_box_str(input: Vec<&str>) -> Box<[Box<str>]> {
+    input
+        .into_iter()
+        .map(std::convert::Into::into)
+        .collect::<Vec<_>>()
+        .into_boxed_slice()
 }
 
 impl From<Literal> for Node {
