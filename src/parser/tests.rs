@@ -58,40 +58,26 @@ mod parser_tests {
     fn test_direct_ast() {
         let source = "condition = 1 - get_pi() < 10 / 3 && get_pi() == 3.141516;";
         let output = parse(source).unwrap();
-        let expected = Node::Group(Box::new([Node::SetEq(
-            "condition".to_owned().into_boxed_str(),
-            Box::new(Node::BinExpr(
+        let expected = Node::group(vec![Node::set_eq(
+            "condition",
+            Node::bin_expr(
                 BinOp::And,
-                Box::new((
-                    Node::BinExpr(
-                        BinOp::LT,
-                        Box::new((
-                            Node::BinExpr(
-                                BinOp::Sub,
-                                Box::new((
-                                    Node::Literal(Literal::Int(1)),
-                                    Node::FuncCall("get_pi".into(), Box::new([])),
-                                )),
-                            ),
-                            Node::BinExpr(
-                                BinOp::Div,
-                                Box::new((
-                                    Node::Literal(Literal::Int(10)),
-                                    Node::Literal(Literal::Int(3)),
-                                )),
-                            ),
-                        )),
+                Node::bin_expr(
+                    BinOp::LT,
+                    Node::bin_expr(
+                        BinOp::Sub,
+                        Node::literal(1),
+                        Node::func_call("get_pi", vec![]),
                     ),
-                    Node::BinExpr(
-                        BinOp::IsEq,
-                        Box::new((
-                            Node::FuncCall("get_pi".into(), Box::new([])),
-                            Node::Literal(Literal::Float(3.141_516)),
-                        )),
-                    ),
-                )),
-            )),
-        )]));
+                    Node::bin_expr(BinOp::Div, Node::literal(10), Node::literal(3)),
+                ),
+                Node::bin_expr(
+                    BinOp::IsEq,
+                    Node::func_call("get_pi", vec![]),
+                    Node::literal(3.141_516),
+                ),
+            ),
+        )]);
         assert_eq!(output, expected);
     }
 }

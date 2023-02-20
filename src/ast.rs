@@ -149,3 +149,42 @@ impl fmt::Debug for Node {
         }
     }
 }
+
+impl Node {
+    pub fn bin_expr(op: BinOp, left: Node, right: Node) -> Node {
+        Node::BinExpr(op, Box::new((left, right)))
+    }
+    pub fn func_call(name: &str, args: Vec<Node>) -> Node {
+        Self::FuncCall(name.into(), args.into_boxed_slice())
+    }
+    pub fn literal(literal: impl Into<Literal>) -> Node {
+        Self::Literal(literal.into())
+    }
+    pub fn group(nodes: Vec<Node>) -> Node {
+        Self::Group(nodes.into_boxed_slice())
+    }
+    pub fn set_eq(ident: &str, value: Node) -> Node {
+        Self::SetEq(ident.into(), Box::new(value))
+    }
+}
+
+impl From<i128> for Literal {
+    fn from(value: i128) -> Self {
+        Self::Int(value)
+    }
+}
+impl From<&str> for Literal {
+    fn from(value: &str) -> Self {
+        Self::String(value.into())
+    }
+}
+impl From<f64> for Literal {
+    fn from(value: f64) -> Self {
+        Self::Float(value)
+    }
+}
+impl From<bool> for Literal {
+    fn from(value: bool) -> Self {
+        Self::Bool(value)
+    }
+}

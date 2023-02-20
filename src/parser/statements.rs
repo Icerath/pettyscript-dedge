@@ -31,15 +31,12 @@ fn class_def(input: &str) -> IRes {
             tuple((
                 sp(strict_ident),
                 delimited(spar('('), params, spar(')')),
-                alt((map(spar(';'), |_| Vec::new()), delimited(spar('{'), many0(function_def), spar('}')))),
+                alt((
+                    map(spar(';'), |_| Vec::new()),
+                    delimited(spar('{'), many0(function_def), spar('}')),
+                )),
             )),
-            |(name, fields, functions)| {
-                Node::ClassDef(
-                    name,
-                    fields,
-                    functions.into_boxed_slice(),
-                )
-            },
+            |(name, fields, functions)| Node::ClassDef(name, fields, functions.into_boxed_slice()),
         )),
     )(input)
 }
