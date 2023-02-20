@@ -17,9 +17,7 @@ Learning to write my own interpreted language for fun.
 - [x] Break and Return keywords
 - [x] Class Definitions
 - [ ] Last semicolon is optional
-- [ ] Variable Type Hinting
-- [ ] Function Type Hinting
-- [ ] Formal Grammer
+- [ ] Type Hinting
 - [ ] Tests
 - [ ] Finish Writing Task List
 
