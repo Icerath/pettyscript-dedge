@@ -51,7 +51,7 @@ fn terminated_expr(input: &str) -> IRes {
 }
 fn set_equals(input: &str) -> IRes {
     map(
-        separated_pair(sp(ident), spar('='), node_expr),
+        separated_pair(type_hinted, spar('='), node_expr),
         |(ident, expr)| Node::SetEq(ident, Box::new(expr)),
     )(input)
 }
@@ -81,7 +81,7 @@ fn unary_expr(input: &str) -> IRes {
 }
 fn params(input: &str) -> IRes<Box<[Box<str>]>> {
     let (rem, nodes) =
-        terminated(separated_list0(spar(','), sp(strict_ident)), opt(spar(',')))(input)?;
+        terminated(separated_list0(spar(','), type_hinted_strict), opt(spar(',')))(input)?;
     Ok((rem, nodes.into_boxed_slice()))
 }
 fn function_call(i: &str) -> IRes {
@@ -134,6 +134,14 @@ fn strict_ident(input: &str) -> IRes<Box<str>> {
         return Err(nom::Err::Error(new_error(rem, PettyParseError::Ident)));
     }
     Ok((rem, ident))
+}
+fn type_hinted(input: &str) -> IRes<Box<str>> {
+    alt((terminated(sp(strict_ident), opt(pair(spar(':'), sp(ident)))),
+        sp(ident),
+    ))(input)
+}
+fn type_hinted_strict(input: &str) -> IRes<Box<str>> {
+    terminated(sp(strict_ident), opt(pair(spar(':'), sp(ident))))(input)
 }
 fn ident(i: &str) -> IRes<Box<str>> {
     err(

@@ -1,5 +1,5 @@
-class Point(x, y);
-class Line(from, to) {
+class Point(x: int, y: int);
+class Line(from: Point, to: Point) {
     fn average(self) {
        return (self.from + self.to) / 2;
     }

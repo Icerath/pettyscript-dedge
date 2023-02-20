@@ -145,4 +145,16 @@ mod parser_tests {
         );
         assert_expected(source, vec![expected]);
     }
+    #[test]
+    fn test_set_eq_type_hints() {
+        let source = "num: int = 0;";
+        let expected = Node::set_eq("num", Node::literal(0));
+        assert_expected(source, vec![expected]);
+        let source_err = "self.x: int = 0;";
+        parse(source_err).unwrap_err();
+    }
+    #[test]
+    fn test_function_type_hints() {
+
+    }
 }
