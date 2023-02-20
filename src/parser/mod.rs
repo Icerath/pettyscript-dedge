@@ -2,6 +2,8 @@ mod bin_expr;
 mod statements;
 mod tests;
 
+use std::any::TypeId;
+
 use bin_expr::bin_expr;
 use statements::statement;
 
@@ -56,8 +58,8 @@ fn set_equals(input: &str) -> IRes {
     )(input)
 }
 #[inline]
-fn node_expr(i: &str) -> IRes {
-    err(sp(alt((bin_expr, node_value))), ParseErr::Expr)(i)
+fn node_expr(input: &str) -> IRes {
+    bin_expr(input)
 }
 fn node_value(input: &str) -> IRes {
     alt((unary_expr, node_value_raw))(input)
@@ -80,7 +82,7 @@ fn unary_expr(input: &str) -> IRes {
     })(input)
 }
 fn params(input: &str) -> IRes<Box<[Box<str>]>> {
-    let (rem, nodes) = terminated(separated_list0(spar(','), sp(ident)), opt(spar(',')))(input)?;
+    let (rem, nodes) = terminated(separated_list0(spar(','), sp(strict_ident)), opt(spar(',')))(input)?;
     Ok((rem, nodes.into_boxed_slice()))
 }
 fn function_call(i: &str) -> IRes {
@@ -112,6 +114,19 @@ fn eat_comments(mut input: &str) -> &str {
     }
     input
 }
+fn strict_ident(input: &str) -> IRes<Box<str>> {
+    let (rem, ident) = err(
+        recognize(tuple((alt((alpha, char('_'))), take_while(is_strict_ident_char)))),
+        ParseErr::Ident,
+    )
+    .map(|s| s.to_owned().into_boxed_str())
+    .parse(input)?;
+// TODO KEYWORDS
+    if matches!(ident.as_ref(), "fn") {
+        return Err(nom::Err::Error(new_error(rem, PettyParseError::Ident)));
+    }
+    Ok((rem, ident))
+}
 fn ident(i: &str) -> IRes<Box<str>> {
     err(
         recognize(tuple((alt((alpha, char('_'))), take_while(is_ident_char)))),
@@ -134,6 +149,10 @@ fn literal(i: &str) -> IRes<Literal> {
 }
 #[inline]
 fn is_ident_char(c: char) -> bool {
+    matches!(c, 'a'..='z'|'A'..='Z'|'0'..='9'|'_'|'.')
+}
+#[inline]
+fn is_strict_ident_char(c: char) -> bool {
     matches!(c, 'a'..='z'|'A'..='Z'|'0'..='9'|'_')
 }
 fn list(i: &str) -> IRes<Vec<Node>> {
@@ -206,6 +225,13 @@ fn err<'a, O, P: Parser<&'a str, O, NomErr<'a>>>(
                 nom::Err::Incomplete(_) => todo!(),
             }
         })
+    }
+}
+
+fn new_error(i: &str, kind: ParseErr) -> NomErr {
+    ErrorTree::Base {
+        location: i,
+        kind: nom_supreme::error::BaseErrorKind::External(Box::new(kind)),
     }
 }
 

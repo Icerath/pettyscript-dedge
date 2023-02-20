@@ -14,7 +14,7 @@ pub enum Node {
     ReturnState(Box<Node>),
     BreakState,
     FuncDef(Box<str>, Box<[Box<str>]>, Box<[Node]>),
-    StructDef(Box<str>, Box<[Box<str>]>),
+    StructDef(Box<str>, Box<[Box<str>]>, Box<[Node]>),
     Empty,
     SetEq(Box<str>, Box<Node>),
 }
@@ -140,10 +140,11 @@ impl fmt::Debug for Node {
                 .field("condition", condition)
                 .field("body", expr)
                 .finish(),
-            Self::StructDef(name, params) => f
+            Self::StructDef(name, params, functions) => f
                 .debug_struct("struct")
                 .field("name", name)
                 .field("params", params)
+                .field("functions", functions)
                 .finish(),
         }
     }

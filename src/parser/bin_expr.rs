@@ -1,7 +1,7 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 pub fn bin_expr(input: &str) -> IRes {
-    condition(input)
+    err(condition, ParseErr::Expr)(input)
 }
 fn paren_bin_expr(i: &str) -> IRes {
     delimited(spar('('), bin_expr, spar(')'))(i)

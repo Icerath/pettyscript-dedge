@@ -28,8 +28,13 @@ fn struct_def(input: &str) -> IRes {
     preceded(
         keyword_name("struct"),
         cut(map(
-            pair(sp(ident), delimited(spar('{'), params, spar('}'))),
-            |(name, params)| Node::StructDef(name, params),
+            pair(
+                sp(ident),
+                delimited(spar('{'), pair(params, many0(function_def)), spar('}')),
+            ),
+            |(name, (params, functions))| {
+                Node::StructDef(name, params, functions.into_boxed_slice())
+            },
         )),
     )(input)
 }
