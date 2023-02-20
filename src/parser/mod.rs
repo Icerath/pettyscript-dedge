@@ -80,7 +80,8 @@ fn unary_expr(input: &str) -> IRes {
     })(input)
 }
 fn params(input: &str) -> IRes<Box<[Box<str>]>> {
-    let (rem, nodes) = terminated(separated_list0(spar(','), sp(strict_ident)), opt(spar(',')))(input)?;
+    let (rem, nodes) =
+        terminated(separated_list0(spar(','), sp(strict_ident)), opt(spar(',')))(input)?;
     Ok((rem, nodes.into_boxed_slice()))
 }
 fn function_call(i: &str) -> IRes {
@@ -107,11 +108,10 @@ fn eat_comments(mut input: &str) -> &str {
     input = input.trim();
     loop {
         let end_of_comment = if input.starts_with("//") {
-            input.find('\n').map(|idx| idx+1) // 1 = '\n';
+            input.find('\n').map(|idx| idx + 1) // 1 = '\n';
         } else if let Some(suffix) = input.strip_prefix("/*") {
-            suffix.find("*/").map(|idx| idx+4) // 4 = prefix.len() + suffix.len();
-        }
-        else {
+            suffix.find("*/").map(|idx| idx + 4) // 4 = prefix.len() + suffix.len();
+        } else {
             break input;
         };
         let end_of_comment = end_of_comment.unwrap_or(input.len());
@@ -121,12 +121,15 @@ fn eat_comments(mut input: &str) -> &str {
 }
 fn strict_ident(input: &str) -> IRes<Box<str>> {
     let (rem, ident) = err(
-        recognize(tuple((alt((alpha, char('_'))), take_while(is_strict_ident_char)))),
+        recognize(tuple((
+            alt((alpha, char('_'))),
+            take_while(is_strict_ident_char),
+        ))),
         ParseErr::Ident,
     )
     .map(|s| s.to_owned().into_boxed_str())
     .parse(input)?;
-// TODO KEYWORDS
+    // TODO KEYWORDS
     if matches!(ident.as_ref(), "fn") {
         return Err(nom::Err::Error(new_error(rem, PettyParseError::Ident)));
     }

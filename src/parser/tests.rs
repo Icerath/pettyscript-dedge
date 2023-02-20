@@ -48,6 +48,13 @@ mod parser_tests {
         assert_eq!(format!("{output:?}"), expected);
     }
     #[test]
+    fn test_multiline_comments() {
+        let source = "/*Hello*/i = 0;/*1\n2\n3*/";
+        let expected = r#"[set_eq { left: "i", right: 0 }]"#;
+        let output = parse(source).unwrap();
+        assert_eq!(format!("{output:?}"), expected);
+    }
+    #[test]
     fn test_direct_ast() {
         let source = "condition = 1 - get_pi() < 10 / 3 && get_pi() == 3.141516;";
         let output = parse(source).unwrap();
