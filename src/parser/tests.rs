@@ -1,8 +1,6 @@
 #[cfg(test)]
 mod parser_tests {
-    use crate::ast::UnaryOp;
-
-    use super::super::{bin_expr, parse, BinOp, Literal, Node};
+    use super::super::{bin_expr, parse, BinOp, Node, UnaryOp};
     fn assert_expected(source: &str, expected: Vec<Node>) {
         let output = parse(source).unwrap();
         assert_eq!(output, Node::group(expected));
@@ -10,19 +8,14 @@ mod parser_tests {
     #[test]
     fn test_set_equals() {
         let source = "var = 10;";
-        let expected = r#"[set_eq { left: "var", right: 10 }]"#;
-        let output = parse(source).unwrap();
-        assert_eq!(format!("{output:?}"), expected);
+        let expected = Node::set_eq("var", Node::literal(10));
+        assert_expected(source, vec![expected]);
     }
     #[test]
     fn test_set_equals_expr() {
         let source = "two_pi = pi() * 2;";
-        let expected = concat!(
-            r#"[set_eq { left: "two_pi", right: expr { left: "#,
-            r#"func { name: "pi", args: [] }, op: Mul, right: 2 } }]"#
-        );
-        let output = parse(source).unwrap();
-        assert_eq!(format!("{output:?}"), expected);
+        let expected = Node::set_eq("two_pi", Node::bin_expr(BinOp::Mul, Node::func_call("pi", vec![]), Node::literal(2)));
+        assert_expected(source, vec![expected]);
     }
     #[test]
     fn test_bin_expr_order() {
