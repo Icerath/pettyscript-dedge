@@ -2,8 +2,6 @@ mod bin_expr;
 mod statements;
 mod tests;
 
-use std::any::TypeId;
-
 use bin_expr::bin_expr;
 use statements::statement;
 
