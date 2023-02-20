@@ -2,7 +2,7 @@
 Learning to write my own interpreted language for fun.
 ### Parser
 - [x] Line Comments
-- [ ] Multiline Comments
+- [x] Multiline Comments
 - [x] Literals
 - [x] Binary Expressions
 - [x] Unary Expressions

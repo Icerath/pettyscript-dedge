@@ -107,12 +107,19 @@ fn fold_exprs(initial: Node, remainder: Vec<(BinOp, Node)>) -> Node {
 }
 fn eat_comments(mut input: &str) -> &str {
     input = input.trim();
-    while input.trim_start().starts_with("//") {
-        let end_of_comment = input.find('\n').map_or(input.len(), |idx| idx + 1);
+    loop {
+        let end_of_comment = if input.starts_with("//") {
+            input.find('\n').map(|idx| idx+1) // 1 = '\n';
+        } else if let Some(suffix) = input.strip_prefix("/*") {
+            suffix.find("*/").map(|idx| idx+4) // 4 = prefix.len() + suffix.len();
+        }
+        else {
+            break input;
+        };
+        let end_of_comment = end_of_comment.unwrap_or(input.len());
         input = &input[end_of_comment..];
         input = input.trim();
     }
-    input
 }
 fn strict_ident(input: &str) -> IRes<Box<str>> {
     let (rem, ident) = err(
