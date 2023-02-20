@@ -157,6 +157,9 @@ impl Node {
     pub fn unary_expr(op: UnaryOp, node: Node) -> Self {
         Self::UnaryOp(op, Box::new(node))
     }
+    pub fn literal_expr<L: Into<Literal>, R: Into<Literal>>(op: BinOp, left: L, right: R) -> Self {
+        Self::bin_expr(op, Node::literal(left), Node::literal(right))
+    }
     pub fn bin_expr(op: BinOp, left: Node, right: Node) -> Self {
         Node::BinExpr(op, Box::new((left, right)))
     }

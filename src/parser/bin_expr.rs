@@ -12,18 +12,18 @@ fn condition(input: &str) -> IRes {
     Ok((input, fold_exprs(initial, remainder)))
 }
 fn comparison(input: &str) -> IRes {
-    let (input, initial) = upper(input)?;
-    let (input, remainder) = many0(pair(binop_comp, upper))(input)?;
+    let (input, initial) = lower(input)?;
+    let (input, remainder) = many0(pair(binop_comp, lower))(input)?;
     Ok((input, fold_exprs(initial, remainder)))
 }
 fn upper(input: &str) -> IRes {
-    let (input, initial) = lower(input)?;
-    let (input, remainder) = many0(pair(binop_upper, lower))(input)?;
+    let (input, initial) = factor(input)?;
+    let (input, remainder) = many0(pair(binop_upper, factor))(input)?;
     Ok((input, fold_exprs(initial, remainder)))
 }
 fn lower(input: &str) -> IRes {
-    let (input, initial) = factor(input)?;
-    let (input, remainder) = many0(pair(binop_lower, factor))(input)?;
+    let (input, initial) = upper(input)?;
+    let (input, remainder) = many0(pair(binop_lower, upper))(input)?;
     Ok((input, fold_exprs(initial, remainder)))
 }
 fn factor(input: &str) -> IRes {

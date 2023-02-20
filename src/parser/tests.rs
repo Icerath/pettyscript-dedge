@@ -27,14 +27,25 @@ mod parser_tests {
     #[test]
     fn test_bin_expr_order() {
         let source = "1 + 2 - 3 * 4 / 5 > 10 && true";
-        let expected = concat!(
-            r#"expr { left: expr { left: expr { left: expr { left: expr { left: "#,
-            r#"expr { left: 1, op: Add, right: 2 }, op: Sub, right: 3 }, op: "#,
-            r#"Mul, right: 4 }, op: Div, right: 5 }, op: GT, right: 10 }, op: "#,
-            r#"And, right: true }"#,
+        let expected = Node::bin_expr(
+            BinOp::And,
+            Node::bin_expr(
+                BinOp::GT,
+                Node::bin_expr(
+                    BinOp::Sub,
+                    Node::literal_expr(BinOp::Add, 1, 2),
+                    Node::bin_expr(
+                        BinOp::Div,
+                        Node::literal_expr(BinOp::Mul, 3, 4),
+                        Node::literal(5),
+                    ),
+                ),
+                Node::literal(10),
+            ),
+            Node::literal(true),
         );
         let output = bin_expr(source).unwrap().1;
-        assert_eq!(format!("{output:?}"), expected);
+        assert_eq!(output, expected);
     }
     #[test]
     fn test_unary_expr() {
