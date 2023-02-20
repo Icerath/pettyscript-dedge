@@ -70,7 +70,7 @@ mod parser_tests {
         assert_expected(source, vec![expected]);
     }
     #[test]
-    fn test_direct_ast() {
+    fn test_complex_expr() {
         let source = "condition = 1 - get_pi() < 10 / 3 && get_pi() == 3.141516;";
         let expected = Node::set_eq(
             "condition",
