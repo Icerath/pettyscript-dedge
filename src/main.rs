@@ -1,5 +1,3 @@
-use std::fs;
-
 use nom_supreme::error::ErrorTree;
 
 mod ast;
@@ -11,11 +9,11 @@ pub type NomErr<'a> = nom_supreme::error::ErrorTree<&'a str>;
 pub type IRes<'a, T = ast::Node, E = NomErr<'a>> = nom::IResult<&'a str, T, E>;
 
 fn main() {
-    let input = fs::read_to_string("example.pty").expect("Failed to read input");
-    let ast = match parser::parse(&input) {
+    let input = include_str!("../example.pty");
+    let ast = match parser::parse(input) {
         Ok(ast) => ast,
         Err(err) => {
-            print_error(&input, err);
+            print_error(input, err);
             return;
         }
     };

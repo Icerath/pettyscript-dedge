@@ -93,8 +93,8 @@ impl fmt::Debug for Node {
         match self {
             Self::BinExpr(op, nodes) => f
                 .debug_struct("expr")
-                .field("left", &nodes.0)
                 .field("op", op)
+                .field("left", &nodes.0)
                 .field("right", &nodes.1)
                 .finish(),
             Self::UnaryOp(op, node) => f
