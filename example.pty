@@ -1,15 +1,10 @@
-// Structs
-struct Point {
-    // Fields
-    x,
-    y,
-    // Methods
-    fn print(self) {
-        print(self.x, self.y);
+class Point(x, y);
+class Line(from, to) {
+    fn average(self) {
+       return (self.from + self.to) / 2;
     }
 }
-// Literals, Bin Expr and function calls
-ints = !1;
+ints = 1;
 floats = 1.5;
 strings = "Hello, World!";
 lists = [1, 1.5, "Hello, World!"];
@@ -20,11 +15,7 @@ function_calls();
 unary_not = !true;
 unary_neg = -1;
 unary_pos = +1;
-/* Multi
-    Line
-Comments.
-*/
-fn functon_definitions(arg1, arg2) {
+fn function_definitions(arg1, arg2) {
     condition = 1 < 2;
     if condition {
         print("if statement");

@@ -15,8 +15,7 @@ Learning to write my own interpreted language for fun.
 - [x] For Loop
 - [x] While Loop
 - [x] Break and Return keywords
-- [x] Struct Definitions
-- [ ] Struct Initialization from Self type
+- [x] Class Definitions
 - [ ] Last semicolon is optional
 - [ ] Variable Type Hinting
 - [ ] Function Type Hinting
@@ -27,7 +26,6 @@ Learning to write my own interpreted language for fun.
 ### Interpreter
 
 - [ ] Finish Writing Task List
-
 ### CLI
 
 - [ ] Argparsing

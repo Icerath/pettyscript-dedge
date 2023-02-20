@@ -9,7 +9,7 @@ pub fn statement(input: &str) -> IRes {
         break_statement,
         return_statement,
         function_def,
-        struct_def,
+        class_def,
     ))(input)
 }
 fn function_def(i: &str) -> IRes {
@@ -24,16 +24,21 @@ fn function_def(i: &str) -> IRes {
     .map(|(ident, params, block)| Node::FuncDef(ident, params, block))
     .parse(i)
 }
-fn struct_def(input: &str) -> IRes {
+fn class_def(input: &str) -> IRes {
     preceded(
-        keyword_name("struct"),
+        keyword_name("class"),
         cut(map(
-            pair(
-                sp(ident),
-                delimited(spar('{'), pair(params, many0(function_def)), spar('}')),
-            ),
-            |(name, (params, functions))| {
-                Node::StructDef(name, params, functions.into_boxed_slice())
+            tuple((
+                sp(strict_ident),
+                delimited(spar('('), params, spar(')')),
+                alt((map(spar(';'), |_| Vec::new()), delimited(spar('{'), many0(function_def), spar('}')))),
+            )),
+            |(name, fields, functions)| {
+                Node::ClassDef(
+                    name,
+                    fields,
+                    functions.into_boxed_slice(),
+                )
             },
         )),
     )(input)
