@@ -1,5 +1,6 @@
 # pettyscript
 Learning to write my own interpreted language for fun.
+
 ### Parser
 - [x] Line Comments
 - [x] Multiline Comments
@@ -18,12 +19,21 @@ Learning to write my own interpreted language for fun.
 - [x] Class Definitions
 - [ ] Last semicolon is optional
 - [x] Type Hinting
+
+### Interpreter
+- [ ] Binary Expressions
+- [ ] Unary Expressions
+- [ ] Variables
+- [ ] Function Calls
+- [ ] Class Instantiation
+- [ ] Methods
+- [ ] For Loop
+- [ ] While Loop
+- [ ] If/Elif/Else Statements
+- [ ] Return/Break Statements
 - [ ] Tests
 - [ ] Finish Writing Task List
 
-### Interpreter
-
-- [ ] Finish Writing Task List
 ### CLI
 
 - [ ] Argparsing
