@@ -1,3 +1,5 @@
+use ast::Node;
+use interpreter::interpret;
 use nom_supreme::error::ErrorTree;
 
 mod ast;
@@ -8,17 +10,20 @@ mod parser;
 pub type NomErr<'a> = nom_supreme::error::ErrorTree<&'a str>;
 pub type IRes<'a, T = ast::Node, E = NomErr<'a>> = nom::IResult<&'a str, T, E>;
 
-fn main() {
+fn main() -> Result<(), ()> {
     let input = include_str!("../example.pty");
-    let ast = match parser::parse(input) {
-        Ok(ast) => ast,
-        Err(err) => {
-            print_error(input, err);
-            return;
-        }
-    };
-    println!("{ast:#?}");
+    let ast = read_ast(input)?;
+    interpret(ast);
+    Ok(())
 }
+fn read_ast(input: &str) -> Result<Node, ()> {
+    match parser::parse(input) {
+        Ok(ast) => return Ok(ast),
+        Err(err) => print_error(input, err),
+    }
+    Err(())
+}
+
 fn print_error(original_input: &str, err: ErrorTree<&str>) {
     let ErrorTree::Base { location, kind } = err else {
         panic!("{err:?}: Invalid Error Kind!\n");
