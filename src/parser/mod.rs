@@ -30,7 +30,7 @@ use crate::NomErr;
 type ParseErr = PettyParseError;
 
 pub fn parse(input: &str) -> Result<Node, NomErr> {
-    final_parser(map(nodes, Node::Group))(input)
+    final_parser(map(nodes, Node::Block))(input)
 }
 fn nodes(input: &str) -> IRes<Box<[Node]>> {
     map(many0(node), Vec::into_boxed_slice)(input)
@@ -38,7 +38,7 @@ fn nodes(input: &str) -> IRes<Box<[Node]>> {
 #[inline]
 fn node(input: &str) -> IRes {
     let (rem, output) = sp(err(
-        alt((statement, map(block, Node::Group), terminated_expr)),
+        alt((statement, map(block, Node::Block), terminated_expr)),
         PettyParseError::Node,
     ))(input)?;
     Ok((eat_comments(rem), output))

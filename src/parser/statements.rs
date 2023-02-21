@@ -58,7 +58,7 @@ fn or_else_segment(input: &str) -> IRes {
             cut(tuple((node_expr, block, opt(or_else_segment)))),
         )
         .map(|(expr, block, or_else)| Node::IfState(Box::new(expr), block, or_else.map(Box::new))),
-        preceded(keyword_name("else"), map(block, Node::Group)),
+        preceded(keyword_name("else"), map(block, Node::Block)),
     ))
     .parse(input)
 }

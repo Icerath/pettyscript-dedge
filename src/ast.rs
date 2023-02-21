@@ -3,7 +3,7 @@ use std::fmt;
 #[derive(PartialEq)]
 pub enum Node {
     Literal(Literal),
-    Group(Box<[Node]>),
+    Block(Box<[Node]>),
     BinExpr(BinOp, Box<(Node, Node)>),
     UnaryOp(UnaryOp, Box<Node>),
     Ident(Box<str>),
@@ -121,7 +121,7 @@ impl fmt::Debug for Node {
                 .field("args", args)
                 .field("body", block)
                 .finish(),
-            Self::Group(nodes) => f.debug_list().entries(nodes.iter()).finish(),
+            Self::Block(nodes) => f.debug_list().entries(nodes.iter()).finish(),
             Self::Ident(ident) => f.debug_tuple("Ident").field(ident).finish(),
             Self::IfState(expr, block, or_else) => f
                 .debug_struct("if")
@@ -170,8 +170,8 @@ impl Node {
     pub fn literal(literal: impl Into<Literal>) -> Self {
         Self::Literal(literal.into())
     }
-    pub fn group(nodes: Vec<Node>) -> Self {
-        Self::Group(nodes.into_boxed_slice())
+    pub fn block(nodes: Vec<Node>) -> Self {
+        Self::Block(nodes.into_boxed_slice())
     }
     pub fn set_eq(ident: &str, value: Node) -> Self {
         Self::SetEq(ident.into(), Box::new(value))

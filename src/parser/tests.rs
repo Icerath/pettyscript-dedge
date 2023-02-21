@@ -3,7 +3,7 @@ mod parser_tests {
     use super::super::{bin_expr, parse, BinOp, Node, UnaryOp};
     fn assert_expected(source: &str, expected: Vec<Node>) {
         let output = parse(source).unwrap();
-        assert_eq!(output, Node::group(expected));
+        assert_eq!(output, Node::block(expected));
     }
     #[test]
     fn test_set_equals() {
@@ -184,7 +184,7 @@ mod parser_tests {
             Some(Node::if_state(
                 Node::ident("y"),
                 vec![Node::func_call("print", vec![Node::ident("y")])],
-                Some(Node::group(vec![Node::func_call(
+                Some(Node::block(vec![Node::func_call(
                     "print",
                     vec![Node::ident("z")],
                 )])),
