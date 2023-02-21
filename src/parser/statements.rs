@@ -89,7 +89,7 @@ fn return_statement(i: &str) -> IRes {
     .map(|node| Node::ReturnState(Box::new(node.unwrap_or(Node::Literal(Literal::Null)))))
     .parse(i)
 }
-fn keyword_name<'a>(name: &'static str) -> impl FnMut(&'a str) -> IRes<&'a str> {
+pub fn keyword_name<'a>(name: &'static str) -> impl FnMut(&'a str) -> IRes<&'a str> {
     move |i: &'a str| {
         let (rem, output) = sp(tag(name))(i)?;
         if rem.starts_with(is_ident_char) {
