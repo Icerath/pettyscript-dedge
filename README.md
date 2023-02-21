@@ -10,8 +10,8 @@ Learning to write my own interpreted language for fun.
 - [x] Function Calls
 - [x] Function Definitions
 - [x] If Statement
-- [ ] Elif Statement
-- [ ] Else Statement
+- [x] Elif Statement
+- [x] Else Statement
 - [x] For Loop
 - [x] While Loop
 - [x] Break and Return keywords

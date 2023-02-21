@@ -80,8 +80,10 @@ fn unary_expr(input: &str) -> IRes {
     })(input)
 }
 fn params(input: &str) -> IRes<Box<[Box<str>]>> {
-    let (rem, nodes) =
-        terminated(separated_list0(spar(','), type_hinted_strict), opt(spar(',')))(input)?;
+    let (rem, nodes) = terminated(
+        separated_list0(spar(','), type_hinted_strict),
+        opt(spar(',')),
+    )(input)?;
     Ok((rem, nodes.into_boxed_slice()))
 }
 fn function_call(i: &str) -> IRes {
@@ -136,7 +138,8 @@ fn strict_ident(input: &str) -> IRes<Box<str>> {
     Ok((rem, ident))
 }
 fn type_hinted(input: &str) -> IRes<Box<str>> {
-    alt((terminated(sp(strict_ident), opt(pair(spar(':'), sp(ident)))),
+    alt((
+        terminated(sp(strict_ident), opt(pair(spar(':'), sp(ident)))),
         sp(ident),
     ))(input)
 }

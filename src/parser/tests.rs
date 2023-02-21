@@ -169,4 +169,27 @@ mod parser_tests {
         );
         assert_expected(source, vec![expected]);
     }
+    #[test]
+    fn test_if_statement() {
+        let source = "if true {}";
+        let expected = Node::if_state(Node::literal(true), vec![], None);
+        assert_expected(source, vec![expected]);
+    }
+    #[test]
+    fn test_if_chain() {
+        let source = "if x { print(x); } elif y { print(y); } else { print(z); }";
+        let expected = Node::if_state(
+            Node::ident("x"),
+            vec![Node::func_call("print", vec![Node::ident("x")])],
+            Some(Node::if_state(
+                Node::ident("y"),
+                vec![Node::func_call("print", vec![Node::ident("y")])],
+                Some(Node::group(vec![Node::func_call(
+                    "print",
+                    vec![Node::ident("z")],
+                )])),
+            )),
+        );
+        assert_expected(source, vec![expected]);
+    }
 }

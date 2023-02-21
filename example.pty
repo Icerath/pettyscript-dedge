@@ -19,6 +19,10 @@ fn function_definitions(arg1, arg2) {
     condition = 1 < 2;
     if condition {
         print("if statement");
+    } elif false {
+        print("elif");
+    } else {
+        print("else");
     }
     for item : ["list", "of", "items"] {
         print("For Loop", item);

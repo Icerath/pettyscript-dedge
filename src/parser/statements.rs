@@ -40,11 +40,29 @@ fn class_def(input: &str) -> IRes {
         )),
     )(input)
 }
-fn if_statement(i: &str) -> IRes {
-    preceded(keyword_name("if"), cut(pair(node_expr, block)))
-        .map(|(n1, n2)| Node::IfState(Box::new(n1), n2))
-        .parse(i)
+fn if_statement(input: &str) -> IRes {
+    if_segment(input)
 }
+fn if_segment(input: &str) -> IRes {
+    preceded(
+        keyword_name("if"),
+        cut(tuple((node_expr, block, opt(or_else_segment)))),
+    )
+    .map(|(expr, block, or_else)| Node::IfState(Box::new(expr), block, or_else.map(Box::new)))
+    .parse(input)
+}
+fn or_else_segment(input: &str) -> IRes {
+    alt((
+        preceded(
+            keyword_name("elif"),
+            cut(tuple((node_expr, block, opt(or_else_segment)))),
+        )
+        .map(|(expr, block, or_else)| Node::IfState(Box::new(expr), block, or_else.map(Box::new))),
+        preceded(keyword_name("else"), map(block, Node::Group)),
+    ))
+    .parse(input)
+}
+
 fn while_statement(i: &str) -> IRes {
     preceded(keyword_name("while"), cut(pair(node_expr, block)))
         .map(|(n1, n2)| Node::WhileLoop(Box::new(n1), n2))

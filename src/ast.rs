@@ -8,7 +8,7 @@ pub enum Node {
     UnaryOp(UnaryOp, Box<Node>),
     Ident(Box<str>),
     FuncCall(Box<str>, Box<[Node]>),
-    IfState(Box<Node>, Box<[Node]>),
+    IfState(Box<Node>, Box<[Node]>, Option<Box<Node>>),
     WhileLoop(Box<Node>, Box<[Node]>),
     ForLoop(Box<str>, Box<Node>, Box<[Node]>),
     ReturnState(Box<Node>),
@@ -123,10 +123,11 @@ impl fmt::Debug for Node {
                 .finish(),
             Self::Group(nodes) => f.debug_list().entries(nodes.iter()).finish(),
             Self::Ident(ident) => f.debug_tuple("Ident").field(ident).finish(),
-            Self::IfState(expr, block) => f
+            Self::IfState(expr, block, or_else) => f
                 .debug_struct("if")
                 .field("condition", expr)
                 .field("body", block)
+                .field("or_else", &or_else.iter().collect::<Vec<_>>())
                 .finish(),
             Self::Literal(literal) => write!(f, "{literal:?}"),
             Self::ReturnState(expr) => f.debug_tuple("return").field(expr).finish(),
@@ -180,6 +181,13 @@ impl Node {
     }
     pub fn func_def(name: &str, params: Vec<&str>, block: Vec<Node>) -> Self {
         Self::FuncDef(name.into(), vec_box_str(params), block.into_boxed_slice())
+    }
+    pub fn if_state(condition: Node, block: Vec<Node>, or_else: Option<Node>) -> Self {
+        Self::IfState(
+            Box::new(condition),
+            block.into_boxed_slice(),
+            or_else.map(Box::new),
+        )
     }
 }
 fn vec_box_str(input: Vec<&str>) -> Box<[Box<str>]> {
