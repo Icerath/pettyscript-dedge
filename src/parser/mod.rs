@@ -162,6 +162,7 @@ fn literal(i: &str) -> IRes<Literal> {
             map(int, Literal::Int),
             map(string, |s| Literal::String(s.to_owned().into_boxed_str())),
             map(list, |vec| Literal::List(vec.into_boxed_slice())),
+            map(sp(tag("null")), |_| Literal::Null),
         )),
         ParseErr::Literal,
     ))(i)
