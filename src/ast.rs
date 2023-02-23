@@ -1,9 +1,13 @@
-use std::fmt;
+use std::{
+    fmt,
+    ops::{Add, BitAnd, Div, Mul, Sub},
+};
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub enum Node {
     Literal(Literal),
     Block(Box<[Node]>),
+    Globals(Box<[Node]>),
     BinExpr(BinOp, Box<(Node, Node)>),
     UnaryOp(UnaryOp, Box<Node>),
     Ident(Box<str>),
@@ -43,7 +47,7 @@ pub enum UnaryOp {
     Plus,
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub enum Literal {
     Int(i128),
     Float(f64),
@@ -121,7 +125,9 @@ impl fmt::Debug for Node {
                 .field("args", args)
                 .field("body", block)
                 .finish(),
-            Self::Block(nodes) => f.debug_list().entries(nodes.iter()).finish(),
+            Self::Block(nodes) | Self::Globals(nodes) => {
+                f.debug_list().entries(nodes.iter()).finish()
+            }
             Self::Ident(ident) => f.debug_tuple("Ident").field(ident).finish(),
             Self::IfState(expr, block, or_else) => f
                 .debug_struct("if")

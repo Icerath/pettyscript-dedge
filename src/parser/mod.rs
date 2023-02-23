@@ -32,7 +32,7 @@ use self::statements::keyword_name;
 type ParseErr = PettyParseError;
 
 pub fn parse(input: &str) -> Result<Node, NomErr> {
-    final_parser(map(nodes, Node::Block))(input)
+    final_parser(map(nodes, Node::Globals))(input)
 }
 fn nodes(input: &str) -> IRes<Box<[Node]>> {
     map(many0(node), Vec::into_boxed_slice)(input)

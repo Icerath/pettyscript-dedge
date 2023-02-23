@@ -3,7 +3,7 @@ mod parser_tests {
     use super::super::{bin_expr, parse, BinOp, Node, UnaryOp};
     fn assert_expected(source: &str, expected: Vec<Node>) {
         let output = parse(source).unwrap();
-        assert_eq!(output, Node::block(expected));
+        assert_eq!(output, Node::Globals(expected.into_boxed_slice()));
     }
     #[test]
     fn test_set_equals() {
