@@ -1,6 +1,6 @@
 class Point(x, y) {
-    fn hello() {
-        print("Hello");
+    fn __repr__(self, other) {
+        return "hello, World!";
     }
 }
 print(Point);

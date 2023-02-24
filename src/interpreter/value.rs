@@ -2,7 +2,10 @@ use std::{any::Any, collections::HashMap};
 
 use crate::ast::Node;
 
-use super::{builtins::{BoolBuiltin, StringBuiltin, NullBuiltin}, interpreter::Interpreter};
+use super::{
+    builtins::{BoolBuiltin, NullBuiltin, StringBuiltin},
+    interpreter::Interpreter,
+};
 pub type PtyObj = Box<dyn PettyObject>;
 pub struct PettyValue {
     ref_count: *mut usize,
@@ -164,11 +167,7 @@ pub struct PettyValueCustom {
 }
 
 impl PettyValueCustom {
-    pub fn new(field_names: Box<[Box<str>]>) -> Self {
-        let mut fields = HashMap::new();
-        for field in field_names.to_vec() {
-            fields.insert(field, NullBuiltin.into());
-        }
+    pub fn new(fields: HashMap<Box<str>, PettyValue>) -> Self {
         Self { fields }
     }
 }
@@ -186,6 +185,20 @@ impl PettyObject for PettyValueCustom {
         let func = self.fields.get("__add__")?;
         func.inner().__call__(interpreter, vec![source, other]);
         todo!()
+    }
+    fn __repr__(&self, interpreter: &mut Interpreter, source: PettyValue) -> Option<PettyValue> {
+        let default = || StringBuiltin(format!("{}: {:?}", self.type_name(), source.object)).into();
+        let Some(init_field) = self.fields.get("__repr__") else {
+            return Some(default());
+        };
+        let Some(init_func) = init_field
+            .inner()
+            .as_any()
+            .downcast_ref::<PettyValueFunction>()
+        else {
+            return Some(default())
+        };
+        init_func.__call__(interpreter, vec![])
     }
     fn as_any(&self) -> &dyn std::any::Any {
         self

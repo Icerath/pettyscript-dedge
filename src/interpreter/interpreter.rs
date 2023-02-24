@@ -1,6 +1,6 @@
 use super::{
     builtins::{self, BoolBuiltin, IntBuiltin, NullBuiltin, StringBuiltin},
-    value::{PettyValue, PettyValueFunction, PettyValueCustom},
+    value::{PettyValue, PettyValueCustom, PettyValueFunction},
 };
 use crate::ast::{BinOp, Literal, Node};
 use std::collections::HashMap;
@@ -137,11 +137,19 @@ impl Interpreter {
     }
     pub fn create_function(&mut self, name: Box<str>, params: Box<[Box<str>]>, block: Box<[Node]>) {
         let function = PettyValueFunction::new(params.to_vec(), block);
-        self.variables
-            .write(name, function.into());
+        self.variables.write(name, function.into());
     }
-    pub fn create_class(&mut self, name: Box<str>, fields: Box<[Box<str>]>, methods: HashMap<Box<str>, PettyValue>) {
-        let class = PettyValueCustom::new(fields);
+    pub fn create_class(
+        &mut self,
+        name: Box<str>,
+        fields: Box<[Box<str>]>,
+        mut methods: HashMap<Box<str>, PettyValue>,
+    ) {
+        for field in fields.to_vec() {
+            methods.insert(field, self.null());
+        }
+
+        let class = PettyValueCustom::new(methods);
         self.variables.write(name, class.into());
     }
     pub fn execute_nodes(&mut self, nodes: &[Node]) {

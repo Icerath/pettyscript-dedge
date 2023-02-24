@@ -2,7 +2,6 @@ use super::{
     interpreter::Interpreter,
     value::{PettyObject, PettyValue},
 };
-
 pub fn load_builtins(interpreter: &mut Interpreter) {
     let builtins = [("print", Box::new(PrintBuiltin))];
     for (name, builtin) in builtins {
@@ -20,7 +19,7 @@ struct PrintBuiltin;
 // Builtin Implementations
 impl PettyObject for StringBuiltin {
     fn type_name(&self) -> &'static str {
-    "String"
+        "String"
     }
     fn __add__(
         &self,
