@@ -1,0 +1,6 @@
+class Point(x, y) {
+    fn hello() {
+        print("Hello");
+    }
+}
+print(Point);

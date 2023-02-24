@@ -1,8 +1,8 @@
-use std::any::Any;
+use std::{any::Any, collections::HashMap};
 
 use crate::ast::Node;
 
-use super::{interpreter::Interpreter, builtins::BoolBuiltin};
+use super::{builtins::{BoolBuiltin, StringBuiltin, NullBuiltin}, interpreter::Interpreter};
 pub type PtyObj = Box<dyn PettyObject>;
 pub struct PettyValue {
     ref_count: *mut usize,
@@ -14,30 +14,61 @@ impl<P: PettyObject + 'static> From<P> for PettyValue {
     }
 }
 pub trait PettyObject: 'static {
-    fn __add__(&self, interpreter: &mut Interpreter, other: PettyValue) -> Option<PettyValue> {
+    fn type_name(&self) -> &'static str;
+    fn __add__(
+        &self,
+        interpreter: &mut Interpreter,
+        source: PettyValue,
+        other: PettyValue,
+    ) -> Option<PettyValue> {
         None
     }
-    fn __sub__(&self, interpreter: &mut Interpreter, other: PettyValue) -> Option<PettyValue> {
+    fn __sub__(
+        &self,
+        interpreter: &mut Interpreter,
+        source: PettyValue,
+        other: PettyValue,
+    ) -> Option<PettyValue> {
         None
     }
-    fn __mul__(&self, interpreter: &mut Interpreter, other: PettyValue) -> Option<PettyValue> {
+    fn __mul__(
+        &self,
+        interpreter: &mut Interpreter,
+        source: PettyValue,
+        other: PettyValue,
+    ) -> Option<PettyValue> {
         None
     }
-    fn __div__(&self, interpreter: &mut Interpreter, other: PettyValue) -> Option<PettyValue> {
+    fn __div__(
+        &self,
+        interpreter: &mut Interpreter,
+        source: PettyValue,
+        other: PettyValue,
+    ) -> Option<PettyValue> {
         None
     }
     fn __bool__(&self, interpreter: &mut Interpreter, source: PettyValue) -> Option<PettyValue> {
         None
     }
-    fn __and__(&self, interpreter: &mut Interpreter, other: PettyValue) -> Option<PettyValue> {
+    fn __and__(
+        &self,
+        interpreter: &mut Interpreter,
+        source: PettyValue,
+        other: PettyValue,
+    ) -> Option<PettyValue> {
         None
     }
-    fn __or__(&self, interpreter: &mut Interpreter, other: PettyValue) -> Option<PettyValue> {
+    fn __or__(
+        &self,
+        interpreter: &mut Interpreter,
+        source: PettyValue,
+        other: PettyValue,
+    ) -> Option<PettyValue> {
         None
     }
     fn __is_eq__(&self, other: PettyValue) -> Option<PettyValue> {
         if self.type_id() != other.type_id() {
-            return Some(BoolBuiltin(false).into())
+            return Some(BoolBuiltin(false).into());
         }
         None
     }
@@ -57,7 +88,8 @@ pub trait PettyObject: 'static {
         None
     }
     fn __repr__(&self, interpreter: &mut Interpreter, source: PettyValue) -> Option<PettyValue> {
-        None
+        let string = format!("{} object at: {:?}", self.type_name(), source.object);
+        Some(StringBuiltin(string).into())
     }
     fn as_any(&self) -> &dyn std::any::Any;
 }
@@ -105,14 +137,55 @@ pub struct PettyValueFunction {
 
 impl PettyValueFunction {
     pub fn new(params: Vec<Box<str>>, nodes: Box<[Node]>) -> Self {
-        Self { nodes, params }
+        Self { params, nodes }
     }
 }
 
 impl PettyObject for PettyValueFunction {
+    fn type_name(&self) -> &'static str {
+        "Function"
+    }
     fn __call__(&self, interpreter: &mut Interpreter, args: Vec<PettyValue>) -> Option<PettyValue> {
-        todo!();
-        None
+        interpreter.variables.new_scope();
+        for (param, arg) in self.params.iter().zip(args.into_iter()) {
+            interpreter.variables.write(param.clone(), arg);
+        }
+        interpreter.execute_nodes(&self.nodes);
+        interpreter.variables.drop_scope();
+        interpreter.return_val.take()
+    }
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
+
+pub struct PettyValueCustom {
+    fields: HashMap<Box<str>, PettyValue>,
+}
+
+impl PettyValueCustom {
+    pub fn new(field_names: Box<[Box<str>]>) -> Self {
+        let mut fields = HashMap::new();
+        for field in field_names.to_vec() {
+            fields.insert(field, NullBuiltin.into());
+        }
+        Self { fields }
+    }
+}
+
+impl PettyObject for PettyValueCustom {
+    fn type_name(&self) -> &'static str {
+        "Class"
+    }
+    fn __add__(
+        &self,
+        interpreter: &mut Interpreter,
+        source: PettyValue,
+        other: PettyValue,
+    ) -> Option<PettyValue> {
+        let func = self.fields.get("__add__")?;
+        func.inner().__call__(interpreter, vec![source, other]);
+        todo!()
     }
     fn as_any(&self) -> &dyn std::any::Any {
         self

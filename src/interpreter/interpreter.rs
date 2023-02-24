@@ -1,6 +1,6 @@
 use super::{
-    builtins::{self, BoolBuiltin, IntBuiltin, NullBuiltin},
-    value::{PettyValue, PettyValueFunction},
+    builtins::{self, BoolBuiltin, IntBuiltin, NullBuiltin, StringBuiltin},
+    value::{PettyValue, PettyValueFunction, PettyValueCustom},
 };
 use crate::ast::{BinOp, Literal, Node};
 use std::collections::HashMap;
@@ -40,7 +40,17 @@ impl Interpreter {
                 return self.evaluate_bin_expr(*op, left, right);
             }
             Node::BreakState => todo!(),
-            Node::ClassDef(name, fields, methods) => todo!(),
+            Node::ClassDef(name, fields, node_methods) => {
+                let mut methods = HashMap::new();
+                for node in node_methods.iter() {
+                    let Node::FuncDef(method_name, params, block) = node else {
+                        unreachable!()
+                    };
+                    let func = PettyValueFunction::new(params.to_vec(), block.clone()).into();
+                    methods.insert(method_name.clone(), func);
+                }
+                self.create_class(name.clone(), fields.clone(), methods);
+            }
             Node::Empty => todo!(),
             Node::ForLoop(target, iter, block) => {
                 let iter = self.evaluate(iter);
@@ -68,7 +78,7 @@ impl Interpreter {
                 self.set_eq(var.clone(), value);
             }
             Node::UnaryOp(op, expr) => todo!(),
-            Node::WhileLoop(condition, body) => todo!(),
+            Node::WhileLoop(condition, body) => self.while_loop(condition, body),
         };
         self.null.clone()
     }
@@ -78,21 +88,37 @@ impl Interpreter {
         left: PettyValue,
         right: PettyValue,
     ) -> PettyValue {
-        let left = left.inner();
         let output = match op {
-            BinOp::Add => left.__add__(self, right),
-            BinOp::Sub => left.__sub__(self, right),
-            BinOp::Mul => left.__mul__(self, right),
-            BinOp::Div => left.__div__(self, right),
-            BinOp::And => left.__and__(self, right),
-            BinOp::GT => left.__gt__(right),
-            BinOp::LT => left.__lt__(right),
-            BinOp::IsEq => left.__is_eq__(right),
-            BinOp::GTEq => left.__gt_eq__(right),
-            BinOp::LTEq => left.__lt_eq__(right),
+            BinOp::Add => left.inner().__add__(self, left.clone(), right.clone()),
+            BinOp::Sub => left.inner().__sub__(self, left.clone(), right.clone()),
+            BinOp::Mul => left.inner().__mul__(self, left.clone(), right.clone()),
+            BinOp::Div => left.inner().__div__(self, left.clone(), right.clone()),
+            BinOp::And => left.inner().__and__(self, left.clone(), right.clone()),
+            BinOp::GT => left.inner().__gt__(right.clone()),
+            BinOp::LT => left.inner().__lt__(right.clone()),
+            BinOp::IsEq => left.inner().__is_eq__(right.clone()),
+            BinOp::GTEq => left.inner().__gt_eq__(right.clone()),
+            BinOp::LTEq => left.inner().__lt_eq__(right.clone()),
             _ => todo!(),
         };
-        output.unwrap()
+        let panic = || {
+            panic!(
+                "BinOp: ('{op:?}' | '{}' | '{}')",
+                self.repr(left.clone()).unwrap(),
+                self.repr(right.clone()).unwrap()
+            )
+        };
+        output.unwrap_or_else(panic)
+    }
+    pub fn repr(&mut self, value: PettyValue) -> Option<String> {
+        let repr = value.inner().__repr__(self, value.clone())?;
+        Some(
+            repr.inner()
+                .as_any()
+                .downcast_ref::<StringBuiltin>()?
+                .0
+                .clone(),
+        )
     }
     pub fn set_eq(&mut self, name: Box<str>, value: PettyValue) {
         self.variables.write(name, value);
@@ -100,7 +126,7 @@ impl Interpreter {
     pub fn read_ident(&self, name: &str) -> PettyValue {
         self.variables
             .read(name)
-            .expect("FUNCTION DOES NOT EXIST - TODO")
+            .expect("Variable does not exist. - TODO: Error")
     }
     pub fn call_function(&mut self, name: &str, args: Box<[PettyValue]>) -> PettyValue {
         let function = self.read_ident(name);
@@ -112,7 +138,11 @@ impl Interpreter {
     pub fn create_function(&mut self, name: Box<str>, params: Box<[Box<str>]>, block: Box<[Node]>) {
         let function = PettyValueFunction::new(params.to_vec(), block);
         self.variables
-            .write(name, PettyValue::new(Box::new(function)));
+            .write(name, function.into());
+    }
+    pub fn create_class(&mut self, name: Box<str>, fields: Box<[Box<str>]>, methods: HashMap<Box<str>, PettyValue>) {
+        let class = PettyValueCustom::new(fields);
+        self.variables.write(name, class.into());
     }
     pub fn execute_nodes(&mut self, nodes: &[Node]) {
         for node in nodes {
@@ -136,6 +166,14 @@ impl Interpreter {
     pub fn for_loop(&mut self, target: Box<str>, iter: PettyValue, block: &[Node]) {
         todo!()
     }
+    pub fn while_loop(&mut self, condition: &Node, block: &[Node]) {
+        while {
+            let value = self.evaluate(condition);
+            self.petty_bool(&value).unwrap()
+        } {
+            self.execute_nodes(block);
+        }
+    }
     pub fn return_statement(&mut self, node: &Node) {
         let value = self.evaluate(node);
         self.return_val = Some(value);
@@ -143,6 +181,10 @@ impl Interpreter {
 
     pub fn null(&self) -> PettyValue {
         self.null.clone()
+    }
+    pub fn petty_bool(&mut self, value: &PettyValue) -> Option<bool> {
+        let inner = value.inner().__bool__(self, value.clone())?;
+        Some(inner.inner().as_any().downcast_ref::<BoolBuiltin>()?.0)
     }
 }
 
@@ -186,6 +228,8 @@ pub fn create_literal(literal: &Literal) -> PettyValue {
     match literal {
         Literal::Int(num) => IntBuiltin(*num).into(),
         Literal::Bool(bool) => BoolBuiltin(*bool).into(),
+        Literal::String(string) => StringBuiltin(string.to_string()).into(),
+        Literal::Null => NullBuiltin.into(),
         _ => todo!(),
     }
 }

@@ -1,5 +1,3 @@
-use std::any::Any;
-
 use super::{
     interpreter::Interpreter,
     value::{PettyObject, PettyValue},
@@ -21,6 +19,18 @@ struct PrintBuiltin;
 
 // Builtin Implementations
 impl PettyObject for StringBuiltin {
+    fn type_name(&self) -> &'static str {
+    "String"
+    }
+    fn __add__(
+        &self,
+        interpreter: &mut Interpreter,
+        source: PettyValue,
+        other: PettyValue,
+    ) -> Option<PettyValue> {
+        let other = &other.inner().as_any().downcast_ref::<StringBuiltin>()?.0;
+        Some(Self(self.0.clone() + other).into())
+    }
     fn __repr__(&self, interpreter: &mut Interpreter, source: PettyValue) -> Option<PettyValue> {
         Some(source)
     }
@@ -29,6 +39,9 @@ impl PettyObject for StringBuiltin {
     }
 }
 impl PettyObject for NullBuiltin {
+    fn type_name(&self) -> &'static str {
+        "null"
+    }
     fn __bool__(&self, interpreter: &mut Interpreter, source: PettyValue) -> Option<PettyValue> {
         Some(BoolBuiltin(false).into())
     }
@@ -37,14 +50,27 @@ impl PettyObject for NullBuiltin {
     }
 }
 impl PettyObject for BoolBuiltin {
+    fn type_name(&self) -> &'static str {
+        "bool"
+    }
     fn __bool__(&self, interpreter: &mut Interpreter, source: PettyValue) -> Option<PettyValue> {
         Some(source)
     }
-    fn __and__(&self, interpreter: &mut Interpreter, other: PettyValue) -> Option<PettyValue> {
+    fn __and__(
+        &self,
+        interpreter: &mut Interpreter,
+        source: PettyValue,
+        other: PettyValue,
+    ) -> Option<PettyValue> {
         let other = other.inner().as_any().downcast_ref::<Self>()?;
         Some(Self(self.0 && other.0).into())
     }
-    fn __or__(&self, interpreter: &mut Interpreter, other: PettyValue) -> Option<PettyValue> {
+    fn __or__(
+        &self,
+        interpreter: &mut Interpreter,
+        source: PettyValue,
+        other: PettyValue,
+    ) -> Option<PettyValue> {
         let other = other.inner().as_any().downcast_ref::<Self>()?;
         Some(Self(self.0 && other.0).into())
     }
@@ -57,7 +83,15 @@ impl PettyObject for BoolBuiltin {
 }
 
 impl PettyObject for IntBuiltin {
-    fn __add__(&self, interpreter: &mut Interpreter, other: PettyValue) -> Option<PettyValue> {
+    fn type_name(&self) -> &'static str {
+        "int"
+    }
+    fn __add__(
+        &self,
+        interpreter: &mut Interpreter,
+        source: PettyValue,
+        other: PettyValue,
+    ) -> Option<PettyValue> {
         Some(match other.inner().as_any() {
             int if int.downcast_ref::<Self>().is_some() => {
                 let other = int.downcast_ref::<Self>().unwrap();
@@ -74,15 +108,30 @@ impl PettyObject for IntBuiltin {
             _ => return None,
         })
     }
-    fn __sub__(&self, interpreter: &mut Interpreter, other: PettyValue) -> Option<PettyValue> {
+    fn __sub__(
+        &self,
+        interpreter: &mut Interpreter,
+        source: PettyValue,
+        other: PettyValue,
+    ) -> Option<PettyValue> {
         let inner = other.inner().as_any().downcast_ref::<Self>()?;
         Some(Self(self.0 - inner.0).into())
     }
-    fn __mul__(&self, interpreter: &mut Interpreter, other: PettyValue) -> Option<PettyValue> {
+    fn __mul__(
+        &self,
+        interpreter: &mut Interpreter,
+        source: PettyValue,
+        other: PettyValue,
+    ) -> Option<PettyValue> {
         let inner = other.inner().as_any().downcast_ref::<Self>()?;
         Some(Self(self.0 - inner.0).into())
     }
-    fn __div__(&self, interpreter: &mut Interpreter, other: PettyValue) -> Option<PettyValue> {
+    fn __div__(
+        &self,
+        interpreter: &mut Interpreter,
+        source: PettyValue,
+        other: PettyValue,
+    ) -> Option<PettyValue> {
         let inner = other.inner().as_any().downcast_ref::<Self>()?;
         Some(Self(self.0 - inner.0).into())
     }
@@ -147,12 +196,18 @@ impl PettyObject for IntBuiltin {
 }
 
 impl PettyObject for FloatBuiltin {
+    fn type_name(&self) -> &'static str {
+        "float"
+    }
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
 }
 
 impl PettyObject for PrintBuiltin {
+    fn type_name(&self) -> &'static str {
+        "function"
+    }
     fn __call__(&self, interpreter: &mut Interpreter, args: Vec<PettyValue>) -> Option<PettyValue> {
         for arg in args {
             let repr = arg.inner().__repr__(interpreter, arg.clone()).unwrap();
