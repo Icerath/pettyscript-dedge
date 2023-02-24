@@ -21,16 +21,17 @@ Learning to write my own interpreted language for fun.
 - [x] Type Hinting
 
 ### Interpreter
-- [ ] Binary Expressions
+- [x] Binary Expressions
 - [ ] Unary Expressions
-- [ ] Variables
-- [ ] Function Calls
+- [x] Variables
+- [x] Function Calls
 - [ ] Class Instantiation
 - [ ] Methods
 - [ ] For Loop
-- [ ] While Loop
-- [ ] If/Elif/Else Statements
+- [x] While Loop
+- [x] If/Elif/Else Statements
 - [ ] Return/Break Statements
+- [ ] Clean up gross code (which is pretty much all of it)
 - [ ] Tests
 - [ ] Finish Writing Task List
 
