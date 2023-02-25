@@ -3,4 +3,5 @@ class Point(x, y) {
         return "hello, World!";
     }
 }
-print(Point);
+point = Point(1, 2);
+print(point);

@@ -34,6 +34,9 @@ pub trait PettyObject: 'static {
     ) -> Option<PettyValue> {
         None
     }
+    fn __get_item__(&self, interpreter: &mut Interpreter, str: &str) -> Option<PettyValue> {
+        None
+    }
     fn __mul__(
         &self,
         interpreter: &mut Interpreter,
@@ -162,6 +165,16 @@ impl PettyObject for PettyValueFunction {
     }
 }
 
+pub struct PettyValueClass;
+impl PettyObject for PettyValueClass {
+    fn type_name(&self) -> &'static str {
+        "Object"
+    }
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
+
 pub struct PettyValueCustom {
     fields: HashMap<Box<str>, PettyValue>,
 }
@@ -202,5 +215,8 @@ impl PettyObject for PettyValueCustom {
     }
     fn as_any(&self) -> &dyn std::any::Any {
         self
+    }
+    fn __get_item__(&self, interpreter: &mut Interpreter, str: &str) -> Option<PettyValue> {
+        self.fields.get(str).cloned()
     }
 }

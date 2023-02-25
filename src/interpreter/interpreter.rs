@@ -33,6 +33,7 @@ impl Interpreter {
     }
     pub fn evaluate(&mut self, node: &Node) -> PettyValue {
         match node {
+            Node::GetItem(from, to) => todo!(),
             Node::Globals(nodes) | Node::Block(nodes) => self.execute_nodes(nodes),
             Node::BinExpr(op, nodes) => {
                 let left = self.evaluate(&nodes.0);

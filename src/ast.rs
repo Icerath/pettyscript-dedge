@@ -11,6 +11,7 @@ pub enum Node {
     BinExpr(BinOp, Box<(Node, Node)>),
     UnaryOp(UnaryOp, Box<Node>),
     Ident(Box<str>),
+    GetItem(Box<str>, Option<Box<Node>>),
     FuncCall(Box<str>, Box<[Node]>),
     IfState(Box<Node>, Box<[Node]>, Option<Box<Node>>),
     WhileLoop(Box<Node>, Box<[Node]>),
@@ -129,6 +130,9 @@ impl fmt::Debug for Node {
                 f.debug_list().entries(nodes.iter()).finish()
             }
             Self::Ident(ident) => f.debug_tuple("Ident").field(ident).finish(),
+            Self::GetItem(ident, next) => {
+                f.debug_tuple("get_item").field(ident).field(next).finish()
+            }
             Self::IfState(expr, block, or_else) => f
                 .debug_struct("if")
                 .field("condition", expr)
