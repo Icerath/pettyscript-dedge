@@ -6,7 +6,7 @@ use crate::vm::{
     object::{PettyObject, PettyObjectType},
 };
 
-use super::function_template::SingleTemplate;
+use super::function_template::{BinOpTemplate, SingleTemplate};
 
 #[derive(Clone)]
 pub struct PtyStr(pub Box<str>);
@@ -16,12 +16,16 @@ impl fmt::Display for PtyStr {
     }
 }
 impl PettyObjectType for PtyStr {
-    fn call(&self, vm: &mut Vm, this: PettyObject, args: FuncArgs) -> PettyObject {
-        todo!()
+    fn call(&self, _vm: &mut Vm, _this: PettyObject, _args: FuncArgs) -> PettyObject {
+        todo!("String is not Callable")
     }
-    fn get_item(&self, vm: &mut Vm, this: PettyObject, str: &str) -> PettyObject {
+    fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
         match str {
             "__repr__" => SingleTemplate(|this: Self| this).into(),
+            "__add__" => BinOpTemplate(|lhs: Self, rhs: Self| {
+                Self((lhs.0.to_string() + &rhs.0).into_boxed_str())
+            })
+            .into(),
             _ => todo!(),
         }
     }

@@ -6,13 +6,19 @@ use crate::vm::{
     object::{PettyObject, PettyObjectType},
 };
 
+use super::{function_template::SingleTemplate, PtyBool};
+
+#[derive(Clone)]
 pub struct PtyNull;
 impl PettyObjectType for PtyNull {
-    fn call(&self, vm: &mut Vm, this: PettyObject, args: FuncArgs) -> PettyObject {
+    fn call(&self, _vm: &mut Vm, _this: PettyObject, _args: FuncArgs) -> PettyObject {
         todo!()
     }
-    fn get_item(&self, vm: &mut Vm, this: PettyObject, str: &str) -> PettyObject {
-        todo!()
+    fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
+        match str {
+            "__bool__" => SingleTemplate(|_: Self| PtyBool(false)).into(),
+            _ => todo!()
+        }
     }
     fn as_any(&self) -> &dyn std::any::Any {
         self
