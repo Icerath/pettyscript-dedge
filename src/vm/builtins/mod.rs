@@ -5,6 +5,7 @@ mod print;
 mod pty_bool;
 mod string;
 
+pub use function_template::display_function_object;
 pub use int::PtyInt;
 pub use null::PtyNull;
 pub use print::PtyPrint;

@@ -4,31 +4,26 @@ use std::{
     ops::{Index, IndexMut},
 };
 
-pub struct FieldDict(HashMap<String, PettyObject>, PettyObject);
+#[derive(Default)]
+pub struct FieldDict {
+    globals: HashMap<String, PettyObject>,
+    scopes: Vec<HashMap<String, PettyObject>>,
+}
 
 impl FieldDict {
-    pub fn new() -> Self {
-        Self(HashMap::new(), PtyNull.into())
-    }
     pub fn write(&mut self, str: &str, value: PettyObject) {
-        self.0.insert(str.into(), value);
+        self.current_scope().insert(str.into(), value);
     }
-    pub fn read(&self, str: &str) -> PettyObject {
-        self.0.get(str).expect("Not found").clone()
+    pub fn read(&mut self, str: &str) -> PettyObject {
+        self.current_scope().get(str).unwrap_or_else(|| panic!("Not found: {str}")).clone()
     }
-}
-
-impl Index<&str> for FieldDict {
-    type Output = PettyObject;
-    fn index(&self, index: &str) -> &PettyObject {
-        &self.1
+    fn current_scope(&mut self) -> &mut HashMap<String, PettyObject> {
+        self.scopes.last_mut().unwrap_or(&mut self.globals)
     }
-}
-impl IndexMut<&str> for FieldDict {
-    fn index_mut(&mut self, index: &str) -> &mut Self::Output {
-        if !self.0.contains_key(index) {
-            self.write(index, PtyNull.into());
-        }
-        self.0.get_mut(index).unwrap()
+    pub fn new_scope(&mut self) {
+        self.scopes.push(HashMap::new());
+    }
+    pub fn drop_scope(&mut self) {
+        self.scopes.pop();
     }
 }
