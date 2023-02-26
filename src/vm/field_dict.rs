@@ -13,6 +13,9 @@ impl FieldDict {
     pub fn write(&mut self, str: &str, value: PettyObject) {
         self.0.insert(str.into(), value);
     }
+    pub fn read(&self, str: &str) -> PettyObject {
+        self.0.get(str).expect("Not found").clone()
+    }
 }
 
 impl Index<&str> for FieldDict {

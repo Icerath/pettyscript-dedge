@@ -54,15 +54,21 @@ impl<I: Into<PettyObject> + Clone, O: Into<PettyObject> + Clone> PettyObjectType
 }
 impl<T: Into<PettyObject> + Clone> fmt::Display for BinOpTemplate<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let ptr = self as *const Self;
-        write!(f, "Function Object at {ptr:?}")
+        display_function_object(self, f)
     }
 }
 impl<I: Into<PettyObject> + Clone, O: Into<PettyObject> + Clone> fmt::Display
     for SingleTemplate<I, O>
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let ptr = self as *const Self;
-        write!(f, "Function Object at {ptr:?}")
+        display_function_object(self, f)
     }
+}
+#[inline]
+pub fn display_function_object<T: Into<PettyObject>>(
+    this: &T,
+    f: &mut fmt::Formatter<'_>,
+) -> fmt::Result {
+    let ptr = this as *const T;
+    write!(f, "Function Object at {ptr:?}")
 }

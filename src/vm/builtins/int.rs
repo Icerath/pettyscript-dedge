@@ -6,17 +6,12 @@ use crate::vm::{
 use std::{any::Any, fmt};
 
 use super::{
-    bool::PtyBool,
     function_template::{BinOpTemplate, SingleTemplate},
+    PtyBool, PtyStr,
 };
 
 #[derive(Clone, Copy)]
-pub struct PtyInt(i128);
-impl PtyInt {
-    pub fn new(int: i128) -> Self {
-        Self(int)
-    }
-}
+pub struct PtyInt(pub i128);
 impl PettyObjectType for PtyInt {
     fn call(&self, _vm: &mut Vm, _this: PettyObject, _args: FuncArgs) -> PettyObject {
         todo!()
@@ -28,8 +23,11 @@ impl PettyObjectType for PtyInt {
             "__mul__" => BinOpTemplate::<Self>(|left, right| Self(left.0 * right.0)).into(),
             "__div__" => BinOpTemplate::<Self>(|left, right| Self(left.0 / right.0)).into(),
             "__bool__" => SingleTemplate::<Self, PtyBool>(|this: Self| PtyBool(this.0 != 0)).into(),
+            "__repr__" => {
+                SingleTemplate::<Self, PtyStr>(|this| PtyStr(this.to_string().into())).into()
+            }
             "abs" => SingleTemplate::<Self, Self>(|this| Self(this.0.abs())).into(),
-            _ => todo!(),
+            _ => todo!("{str}"),
         }
     }
     fn as_any(&self) -> &dyn Any {

@@ -1,6 +1,11 @@
 use crate::ast::{BinOp, Node};
 
-use super::{builtins, field_dict::FieldDict, function_args::FuncArgs, object::PettyObject};
+use super::{
+    builtins,
+    field_dict::FieldDict,
+    function_args::FuncArgs,
+    object::{PettyObject, PettyObjectType},
+};
 
 pub type Vm = VirtualMachine;
 
@@ -19,6 +24,9 @@ impl VirtualMachine {
     pub fn null(&self) -> PettyObject {
         self.null.clone()
     }
+    pub fn load_builtin<PtyObj: PettyObjectType + 'static>(&mut self, name: &str, object: PtyObj) {
+        self.fields.write(name, object.into());
+    }
 }
 
 impl VirtualMachine {
@@ -28,6 +36,7 @@ impl VirtualMachine {
             Node::SetEq(name, expr) => self.set_eq(name, expr),
             Node::BinExpr(op, nodes) => return self.bin_expr(*op, &nodes.0, &nodes.1),
             Node::Literal(literal) => return builtins::create_literal(literal),
+            Node::FuncCall(name, args) => return self.func_call(name, args),
             _ => todo!("{node:?}"),
         };
         self.null()
@@ -49,6 +58,11 @@ impl VirtualMachine {
         let function = lhs.get_item(self, lhs.clone(), function_name);
         let args = FuncArgs(vec![lhs, rhs]);
         function.call(self, function.clone(), args)
+    }
+    pub fn func_call(&mut self, name: &str, args: &[Node]) -> PettyObject {
+        let args: Vec<_> = args.iter().map(|arg| self.evaluate(arg)).collect();
+        let function = self.fields.read(name);
+        function.call(self, function.clone(), FuncArgs(args))
     }
 }
 
