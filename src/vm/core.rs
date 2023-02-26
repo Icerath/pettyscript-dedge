@@ -24,7 +24,7 @@ impl VirtualMachine {
 impl VirtualMachine {
     pub fn evaluate(&mut self, node: &Node) -> PettyObject {
         match node {
-            Node::Globals(nodes)|Node::Block(nodes) => self.execute_nodes(nodes),
+            Node::Globals(nodes) | Node::Block(nodes) => self.execute_nodes(nodes),
             Node::SetEq(name, expr) => self.set_eq(name, expr),
             Node::BinExpr(op, nodes) => return self.bin_expr(*op, &nodes.0, &nodes.1),
             Node::Literal(literal) => return builtins::create_literal(literal),
@@ -57,6 +57,9 @@ impl VirtualMachine {
 fn op_to_function(op: BinOp) -> &'static str {
     match op {
         BinOp::Add => "__add__",
+        BinOp::Sub => "__sub__",
+        BinOp::Mul => "__mul__",
+        BinOp::Div => "__div__",
         _ => todo!(),
     }
 }

@@ -1,5 +1,8 @@
-use super::{object::PettyObject, builtins::PtyNull};
-use std::{collections::HashMap, ops::{IndexMut, Index}};
+use super::{builtins::PtyNull, object::PettyObject};
+use std::{
+    collections::HashMap,
+    ops::{Index, IndexMut},
+};
 
 pub struct FieldDict(HashMap<String, PettyObject>, PettyObject);
 
@@ -11,7 +14,6 @@ impl FieldDict {
         self.0.insert(str.into(), value);
     }
 }
-
 
 impl Index<&str> for FieldDict {
     type Output = PettyObject;

@@ -1,4 +1,4 @@
-use std::{fmt, ops::Deref, ptr::NonNull, any::Any};
+use std::{any::Any, fmt, ops::Deref, ptr::NonNull};
 
 use crate::slim_rc::Rc;
 
