@@ -1,11 +1,11 @@
 use ast::Node;
-use interpreter::interpret;
 use nom_supreme::error::ErrorTree;
 
 mod ast;
 mod error;
-mod interpreter;
 mod parser;
+mod slim_rc;
+mod vm;
 
 pub type NomErr<'a> = nom_supreme::error::ErrorTree<&'a str>;
 pub type IRes<'a, T = ast::Node, E = NomErr<'a>> = nom::IResult<&'a str, T, E>;
@@ -13,7 +13,7 @@ pub type IRes<'a, T = ast::Node, E = NomErr<'a>> = nom::IResult<&'a str, T, E>;
 fn main() -> Result<(), ()> {
     let input = include_str!("../example.pty");
     let ast = read_ast(input)?;
-    interpret(&ast);
+    vm::run_virtual_machine(&ast);
     Ok(())
 }
 fn read_ast(input: &str) -> Result<Node, ()> {
