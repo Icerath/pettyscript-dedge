@@ -47,7 +47,7 @@ fn node(input: &str) -> IRes {
 }
 fn terminated_expr(input: &str) -> IRes {
     err(
-        alt((set_equals, node_value)).terminated(cut(spar(';'))),
+        alt((set_equals, bin_expr)).terminated(cut(spar(';'))),
         ParseErr::TermExpr,
     )(input)
 }

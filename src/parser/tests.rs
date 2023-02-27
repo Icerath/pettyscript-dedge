@@ -226,4 +226,14 @@ mod parser_tests {
         );
         assert_expected(source, vec![expected]);
     }
+    #[test]
+    fn test_get_item_precedence() {
+        let source = "1 + 1.abs();";
+        let expected = Node::bin_expr(
+            BinOp::Add,
+            Node::literal(1),
+            Node::get_item(Node::func_call("abs", vec![]), Node::literal(1)),
+        );
+        assert_expected(source, vec![expected]);
+    }
 }
