@@ -6,13 +6,13 @@ mod parser_tests {
         assert_eq!(output, Node::Globals(expected.into_boxed_slice()));
     }
     #[test]
-    fn test_set_equals() {
+    fn set_equals() {
         let source = "var = 10;";
         let expected = Node::set_eq("var", Node::literal(10));
         assert_expected(source, vec![expected]);
     }
     #[test]
-    fn test_set_equals_expr() {
+    fn set_equals_expr() {
         let source = "two_pi = pi() * 2;";
         let expected = Node::set_eq(
             "two_pi",
@@ -21,7 +21,7 @@ mod parser_tests {
         assert_expected(source, vec![expected]);
     }
     #[test]
-    fn test_bin_expr_order() {
+    fn bin_expr_order() {
         let source = "1 + 2 - 3 * 4 / 5 > 10 && true";
         let expected = Node::bin_expr(
             BinOp::And,
@@ -44,7 +44,7 @@ mod parser_tests {
         assert_eq!(output, expected);
     }
     #[test]
-    fn test_unary_expr() {
+    fn unary_expr() {
         let source = "--1 + !i";
         let expected = Node::bin_expr(
             BinOp::Add,
@@ -58,7 +58,7 @@ mod parser_tests {
         assert_eq!(output, expected);
     }
     #[test]
-    fn test_line_comments() {
+    fn line_comments() {
         let source = "//Hello!\none = 1;//Two\n//Comments\ntwo = 2;//End";
         let expected = vec![
             Node::set_eq("one", Node::literal(1)),
@@ -67,13 +67,13 @@ mod parser_tests {
         assert_expected(source, expected);
     }
     #[test]
-    fn test_multiline_comments() {
+    fn multiline_comments() {
         let source = "/*Hello*/i = 0;/*1\n2\n3*/";
         let expected = Node::set_eq("i", Node::literal(0));
         assert_expected(source, vec![expected]);
     }
     #[test]
-    fn test_complex_expr() {
+    fn complex_expr() {
         let source = "condition = 1 - get_pi() < 10 / 3 && get_pi() == 3.141516;";
         let expected = Node::set_eq(
             "condition",
@@ -98,7 +98,7 @@ mod parser_tests {
         assert_expected(source, vec![expected]);
     }
     #[test]
-    fn test_simple_function() {
+    fn simple_function() {
         let source = r#"fn greet(name) { print("Hello " + name); }"#;
         let expected = Node::func_def(
             "greet",
@@ -115,13 +115,13 @@ mod parser_tests {
         assert_expected(source, vec![expected]);
     }
     #[test]
-    fn test_simple_class() {
+    fn simple_class() {
         let source = "class Point(x, y);";
         let expected = Node::class_def("Point", vec!["x", "y"], vec![]);
         assert_expected(source, vec![expected]);
     }
     #[test]
-    fn test_class_methods() {
+    fn class_methods() {
         let source = "
             class Point(x, y) {
                 fn add(self, other) {
@@ -154,7 +154,7 @@ mod parser_tests {
         assert_expected(source, vec![expected]);
     }
     #[test]
-    fn test_set_eq_type_hints() {
+    fn set_eq_type_hints() {
         let source = "num: int = 0;";
         let expected = Node::set_eq("num", Node::literal(0));
         assert_expected(source, vec![expected]);
@@ -162,7 +162,7 @@ mod parser_tests {
         parse(source_err).unwrap_err();
     }
     #[test]
-    fn test_function_type_hints() {
+    fn function_type_hints() {
         let source = "fn squared(num: int) {
             return num * num;
         }";
@@ -178,13 +178,13 @@ mod parser_tests {
         assert_expected(source, vec![expected]);
     }
     #[test]
-    fn test_if_statement() {
+    fn if_statement() {
         let source = "if true {}";
         let expected = Node::if_state(Node::literal(true), vec![], None);
         assert_expected(source, vec![expected]);
     }
     #[test]
-    fn test_if_chain() {
+    fn if_chain() {
         let source = "if x { print(x); } elif y { print(y); } else { print(z); }";
         let expected = Node::if_state(
             Node::ident("x"),
@@ -201,13 +201,13 @@ mod parser_tests {
         assert_expected(source, vec![expected]);
     }
     #[test]
-    fn test_list_literal() {
+    fn list_literal() {
         let source = "[1, 2, 3];";
         let expected = Node::literal(vec![Node::literal(1), Node::literal(2), Node::literal(3)]);
         assert_expected(source, vec![expected]);
     }
     #[test]
-    fn test_list_literal_exprs() {
+    fn list_literal_exprs() {
         let source = r#"[1+2, pi(), "Hello, World!"];"#;
         let expected = Node::literal(vec![
             Node::bin_expr(BinOp::Add, Node::literal(1), Node::literal(2)),
@@ -217,7 +217,7 @@ mod parser_tests {
         assert_expected(source, vec![expected]);
     }
     #[test]
-    fn test_get_item() {
+    fn get_item() {
         let source = "[1, 2, 3].len;";
         let expected = Node::bin_expr(
             BinOp::GetItem,
@@ -227,7 +227,7 @@ mod parser_tests {
         assert_expected(source, vec![expected]);
     }
     #[test]
-    fn test_get_item_layered() {
+    fn get_item_layered() {
         let source = "[1, 2, 3].len.abs().ans;";
         let expected = Node::bin_expr(
             BinOp::GetItem,
@@ -245,7 +245,7 @@ mod parser_tests {
         assert_expected(source, vec![expected]);
     }
     #[test]
-    fn test_get_item_function() {
+    fn get_item_function() {
         let source = "1.max(2);";
         let expected = Node::bin_expr(
             BinOp::GetItem,
@@ -255,7 +255,7 @@ mod parser_tests {
         assert_expected(source, vec![expected]);
     }
     #[test]
-    fn test_get_item_precedence() {
+    fn get_item_precedence() {
         let source = "1 + 1.abs();";
         let expected = Node::bin_expr(
             BinOp::Add,
@@ -267,5 +267,15 @@ mod parser_tests {
             ),
         );
         assert_expected(source, vec![expected]);
+    }
+}
+
+#[cfg(test)]
+mod failing_tests {
+    use super::super::{parse};
+    #[test]
+    fn fail_get_item() {
+        let source = "1.1;";
+        parse(source).unwrap();
     }
 }
