@@ -6,7 +6,7 @@ use crate::vm::{
     object::{PettyObject, PettyObjectType},
 };
 
-use super::function_template::SingleTemplate;
+use super::{function_template::SingleTemplate, PtyStr};
 
 #[derive(Clone)]
 pub struct PtyBool(pub bool);
@@ -14,7 +14,9 @@ impl PettyObjectType for PtyBool {
     fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
         match str {
             "__bool__" => SingleTemplate(|this: Self| this).into(),
-            _ => todo!(),
+            "__not__" => SingleTemplate(|this: Self| Self(!this.0)).into(),
+            "__repr__" => SingleTemplate(|this: Self| PtyStr::from_obj(&this)).into(),
+            _ => todo!("{str}"),
         }
     }
     fn call(&self, _vm: &mut Vm, _this: PettyObject, _args: FuncArgs) -> PettyObject {
