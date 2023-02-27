@@ -4,7 +4,8 @@ use super::{
     builtins::{self, PtyNull},
     field_dict::FieldDict,
     function_args::FuncArgs,
-    object::{PettyObject, PettyObjectType}, petty_function::PettyFunction,
+    object::{PettyObject, PettyObjectType},
+    petty_function::PettyFunction,
 };
 
 pub type Vm = VirtualMachine;

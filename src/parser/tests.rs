@@ -192,4 +192,38 @@ mod parser_tests {
         );
         assert_expected(source, vec![expected]);
     }
+    #[test]
+    fn test_list_literal() {
+        let source = "[1, 2, 3];";
+        let expected = Node::literal(vec![Node::literal(1), Node::literal(2), Node::literal(3)]);
+        assert_expected(source, vec![expected]);
+    }
+    #[test]
+    fn test_list_literal_exprs() {
+        let source = r#"[1+2, pi(), "Hello, World!"];"#;
+        let expected = Node::literal(vec![
+            Node::bin_expr(BinOp::Add, Node::literal(1), Node::literal(2)),
+            Node::func_call("pi", vec![]),
+            Node::literal("Hello, World!"),
+        ]);
+        assert_expected(source, vec![expected]);
+    }
+    #[test]
+    fn test_get_item() {
+        let source = "[1, 2, 3].len;";
+        let expected = Node::get_item(
+            Node::ident("len"),
+            Node::literal(vec![Node::literal(1), Node::literal(2), Node::literal(3)]),
+        );
+        assert_expected(source, vec![expected]);
+    }
+    #[test]
+    fn test_get_item_function() {
+        let source = "1.max(2);";
+        let expected = Node::get_item(
+            Node::func_call("max", vec![Node::literal(2)]),
+            Node::literal(1),
+        );
+        assert_expected(source, vec![expected]);
+    }
 }

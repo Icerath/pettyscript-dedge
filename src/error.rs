@@ -10,6 +10,7 @@ pub enum PettyParseError {
     Float,
     FloatDigit,
     TermExpr,
+    ExpectedIdentAfterDot,
 }
 
 impl fmt::Display for PettyParseError {

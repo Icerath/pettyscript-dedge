@@ -11,7 +11,7 @@ pub enum Node {
     BinExpr(BinOp, Box<(Node, Node)>),
     UnaryOp(UnaryOp, Box<Node>),
     Ident(Box<str>),
-    GetItem(Box<str>, Option<Box<Node>>),
+    GetItem(Box<Node>, Box<Node>),
     FuncCall(Box<str>, Box<[Node]>),
     IfState(Box<Node>, Box<[Node]>, Option<Box<Node>>),
     WhileLoop(Box<Node>, Box<[Node]>),
@@ -186,6 +186,9 @@ impl Node {
     pub fn set_eq(ident: &str, value: Node) -> Self {
         Self::SetEq(ident.into(), Box::new(value))
     }
+    pub fn get_item(item: Node, from: Node) -> Self {
+        Self::GetItem(Box::new(item), Box::new(from))
+    }
     pub fn class_def(name: &str, fields: Vec<&str>, methods: Vec<Node>) -> Self {
         Self::ClassDef(name.into(), vec_box_str(fields), methods.into_boxed_slice())
     }
@@ -232,5 +235,11 @@ impl From<f64> for Literal {
 impl From<bool> for Literal {
     fn from(value: bool) -> Self {
         Self::Bool(value)
+    }
+}
+
+impl From<Vec<Node>> for Literal {
+    fn from(value: Vec<Node>) -> Self {
+        Self::List(value.into_boxed_slice())
     }
 }

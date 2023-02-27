@@ -15,7 +15,10 @@ impl FieldDict {
         self.current_scope().insert(str.into(), value);
     }
     pub fn read(&mut self, str: &str) -> PettyObject {
-        self.current_scope().get(str).unwrap_or_else(|| panic!("Not found: {str}")).clone()
+        self.current_scope()
+            .get(str)
+            .unwrap_or_else(|| panic!("Not found: {str}"))
+            .clone()
     }
     fn current_scope(&mut self) -> &mut HashMap<String, PettyObject> {
         self.scopes.last_mut().unwrap_or(&mut self.globals)

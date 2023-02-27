@@ -23,7 +23,11 @@ impl PettyObjectType for PettyFunction {
     fn call(&self, vm: &mut Vm, this: PettyObject, args: FuncArgs) -> PettyObject {
         vm.fields.new_scope();
         if self.args.len() != args.0.len() {
-            todo!("Expected {} arguments, got {}.", {self.args.len()}, args.0.len());
+            todo!(
+                "Expected {} arguments, got {}.",
+                { self.args.len() },
+                args.0.len()
+            );
         }
         for (param, arg) in self.args.iter().zip(args.0.into_iter()) {
             vm.fields.write(param, arg);

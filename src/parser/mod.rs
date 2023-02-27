@@ -62,7 +62,17 @@ fn node_expr(input: &str) -> IRes {
     bin_expr(input)
 }
 fn node_value(input: &str) -> IRes {
-    alt((unary_expr, node_value_raw))(input)
+    alt((unary_expr, get_item, node_value_raw))(input)
+}
+fn get_item(input: &str) -> IRes {
+    map(
+        separated_pair(
+            sp(node_value_raw),
+            spar('.'),
+            cut(err(sp(node_value), PettyParseError::ExpectedIdentAfterDot)),
+        ),
+        |(node, name)| Node::GetItem(Box::new(name), Box::new(node)),
+    )(input)
 }
 fn node_value_raw(input: &str) -> IRes {
     alt((
@@ -194,7 +204,7 @@ fn float(i: &str) -> IRes<f64> {
             sp(opt(one_of("+-"))),
             sp(digit1),
             char('.'),
-            cut(err(digit1, ParseErr::FloatDigit)),
+            err(digit1, ParseErr::FloatDigit),
         )),
         ParseErr::Float,
     ));
@@ -238,7 +248,7 @@ fn err<'a, O, P: Parser<&'a str, O, NomErr<'a>>>(
                 nom::Err::Error(_) => nom::Err::Error(err),
                 nom::Err::Failure(e) => match &e {
                     ErrorTree::Base { location: _, kind }
-                        if matches!(kind, BaseErrorKind::Expected(_)) =>
+                        if matches!(kind, BaseErrorKind::External(_err)) =>
                     {
                         nom::Err::Failure(e)
                     }
