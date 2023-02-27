@@ -1,4 +1,4 @@
-use crate::ast::{BinOp, Node};
+use crate::ast::{BinOp, Node, UnaryOp};
 
 use super::{
     builtins::{self, PtyNull},
@@ -41,6 +41,7 @@ impl VirtualMachine {
             Node::FuncCall(name, args) => return self.func_call(name, args),
             Node::FuncDef(name, args, block) => self.func_def(name, args, block),
             Node::ReturnState(expr) => self.return_val = Some(self.evaluate(expr)),
+            Node::UnaryOp(op, expr) => return self.unary_expr(*op, expr),
             _ => todo!("{node:?}"),
         };
         PtyNull.into()
@@ -68,9 +69,16 @@ impl VirtualMachine {
     pub fn bin_expr(&mut self, op: BinOp, lhs: &Node, rhs: &Node) -> PettyObject {
         let lhs = self.evaluate(lhs);
         let rhs = self.evaluate(rhs);
-        let function_name = op_to_function(op);
+        let function_name = op.into_petty_function();
         let function = lhs.get_item(self, lhs.clone(), function_name);
         let args = FuncArgs(vec![lhs, rhs]);
+        function.call(self, function.clone(), args)
+    }
+    pub fn unary_expr(&mut self, op: UnaryOp, expr: &Node) -> PettyObject {
+        let inner = self.evaluate(expr);
+        let function_name = op.into_petty_function();
+        let function = inner.get_item(self, inner.clone(), function_name);
+        let args = FuncArgs(vec![inner]);
         function.call(self, function.clone(), args)
     }
     pub fn func_call(&mut self, name: &str, args: &[Node]) -> PettyObject {
@@ -87,14 +95,28 @@ impl VirtualMachine {
     }
 }
 
-#[must_use]
-#[inline]
-fn op_to_function(op: BinOp) -> &'static str {
-    match op {
-        BinOp::Add => "__add__",
-        BinOp::Sub => "__sub__",
-        BinOp::Mul => "__mul__",
-        BinOp::Div => "__div__",
-        _ => todo!(),
+impl BinOp {
+    #[must_use]
+    #[inline]
+    pub fn into_petty_function(self) -> &'static str {
+        match self {
+            Self::Add => "__add__",
+            Self::Sub => "__sub__",
+            Self::Mul => "__mul__",
+            Self::Div => "__div__",
+            _ => todo!(),
+        }
+    }
+}
+
+impl UnaryOp {
+    #[must_use]
+    #[inline]
+    pub fn into_petty_function(self) -> &'static str {
+        match self {
+            Self::Neg => "__neg__",
+            Self::Not => "__not__",
+            Self::Plus => panic!("Idk what to use this for yet"),
+        }
     }
 }
