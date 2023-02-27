@@ -28,14 +28,12 @@ fn upper(input: &str) -> IRes {
 }
 fn get_item(input: &str) -> IRes {
     let (input, initial) = factor(input)?;
-    let (input, remainder) = many0(pair(map(spar('.'), |_| BinOp::GetItem), get_item_suffix))(input)?;
+    let (input, remainder) =
+        many0(pair(map(spar('.'), |_| BinOp::GetItem), get_item_suffix))(input)?;
     Ok((input, fold_exprs(initial, remainder)))
 }
 fn get_item_suffix(input: &str) -> IRes {
-    alt((
-        function_call,
-        map(sp(ident), Node::Ident)
-    ))(input)
+    alt((function_call, map(sp(ident), Node::Ident)))(input)
 }
 fn factor(input: &str) -> IRes {
     alt((paren_bin_expr, node_value))(input)

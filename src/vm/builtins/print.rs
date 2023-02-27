@@ -13,11 +13,9 @@ pub struct PtyPrint;
 impl PettyObjectType for PtyPrint {
     fn call(&self, vm: &mut Vm, _this: PettyObject, args: FuncArgs) -> PettyObject {
         for arg in args.0 {
-            let repr_object = arg.get_item(vm, arg.clone(), "__repr__");
-            let string = repr_object
-                .call(vm, repr_object.clone(), FuncArgs(vec![arg]))
-                .to_string();
-            println!("{string:?}");
+            let repr_function = arg.get_item(vm, arg.clone(), "__repr__");
+            let repr_object = repr_function.call(vm, repr_function.clone(), FuncArgs(vec![arg]));
+            println!("{repr_object}");
         }
         PtyNull.into()
     }

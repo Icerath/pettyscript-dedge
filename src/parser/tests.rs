@@ -272,7 +272,7 @@ mod parser_tests {
 
 #[cfg(test)]
 mod failing_tests {
-    use super::super::{parse};
+    use super::super::parse;
     #[test]
     fn fail_get_item() {
         let source = "1.1;";
