@@ -1,1 +1,1 @@
-1.len.abs;
+print(1.abs());

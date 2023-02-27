@@ -32,7 +32,7 @@ impl VirtualMachine {
         match node {
             Node::Globals(nodes) | Node::Block(nodes) => self.execute_nodes(nodes),
             Node::SetEq(name, expr) => self.set_eq(name, expr),
-            Node::BinExpr(op, nodes) if *op == BinOp::GetItem => self.get_item(&nodes.0, &nodes.1),
+            Node::BinExpr(op, nodes) if *op == BinOp::GetItem => return self.get_item(&nodes.0, &nodes.1),
             Node::BinExpr(op, nodes) => return self.bin_expr(*op, &nodes.0, &nodes.1),
             Node::Literal(literal) => return builtins::create_literal(literal),
             Node::Ident(ident) => return self.fields.read(ident),
@@ -53,8 +53,16 @@ impl VirtualMachine {
         println!("{name}: {}", &value);
         self.fields.write(name, value);
     }
-    pub fn get_item(&mut self, left: &Node, right: &Node) {
-        todo!()
+    pub fn get_item(&mut self, left: &Node, right: &Node) -> PettyObject {
+        let left = self.evaluate(left);
+        let (function, args) = match right {
+            Node::Ident(ident) => return left.get_item(self, left.clone(), ident),
+            Node::FuncCall(name, args) => (left.get_item(self, left.clone(), name), args),
+            _ => unreachable!(),
+        };
+        let mut args = self.evaluate_list(args);
+        args.push(left);
+        function.call(self, function.clone(), FuncArgs(args))
     }
     pub fn bin_expr(&mut self, op: BinOp, lhs: &Node, rhs: &Node) -> PettyObject {
         let lhs = self.evaluate(lhs);
@@ -65,9 +73,12 @@ impl VirtualMachine {
         function.call(self, function.clone(), args)
     }
     pub fn func_call(&mut self, name: &str, args: &[Node]) -> PettyObject {
-        let args: Vec<_> = args.iter().map(|arg| self.evaluate(arg)).collect();
+        let args = self.evaluate_list(args);
         let function = self.fields.read(name);
         function.call(self, function.clone(), FuncArgs(args))
+    }
+    pub fn evaluate_list(&mut self, items: &[Node]) -> Vec<PettyObject> {
+        items.iter().map(|arg| self.evaluate(arg)).collect()
     }
     pub fn func_def(&mut self, name: &str, args: &Box<[Box<str>]>, block: &Box<[Node]>) {
         let function = PettyFunction::new(args.clone(), block.clone());
