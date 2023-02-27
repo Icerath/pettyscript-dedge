@@ -10,6 +10,5 @@ mod petty_function;
 pub fn run_virtual_machine(ast: &ast::Node) {
     let mut vm = core::VirtualMachine::new();
     builtins::load_builtins(&mut vm);
-    let result = vm.evaluate(ast);
-    println!("{result}");
+    vm.evaluate(ast);
 }

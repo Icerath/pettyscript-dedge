@@ -50,7 +50,6 @@ impl VirtualMachine {
     }
     pub fn set_eq(&mut self, name: &str, expr: &Node) {
         let value = self.evaluate(expr);
-        println!("{name}: {}", &value);
         self.fields.write(name, value);
     }
     pub fn get_item(&mut self, left: &Node, right: &Node) -> PettyObject {
