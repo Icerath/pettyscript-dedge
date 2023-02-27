@@ -23,7 +23,7 @@ Learning to write my own interpreted language for fun.
 
 ### Interpreter
 - [x] Binary Expressions
-- [ ] Unary Expressions
+- [x] Unary Expressions
 - [x] Variables
 - [x] Function Calls
 - [ ] Class Instantiation
@@ -35,6 +35,7 @@ Learning to write my own interpreted language for fun.
 - [ ] Clean up gross code (which is pretty much all of it)
 - [ ] Tests
 - [ ] Finish Writing Task List
+- [ ] Maybe learn proc macros to make creating builtins easier!!!!!
 
 ### CLI
 
