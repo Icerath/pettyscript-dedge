@@ -1,7 +1,5 @@
 use super::object::PettyObject;
-use std::{
-    collections::HashMap,
-};
+use std::collections::HashMap;
 
 #[derive(Default)]
 pub struct FieldDict {

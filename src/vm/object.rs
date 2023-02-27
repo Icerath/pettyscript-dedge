@@ -19,6 +19,11 @@ impl PettyObject {
             object: NonNull::from(Box::leak(Box::new(object))),
         })
     }
+    pub fn call_method(&self, vm: &mut Vm, func: &str, mut args: FuncArgs) -> PettyObject {
+        args.0.push(self.clone());
+        let function = self.get_item(vm, self.clone(), func);
+        function.call(vm, function.clone(), args)
+    }
 }
 impl<Pty: PettyObjectType + 'static> From<Pty> for PettyObject {
     fn from(value: Pty) -> Self {

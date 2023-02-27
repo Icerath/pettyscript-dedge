@@ -1,7 +1,7 @@
 use crate::ast::{BinOp, Node, UnaryOp};
 
 use super::{
-    builtins::{self, PtyNull},
+    builtins::{self, PtyBool, PtyNull},
     field_dict::FieldDict,
     function_args::FuncArgs,
     object::{PettyObject, PettyObjectType},
@@ -42,6 +42,11 @@ impl VirtualMachine {
             Node::FuncDef(name, args, block) => self.func_def(name, args, block),
             Node::ReturnState(expr) => self.return_val = Some(self.evaluate(expr)),
             Node::UnaryOp(op, expr) => return self.unary_expr(*op, expr),
+            Node::IfState(condition, block, or_else) => {
+                self.if_statement(condition, block, or_else.as_ref().map(Box::as_ref));
+            }
+            Node::WhileLoop(condition, block) => self.while_loop(condition, block),
+            Node::ForLoop(target, iter, block) => self.for_loop(target, iter, block),
             _ => todo!("{node:?}"),
         };
         PtyNull.into()
@@ -94,6 +99,36 @@ impl VirtualMachine {
         let function = PettyFunction::new(args.clone(), block.clone());
         self.fields.write(name, function.into());
     }
+    pub fn if_statement(&mut self, condition: &Node, block: &[Node], or_else: Option<&Node>) {
+        let condition = self.evaluate(condition);
+        let condition = condition.call_method(self, "__bool__", FuncArgs(vec![]));
+        let condition = condition
+            .as_any()
+            .downcast_ref::<PtyBool>()
+            .expect("Expected bool");
+        if condition.0 {
+            return self.execute_nodes(block);
+        }
+        if let Some(node) = or_else {
+            self.evaluate(node);
+        };
+    }
+    pub fn while_loop(&mut self, condition: &Node, block: &[Node]) {
+        while {
+            let condition = self.evaluate(condition);
+            let condition = condition.call_method(self, "__bool__", FuncArgs(vec![]));
+            let condition = condition
+                .as_any()
+                .downcast_ref::<PtyBool>()
+                .expect("Expected bool");
+            condition.0
+        } {
+            self.execute_nodes(block);
+        }
+    }
+    pub fn for_loop(&mut self, target: &str, iter: &Node, block: &[Node]) {
+        todo!()
+    }
 }
 
 impl BinOp {
@@ -105,6 +140,11 @@ impl BinOp {
             Self::Sub => "__sub__",
             Self::Mul => "__mul__",
             Self::Div => "__div__",
+            Self::IsEq => "__is_eq__",
+            Self::LT => "__lt__",
+            Self::GT => "__gt__",
+            Self::LTEq => "__lt_eq__",
+            Self::GTEq => "__gt_eq__",
             _ => todo!(),
         }
     }

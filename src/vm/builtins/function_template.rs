@@ -6,20 +6,29 @@ use crate::vm::{
     object::{PettyObject, PettyObjectType},
 };
 
-pub struct BinOpTemplate<T: Into<PettyObject> + Clone + 'static>(pub fn(T, T) -> T);
+pub struct BinOpTemplate<
+    Lhs: Into<PettyObject> + Clone + 'static,
+    Rhs: Into<PettyObject> + Clone + 'static,
+    Ret: Into<PettyObject> + Clone + 'static,
+>(pub fn(Lhs, Rhs) -> Ret);
 pub struct SingleTemplate<
     I: Into<PettyObject> + Clone + 'static,
     O: Into<PettyObject> + Clone + 'static,
 >(pub fn(I) -> O);
-impl<T: Into<PettyObject> + Clone> PettyObjectType for BinOpTemplate<T> {
+impl<
+        Lhs: Into<PettyObject> + Clone,
+        Rhs: Into<PettyObject> + Clone,
+        Ret: Into<PettyObject> + Clone,
+    > PettyObjectType for BinOpTemplate<Lhs, Rhs, Ret>
+{
     fn call(&self, _vm: &mut Vm, _this: PettyObject, args: FuncArgs) -> PettyObject {
         if args.0.len() != 2 {
             todo!("Expected 2 arguments got {}", args.0.len());
         }
         let (lhs, rhs) = (args.0[0].clone(), args.0[1].clone());
         let (Some(lhs), Some(rhs)) = (
-            lhs.as_any().downcast_ref::<T>(),
-            rhs.as_any().downcast_ref::<T>())
+            lhs.as_any().downcast_ref::<Lhs>(),
+            rhs.as_any().downcast_ref::<Rhs>())
         else {
             todo!("Incorrect Types");
         };
@@ -52,7 +61,12 @@ impl<I: Into<PettyObject> + Clone, O: Into<PettyObject> + Clone> PettyObjectType
         self
     }
 }
-impl<T: Into<PettyObject> + Clone> fmt::Display for BinOpTemplate<T> {
+impl<
+        Lhs: Into<PettyObject> + Clone,
+        Rhs: Into<PettyObject> + Clone,
+        Ret: Into<PettyObject> + Clone,
+    > fmt::Display for BinOpTemplate<Lhs, Rhs, Ret>
+{
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         display_function_object(self, f)
     }
