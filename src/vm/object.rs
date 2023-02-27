@@ -19,9 +19,6 @@ impl PettyObject {
             object: NonNull::from(Box::leak(Box::new(object))),
         })
     }
-    pub fn inner(&self) -> &dyn PettyObjectType {
-        unsafe { self.object.as_ref() }
-    }
 }
 impl<Pty: PettyObjectType + 'static> From<Pty> for PettyObject {
     fn from(value: Pty) -> Self {

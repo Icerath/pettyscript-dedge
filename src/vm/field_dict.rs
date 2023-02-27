@@ -1,7 +1,6 @@
-use super::{builtins::PtyNull, object::PettyObject};
+use super::object::PettyObject;
 use std::{
     collections::HashMap,
-    ops::{Index, IndexMut},
 };
 
 #[derive(Default)]

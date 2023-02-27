@@ -89,6 +89,7 @@ impl VirtualMachine {
     pub fn evaluate_list(&mut self, items: &[Node]) -> Vec<PettyObject> {
         items.iter().map(|arg| self.evaluate(arg)).collect()
     }
+    #[allow(clippy::borrowed_box)]
     pub fn func_def(&mut self, name: &str, args: &Box<[Box<str>]>, block: &Box<[Node]>) {
         let function = PettyFunction::new(args.clone(), block.clone());
         self.fields.write(name, function.into());

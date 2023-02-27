@@ -6,7 +6,7 @@ pub struct Rc<T: ?Sized> {
     pub object: NonNull<T>,
 }
 impl<T> Rc<T> {
-    pub fn new(value: T) -> Self {
+    pub fn _new(value: T) -> Self {
         Self {
             ref_count: Box::leak(Box::new(1)).into(),
             object: Box::leak(Box::new(value)).into(),
@@ -31,7 +31,7 @@ impl<T: ?Sized> Drop for Rc<T> {
         unsafe {
             *self.ref_count.as_ptr() -= 1;
             if *self.ref_count.as_ptr() == 0 {
-                self.object.as_ptr().drop_in_place()
+                self.object.as_ptr().drop_in_place();
             }
         }
     }
@@ -52,6 +52,6 @@ impl<T: fmt::Debug + ?Sized> fmt::Debug for Rc<T> {
 impl<T: ?Sized> Deref for Rc<T> {
     type Target = T;
     fn deref(&self) -> &Self::Target {
-        unsafe { &self.object.as_ref() }
+        unsafe { self.object.as_ref() }
     }
 }
