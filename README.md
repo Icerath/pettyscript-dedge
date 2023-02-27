@@ -18,6 +18,7 @@ Learning to write my own interpreted language for fun.
 - [x] Break and Return keywords
 - [x] Class Definitions
 - [ ] Last semicolon is optional
+- [x] Get item ([1, 2, 3].len())
 - [x] Type Hinting
 
 ### Interpreter
