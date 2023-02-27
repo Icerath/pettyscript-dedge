@@ -32,6 +32,7 @@ impl VirtualMachine {
         match node {
             Node::Globals(nodes) | Node::Block(nodes) => self.execute_nodes(nodes),
             Node::SetEq(name, expr) => self.set_eq(name, expr),
+            Node::BinExpr(op, nodes) if *op == BinOp::GetItem => self.get_item(&nodes.0, &nodes.1),
             Node::BinExpr(op, nodes) => return self.bin_expr(*op, &nodes.0, &nodes.1),
             Node::Literal(literal) => return builtins::create_literal(literal),
             Node::Ident(ident) => return self.fields.read(ident),
@@ -51,6 +52,9 @@ impl VirtualMachine {
         let value = self.evaluate(expr);
         println!("{name}: {}", &value);
         self.fields.write(name, value);
+    }
+    pub fn get_item(&mut self, left: &Node, right: &Node) {
+        todo!()
     }
     pub fn bin_expr(&mut self, op: BinOp, lhs: &Node, rhs: &Node) -> PettyObject {
         let lhs = self.evaluate(lhs);

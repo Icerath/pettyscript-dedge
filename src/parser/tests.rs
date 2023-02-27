@@ -137,8 +137,16 @@ mod parser_tests {
                 vec![Node::ReturnState(Box::new(Node::func_call(
                     "Point",
                     vec![
-                        Node::bin_expr(BinOp::Add, Node::ident("self.x"), Node::ident("other.x")),
-                        Node::bin_expr(BinOp::Add, Node::ident("self.y"), Node::ident("other.y")),
+                        Node::bin_expr(
+                            BinOp::Add,
+                            Node::bin_expr(BinOp::GetItem, Node::ident("self"), Node::ident("x")),
+                            Node::bin_expr(BinOp::GetItem, Node::ident("other"), Node::ident("x")),
+                        ),
+                        Node::bin_expr(
+                            BinOp::Add,
+                            Node::bin_expr(BinOp::GetItem, Node::ident("self"), Node::ident("y")),
+                            Node::bin_expr(BinOp::GetItem, Node::ident("other"), Node::ident("y")),
+                        ),
                     ],
                 )))],
             )],
@@ -211,18 +219,38 @@ mod parser_tests {
     #[test]
     fn test_get_item() {
         let source = "[1, 2, 3].len;";
-        let expected = Node::get_item(
-            Node::ident("len"),
+        let expected = Node::bin_expr(
+            BinOp::GetItem,
             Node::literal(vec![Node::literal(1), Node::literal(2), Node::literal(3)]),
+            Node::ident("len"),
+        );
+        assert_expected(source, vec![expected]);
+    }
+    #[test]
+    fn test_get_item_layered() {
+        let source = "[1, 2, 3].len.abs().ans;";
+        let expected = Node::bin_expr(
+            BinOp::GetItem,
+            Node::bin_expr(
+                BinOp::GetItem,
+                Node::bin_expr(
+                    BinOp::GetItem,
+                    Node::literal(vec![Node::literal(1), Node::literal(2), Node::literal(3)]),
+                    Node::ident("len"),
+                ),
+                Node::func_call("abs", vec![]),
+            ),
+            Node::ident("ans"),
         );
         assert_expected(source, vec![expected]);
     }
     #[test]
     fn test_get_item_function() {
         let source = "1.max(2);";
-        let expected = Node::get_item(
-            Node::func_call("max", vec![Node::literal(2)]),
+        let expected = Node::bin_expr(
+            BinOp::GetItem,
             Node::literal(1),
+            Node::func_call("max", vec![Node::literal(2)]),
         );
         assert_expected(source, vec![expected]);
     }
@@ -232,7 +260,11 @@ mod parser_tests {
         let expected = Node::bin_expr(
             BinOp::Add,
             Node::literal(1),
-            Node::get_item(Node::func_call("abs", vec![]), Node::literal(1)),
+            Node::bin_expr(
+                BinOp::GetItem,
+                Node::literal(1),
+                Node::func_call("abs", vec![]),
+            ),
         );
         assert_expected(source, vec![expected]);
     }

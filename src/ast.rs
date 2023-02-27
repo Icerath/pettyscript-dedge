@@ -11,7 +11,6 @@ pub enum Node {
     BinExpr(BinOp, Box<(Node, Node)>),
     UnaryOp(UnaryOp, Box<Node>),
     Ident(Box<str>),
-    GetItem(Box<Node>, Box<Node>),
     FuncCall(Box<str>, Box<[Node]>),
     IfState(Box<Node>, Box<[Node]>, Option<Box<Node>>),
     WhileLoop(Box<Node>, Box<[Node]>),
@@ -23,6 +22,7 @@ pub enum Node {
     Empty,
     SetEq(Box<str>, Box<Node>),
 }
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum BinOp {
     Add,
@@ -39,6 +39,8 @@ pub enum BinOp {
     GTEq,
     IsEq,
     NotEq,
+
+    GetItem,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -76,6 +78,7 @@ impl fmt::Display for BinOp {
 
             Self::And => write!(f, "&&"),
             Self::Or => write!(f, "||"),
+            Self::GetItem => write!(f, "."),
         }
     }
 }
@@ -115,9 +118,9 @@ impl fmt::Debug for Node {
                 .field("iter", expr)
                 .field("body", block)
                 .finish(),
-            Self::FuncCall(ident, args) => f
-                .debug_struct("func")
-                .field("name", ident)
+            Self::FuncCall(name, args) => f
+                .debug_struct("func_call")
+                .field("name", name)
                 .field("args", args)
                 .finish(),
             Self::FuncDef(ident, args, block) => f
@@ -130,9 +133,6 @@ impl fmt::Debug for Node {
                 f.debug_list().entries(nodes.iter()).finish()
             }
             Self::Ident(ident) => f.debug_tuple("Ident").field(ident).finish(),
-            Self::GetItem(ident, next) => {
-                f.debug_tuple("get_item").field(ident).field(next).finish()
-            }
             Self::IfState(expr, block, or_else) => f
                 .debug_struct("if")
                 .field("condition", expr)
@@ -185,9 +185,6 @@ impl Node {
     }
     pub fn set_eq(ident: &str, value: Node) -> Self {
         Self::SetEq(ident.into(), Box::new(value))
-    }
-    pub fn get_item(item: Node, from: Node) -> Self {
-        Self::GetItem(Box::new(item), Box::new(from))
     }
     pub fn class_def(name: &str, fields: Vec<&str>, methods: Vec<Node>) -> Self {
         Self::ClassDef(name.into(), vec_box_str(fields), methods.into_boxed_slice())

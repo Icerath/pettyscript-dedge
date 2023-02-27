@@ -29,7 +29,7 @@ fn class_def(input: &str) -> IRes {
         keyword_name("class"),
         cut(map(
             tuple((
-                sp(strict_ident),
+                sp(ident),
                 delimited(spar('('), params, spar(')')),
                 alt((
                     map(spar(';'), |_| Vec::new()),

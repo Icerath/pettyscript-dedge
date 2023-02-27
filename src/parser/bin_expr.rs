@@ -16,14 +16,19 @@ fn comparison(input: &str) -> IRes {
     let (input, remainder) = many0(pair(binop_comp, lower))(input)?;
     Ok((input, fold_exprs(initial, remainder)))
 }
-fn upper(input: &str) -> IRes {
-    let (input, initial) = factor(input)?;
-    let (input, remainder) = many0(pair(binop_upper, factor))(input)?;
-    Ok((input, fold_exprs(initial, remainder)))
-}
 fn lower(input: &str) -> IRes {
     let (input, initial) = upper(input)?;
     let (input, remainder) = many0(pair(binop_lower, upper))(input)?;
+    Ok((input, fold_exprs(initial, remainder)))
+}
+fn upper(input: &str) -> IRes {
+    let (input, initial) = get_item(input)?;
+    let (input, remainder) = many0(pair(binop_upper, get_item))(input)?;
+    Ok((input, fold_exprs(initial, remainder)))
+}
+fn get_item(input: &str) -> IRes {
+    let (input, initial) = factor(input)?;
+    let (input, remainder) = many0(pair(map(spar('.'), |_| BinOp::GetItem), factor))(input)?;
     Ok((input, fold_exprs(initial, remainder)))
 }
 fn factor(input: &str) -> IRes {

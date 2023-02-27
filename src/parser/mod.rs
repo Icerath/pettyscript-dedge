@@ -62,17 +62,7 @@ fn node_expr(input: &str) -> IRes {
     bin_expr(input)
 }
 fn node_value(input: &str) -> IRes {
-    alt((unary_expr, get_item, node_value_raw))(input)
-}
-fn get_item(input: &str) -> IRes {
-    map(
-        separated_pair(
-            sp(node_value_raw),
-            spar('.'),
-            cut(err(sp(node_value), PettyParseError::ExpectedIdentAfterDot)),
-        ),
-        |(node, name)| Node::GetItem(Box::new(name), Box::new(node)),
-    )(input)
+    alt((unary_expr, node_value_raw))(input)
 }
 fn node_value_raw(input: &str) -> IRes {
     alt((
@@ -92,10 +82,7 @@ fn unary_expr(input: &str) -> IRes {
     })(input)
 }
 fn params(input: &str) -> IRes<Box<[Box<str>]>> {
-    let (rem, nodes) = terminated(
-        separated_list0(spar(','), type_hinted_strict),
-        opt(spar(',')),
-    )(input)?;
+    let (rem, nodes) = terminated(separated_list0(spar(','), type_hinted), opt(spar(',')))(input)?;
     Ok((rem, nodes.into_boxed_slice()))
 }
 fn function_call(i: &str) -> IRes {
@@ -103,7 +90,7 @@ fn function_call(i: &str) -> IRes {
         sp(ident),
         delimited(spar('('), function_args, cut(spar(')'))),
     )
-    .map(|(ident, args)| Node::FuncCall(ident, args))
+    .map(|(name, args)| Node::FuncCall(name, args))
     .parse(i)
 }
 fn function_args(i: &str) -> IRes<Box<[Node]>> {
@@ -133,30 +120,11 @@ fn eat_comments(mut input: &str) -> &str {
         input = input.trim();
     }
 }
-fn strict_ident(input: &str) -> IRes<Box<str>> {
-    let (rem, ident) = err(
-        recognize(tuple((
-            alt((alpha, char('_'))),
-            take_while(is_strict_ident_char),
-        ))),
-        ParseErr::Ident,
-    )
-    .map(|s| s.to_owned().into_boxed_str())
-    .parse(input)?;
-    // TODO KEYWORDS
-    if matches!(ident.as_ref(), "fn") {
-        return Err(nom::Err::Error(new_error(rem, PettyParseError::Ident)));
-    }
-    Ok((rem, ident))
-}
 fn type_hinted(input: &str) -> IRes<Box<str>> {
     alt((
-        terminated(sp(strict_ident), opt(pair(spar(':'), sp(ident)))),
+        terminated(sp(ident), opt(pair(spar(':'), sp(ident)))),
         sp(ident),
     ))(input)
-}
-fn type_hinted_strict(input: &str) -> IRes<Box<str>> {
-    terminated(sp(strict_ident), opt(pair(spar(':'), sp(ident))))(input)
 }
 fn ident(i: &str) -> IRes<Box<str>> {
     err(
@@ -181,10 +149,6 @@ fn literal(i: &str) -> IRes<Literal> {
 }
 #[inline]
 fn is_ident_char(c: char) -> bool {
-    matches!(c, 'a'..='z'|'A'..='Z'|'0'..='9'|'_'|'.')
-}
-#[inline]
-fn is_strict_ident_char(c: char) -> bool {
     matches!(c, 'a'..='z'|'A'..='Z'|'0'..='9'|'_')
 }
 fn list(i: &str) -> IRes<Vec<Node>> {
