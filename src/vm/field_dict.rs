@@ -12,7 +12,12 @@ impl FieldDict {
         self.current_scope().insert(str.into(), value);
     }
     pub fn read(&mut self, str: &str) -> PettyObject {
-        self.current_scope()
+        for scope in self.scopes.iter().rev() {
+            if let Some(object) = scope.get(str) {
+                return object.clone();
+            }
+        }
+        self.globals
             .get(str)
             .unwrap_or_else(|| panic!("Not found: {str}"))
             .clone()

@@ -1,5 +1,4 @@
 use crate::{
-    ast::BinOp,
     vm::{
         core::Vm,
         function_args::FuncArgs,
