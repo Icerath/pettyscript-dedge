@@ -53,6 +53,9 @@ impl VirtualMachine {
     }
     pub fn execute_nodes(&mut self, nodes: &[Node]) {
         for node in nodes {
+            if self.return_val.is_some() {
+                break;
+            }
             self.evaluate(node);
         }
     }

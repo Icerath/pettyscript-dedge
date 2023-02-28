@@ -1,8 +1,6 @@
-fn print_n(n) {
-    i = 0;
-    while i < n {
-        print(i);
-        i = i + 1;
-    }
+fn square(n) {
+    return n * n;
+    print(n);
 }
-print_n(10);
+
+print(square(5));
