@@ -1,4 +1,8 @@
-use crate::ast::{BinOp, Node, UnaryOp};
+use crate::{
+    ast::{BinOp, Node, UnaryOp},
+    rc_str::RcStr,
+    slim_rc::Rc,
+};
 
 use super::{
     builtins::{self, PtyBool, PtyNull},
@@ -43,7 +47,7 @@ impl VirtualMachine {
             Node::ReturnState(expr) => self.return_val = Some(self.evaluate(expr)),
             Node::UnaryOp(op, expr) => return self.unary_expr(*op, expr),
             Node::IfState(condition, block, or_else) => {
-                self.if_statement(condition, block, or_else.as_ref().map(Box::as_ref));
+                self.if_statement(condition, block, or_else.as_ref().map(Rc::as_ref));
             }
             Node::WhileLoop(condition, block) => self.while_loop(condition, block),
             Node::ForLoop(target, iter, block) => self.for_loop(target, iter, block),
@@ -98,7 +102,7 @@ impl VirtualMachine {
         items.iter().map(|arg| self.evaluate(arg)).collect()
     }
     #[allow(clippy::borrowed_box)]
-    pub fn func_def(&mut self, name: &str, args: &Box<[Box<str>]>, block: &Box<[Node]>) {
+    pub fn func_def(&mut self, name: &str, args: &Rc<[RcStr]>, block: &Rc<[Node]>) {
         let function = PettyFunction::new(args.clone(), block.clone());
         self.fields.write(name, function.into());
     }

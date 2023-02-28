@@ -1,9 +1,7 @@
-use crate::{
-    vm::{
-        core::Vm,
-        function_args::FuncArgs,
-        object::{PettyObject, PettyObjectType},
-    },
+use crate::vm::{
+    core::Vm,
+    function_args::FuncArgs,
+    object::{PettyObject, PettyObjectType},
 };
 use std::{any::Any, fmt};
 
@@ -37,12 +35,10 @@ impl PettyObjectType for PtyInt {
                     .into()
             }
             "__lt__" => {
-                BinOpTemplate::<Self, Self, PtyBool>(|left, right| PtyBool(left.0 < right.0))
-                    .into()
+                BinOpTemplate::<Self, Self, PtyBool>(|left, right| PtyBool(left.0 < right.0)).into()
             }
             "__gt__" => {
-                BinOpTemplate::<Self, Self, PtyBool>(|left, right| PtyBool(left.0 > right.0))
-                    .into()
+                BinOpTemplate::<Self, Self, PtyBool>(|left, right| PtyBool(left.0 > right.0)).into()
             }
             "__lt_eq__" => {
                 BinOpTemplate::<Self, Self, PtyBool>(|left, right| PtyBool(left.0 <= right.0))

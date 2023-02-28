@@ -1,15 +1,18 @@
 use std::fmt;
 
-use crate::vm::{
-    core::Vm,
-    function_args::FuncArgs,
-    object::{PettyObject, PettyObjectType},
+use crate::{
+    rc_str::RcStr,
+    vm::{
+        core::Vm,
+        function_args::FuncArgs,
+        object::{PettyObject, PettyObjectType},
+    },
 };
 
 use super::function_template::{BinOpTemplate, SingleTemplate};
 
 #[derive(Clone)]
-pub struct PtyStr(pub Box<str>);
+pub struct PtyStr(pub RcStr);
 
 impl PtyStr {
     pub fn from_obj<PtyObj: PettyObjectType>(object: &PtyObj) -> Self {
@@ -24,10 +27,10 @@ impl PettyObjectType for PtyStr {
     fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
         match str {
             "__repr__" => SingleTemplate(|this: Self| this).into(),
-            "__add__" => BinOpTemplate(|lhs: Self, rhs: Self| {
-                Self((lhs.0.to_string() + &rhs.0).into_boxed_str())
-            })
-            .into(),
+            "__add__" => {
+                BinOpTemplate(|lhs: Self, rhs: Self| Self((lhs.0.to_string() + &rhs.0).into()))
+                    .into()
+            }
             _ => todo!(),
         }
     }

@@ -8,6 +8,8 @@ use statements::statement;
 use crate::{
     ast::{BinOp, Literal, Node, UnaryOp},
     error::PettyParseError,
+    rc_str::RcStr,
+    slim_rc::Rc,
 };
 use nom::{
     branch::alt,
@@ -34,8 +36,8 @@ type ParseErr = PettyParseError;
 pub fn parse(input: &str) -> Result<Node, NomErr> {
     final_parser(map(nodes, Node::Globals))(input)
 }
-fn nodes(input: &str) -> IRes<Box<[Node]>> {
-    map(many0(node), Vec::into_boxed_slice)(input)
+fn nodes(input: &str) -> IRes<Rc<[Node]>> {
+    map(many0(node), Rc::from)(input)
 }
 #[inline]
 fn node(input: &str) -> IRes {
@@ -54,7 +56,7 @@ fn terminated_expr(input: &str) -> IRes {
 fn set_equals(input: &str) -> IRes {
     map(
         separated_pair(type_hinted, spar('='), node_expr),
-        |(ident, expr)| Node::SetEq(ident, Box::new(expr)),
+        |(ident, expr)| Node::SetEq(ident, Rc::new(expr)),
     )(input)
 }
 #[inline]
@@ -78,12 +80,12 @@ fn unary_expr(input: &str) -> IRes {
         map(char('-'), |_| UnaryOp::Neg),
     )));
     map(pair(unary_op, node_value), |(op, node)| {
-        Node::UnaryOp(op, Box::new(node))
+        Node::UnaryOp(op, Rc::new(node))
     })(input)
 }
-fn params(input: &str) -> IRes<Box<[Box<str>]>> {
+fn params(input: &str) -> IRes<Rc<[RcStr]>> {
     let (rem, nodes) = terminated(separated_list0(spar(','), type_hinted), opt(spar(',')))(input)?;
-    Ok((rem, nodes.into_boxed_slice()))
+    Ok((rem, nodes.into()))
 }
 fn function_call(i: &str) -> IRes {
     pair(
@@ -93,16 +95,16 @@ fn function_call(i: &str) -> IRes {
     .map(|(name, args)| Node::FuncCall(name, args))
     .parse(i)
 }
-fn function_args(i: &str) -> IRes<Box<[Node]>> {
+fn function_args(i: &str) -> IRes<Rc<[Node]>> {
     let (rem, nodes) = sp(separated_list0(spar(','), sp(node_expr)))(i)?;
-    Ok((rem, nodes.into_boxed_slice()))
+    Ok((rem, nodes.into()))
 }
-fn block(i: &str) -> IRes<Box<[Node]>> {
+fn block(i: &str) -> IRes<Rc<[Node]>> {
     delimited(spar('{'), nodes, spar('}'))(i)
 }
 fn fold_exprs(initial: Node, remainder: Vec<(BinOp, Node)>) -> Node {
     remainder.into_iter().fold(initial, |acc, (op, expr)| {
-        Node::BinExpr(op, Box::new((acc, expr)))
+        Node::BinExpr(op, Rc::new((acc, expr)))
     })
 }
 fn eat_comments(mut input: &str) -> &str {
@@ -120,18 +122,18 @@ fn eat_comments(mut input: &str) -> &str {
         input = input.trim();
     }
 }
-fn type_hinted(input: &str) -> IRes<Box<str>> {
+fn type_hinted(input: &str) -> IRes<RcStr> {
     alt((
         terminated(sp(ident), opt(pair(spar(':'), sp(ident)))),
         sp(ident),
     ))(input)
 }
-fn ident(i: &str) -> IRes<Box<str>> {
+fn ident(i: &str) -> IRes<RcStr> {
     err(
         recognize(tuple((alt((alpha, char('_'))), take_while(is_ident_char)))),
         ParseErr::Ident,
     )
-    .map(|s| s.to_owned().into_boxed_str())
+    .map(|s| s.into())
     .parse(i)
 }
 fn literal(i: &str) -> IRes<Literal> {
@@ -140,8 +142,8 @@ fn literal(i: &str) -> IRes<Literal> {
             map(boolean, Literal::Bool),
             map(float, Literal::Float),
             map(int, Literal::Int),
-            map(string, |s| Literal::String(s.to_owned().into_boxed_str())),
-            map(list, |vec| Literal::List(vec.into_boxed_slice())),
+            map(string, |s| Literal::String(s.into())),
+            map(list, |vec| Literal::List(vec.into())),
             map(keyword_name("null"), |_| Literal::Null),
         )),
         ParseErr::Literal,

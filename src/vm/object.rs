@@ -14,10 +14,7 @@ pub trait PettyObjectType: fmt::Display {
 pub struct PettyObject(Rc<dyn PettyObjectType>);
 impl PettyObject {
     pub fn new<Pty: PettyObjectType + 'static>(object: Pty) -> Self {
-        Self(Rc {
-            ref_count: Box::leak(Box::new(1)).into(),
-            object: NonNull::from(Box::leak(Box::new(object))),
-        })
+        Self(Rc::new(object))
     }
     pub fn call_method(&self, vm: &mut Vm, func: &str, mut args: FuncArgs) -> PettyObject {
         args.0.push(self.clone());

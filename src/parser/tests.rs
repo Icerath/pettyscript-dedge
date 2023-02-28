@@ -1,9 +1,11 @@
 #[cfg(test)]
 mod parser_tests {
+    use crate::slim_rc::Rc;
+
     use super::super::{bin_expr, parse, BinOp, Node, UnaryOp};
     fn assert_expected(source: &str, expected: Vec<Node>) {
         let output = parse(source).unwrap();
-        assert_eq!(output, Node::Globals(expected.into_boxed_slice()));
+        assert_eq!(output, Node::Globals(expected.into()));
     }
     #[test]
     fn set_equals() {
@@ -134,7 +136,7 @@ mod parser_tests {
             vec![Node::func_def(
                 "add",
                 vec!["self", "other"],
-                vec![Node::ReturnState(Box::new(Node::func_call(
+                vec![Node::ReturnState(Rc::new(Node::func_call(
                     "Point",
                     vec![
                         Node::bin_expr(
@@ -169,7 +171,7 @@ mod parser_tests {
         let expected = Node::func_def(
             "squared",
             vec!["num"],
-            vec![Node::ReturnState(Box::new(Node::bin_expr(
+            vec![Node::ReturnState(Rc::new(Node::bin_expr(
                 BinOp::Mul,
                 Node::ident("num"),
                 Node::ident("num"),

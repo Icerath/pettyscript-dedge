@@ -1,23 +1,25 @@
 use std::fmt;
 
+use crate::{rc_str::RcStr, slim_rc::Rc};
+
 #[derive(PartialEq, Clone)]
 pub enum Node {
     Literal(Literal),
-    Block(Box<[Node]>),
-    Globals(Box<[Node]>),
-    BinExpr(BinOp, Box<(Node, Node)>),
-    UnaryOp(UnaryOp, Box<Node>),
-    Ident(Box<str>),
-    FuncCall(Box<str>, Box<[Node]>),
-    IfState(Box<Node>, Box<[Node]>, Option<Box<Node>>),
-    WhileLoop(Box<Node>, Box<[Node]>),
-    ForLoop(Box<str>, Box<Node>, Box<[Node]>),
-    ReturnState(Box<Node>),
+    Block(Rc<[Node]>),
+    Globals(Rc<[Node]>),
+    BinExpr(BinOp, Rc<(Node, Node)>),
+    UnaryOp(UnaryOp, Rc<Node>),
+    Ident(RcStr),
+    FuncCall(RcStr, Rc<[Node]>),
+    IfState(Rc<Node>, Rc<[Node]>, Option<Rc<Node>>),
+    WhileLoop(Rc<Node>, Rc<[Node]>),
+    ForLoop(RcStr, Rc<Node>, Rc<[Node]>),
+    ReturnState(Rc<Node>),
     BreakState,
-    FuncDef(Box<str>, Box<[Box<str>]>, Box<[Node]>),
-    ClassDef(Box<str>, Box<[Box<str>]>, Box<[Node]>),
+    FuncDef(RcStr, Rc<[RcStr]>, Rc<[Node]>),
+    ClassDef(RcStr, Rc<[RcStr]>, Rc<[Node]>),
     Empty,
-    SetEq(Box<str>, Box<Node>),
+    SetEq(RcStr, Rc<Node>),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -51,8 +53,8 @@ pub enum UnaryOp {
 pub enum Literal {
     Int(i128),
     Float(f64),
-    String(Box<str>),
-    List(Box<[Node]>),
+    String(RcStr),
+    List(Rc<[Node]>),
     Null,
     Bool(bool),
 }
@@ -163,46 +165,42 @@ impl Node {
         Self::Ident(string.into())
     }
     pub fn unary_expr(op: UnaryOp, node: Node) -> Self {
-        Self::UnaryOp(op, Box::new(node))
+        Self::UnaryOp(op, Rc::new(node))
     }
     pub fn literal_expr<L: Into<Literal>, R: Into<Literal>>(op: BinOp, left: L, right: R) -> Self {
         Self::bin_expr(op, Node::literal(left), Node::literal(right))
     }
     pub fn bin_expr(op: BinOp, left: Node, right: Node) -> Self {
-        Node::BinExpr(op, Box::new((left, right)))
+        Node::BinExpr(op, Rc::new((left, right)))
     }
     pub fn func_call(name: &str, args: Vec<Node>) -> Self {
-        Self::FuncCall(name.into(), args.into_boxed_slice())
+        Self::FuncCall(name.into(), args.into())
     }
     pub fn literal(literal: impl Into<Literal>) -> Self {
         Self::Literal(literal.into())
     }
     pub fn block(nodes: Vec<Node>) -> Self {
-        Self::Block(nodes.into_boxed_slice())
+        Self::Block(nodes.into())
     }
     pub fn set_eq(ident: &str, value: Node) -> Self {
-        Self::SetEq(ident.into(), Box::new(value))
+        Self::SetEq(ident.into(), Rc::new(value))
     }
     pub fn class_def(name: &str, fields: Vec<&str>, methods: Vec<Node>) -> Self {
-        Self::ClassDef(name.into(), vec_box_str(fields), methods.into_boxed_slice())
+        Self::ClassDef(name.into(), vec_box_str(fields), methods.into())
     }
     pub fn func_def(name: &str, params: Vec<&str>, block: Vec<Node>) -> Self {
-        Self::FuncDef(name.into(), vec_box_str(params), block.into_boxed_slice())
+        Self::FuncDef(name.into(), vec_box_str(params), block.into())
     }
     pub fn if_state(condition: Node, block: Vec<Node>, or_else: Option<Node>) -> Self {
-        Self::IfState(
-            Box::new(condition),
-            block.into_boxed_slice(),
-            or_else.map(Box::new),
-        )
+        Self::IfState(Rc::new(condition), block.into(), or_else.map(Rc::new))
     }
 }
-fn vec_box_str(input: Vec<&str>) -> Box<[Box<str>]> {
+fn vec_box_str(input: Vec<&str>) -> Rc<[RcStr]> {
     input
         .into_iter()
         .map(std::convert::Into::into)
         .collect::<Vec<_>>()
-        .into_boxed_slice()
+        .into()
 }
 
 impl From<Literal> for Node {
@@ -234,6 +232,6 @@ impl From<bool> for Literal {
 
 impl From<Vec<Node>> for Literal {
     fn from(value: Vec<Node>) -> Self {
-        Self::List(value.into_boxed_slice())
+        Self::List(value.into())
     }
 }

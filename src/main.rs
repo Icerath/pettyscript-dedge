@@ -4,6 +4,7 @@ use nom_supreme::error::ErrorTree;
 mod ast;
 mod error;
 mod parser;
+mod rc_str;
 mod slim_rc;
 mod vm;
 
