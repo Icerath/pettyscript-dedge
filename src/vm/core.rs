@@ -27,8 +27,8 @@ impl VirtualMachine {
             return_val: None,
         }
     }
-    pub fn load_builtin<PtyObj: PettyObjectType + 'static>(&mut self, name: &str, object: PtyObj) {
-        self.fields.write(name.into(), object.into());
+    pub fn load_builtin(&mut self, name: &str, object: PettyObject) {
+        self.fields.write(name.into(), object);
     }
 }
 

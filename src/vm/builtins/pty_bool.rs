@@ -13,7 +13,7 @@ pub struct PtyBool(pub bool);
 impl PettyObjectType for PtyBool {
     fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
         match str {
-            "__bool__" => SingleTemplate(|this: &Self| this.clone()).into(),
+            "__bool__" => SingleTemplate(Self::clone).into(),
             "__not__" => SingleTemplate(|this: &Self| Self(!this.0)).into(),
             "__repr__" => SingleTemplate(|this: &Self| PtyStr::from_obj(this)).into(),
             _ => todo!("{str}"),

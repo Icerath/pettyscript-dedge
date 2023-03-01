@@ -26,7 +26,7 @@ impl PettyObjectType for PtyStr {
     }
     fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
         match str {
-            "__repr__" => SingleTemplate(|this: &Self| this.clone()).into(),
+            "__repr__" => SingleTemplate(Self::clone).into(),
             "__add__" => {
                 BinOpTemplate(|lhs: Self, rhs: Self| Self((lhs.0.to_string() + &rhs.0).into()))
                     .into()
