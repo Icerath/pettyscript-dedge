@@ -48,6 +48,7 @@ Currently inspired mostly by Python.
 ### Longterm
 - [ ] Change into bytecode interpreter instead of treewalk.
 - [ ] Add much more information to the AST and allow access to it from within the language.
+- [ ] Basic Documentation
 - [ ] Maybe some kind of macro support.
 
 ### CLI
