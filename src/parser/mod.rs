@@ -133,7 +133,7 @@ fn ident(i: &str) -> IRes<RcStr> {
         recognize(tuple((alt((alpha, char('_'))), take_while(is_ident_char)))),
         ParseErr::Ident,
     )
-    .map(|s| s.into())
+    .map(RcStr::from)
     .parse(i)
 }
 fn literal(i: &str) -> IRes<Literal> {
