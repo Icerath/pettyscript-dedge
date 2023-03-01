@@ -16,7 +16,7 @@ impl PettyObjectType for PtyNull {
     }
     fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
         match str {
-            "__bool__" => SingleTemplate(|_: Self| PtyBool(false)).into(),
+            "__bool__" => SingleTemplate(|_: &Self| PtyBool(false)).into(),
             _ => todo!(),
         }
     }

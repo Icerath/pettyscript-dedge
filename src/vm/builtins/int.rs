@@ -48,12 +48,12 @@ impl PettyObjectType for PtyInt {
                 BinOpTemplate::<Self, Self, PtyBool>(|left, right| PtyBool(left.0 >= right.0))
                     .into()
             }
-            "__bool__" => SingleTemplate::<Self, PtyBool>(|this: Self| PtyBool(this.0 != 0)).into(),
-            "__neg__" => SingleTemplate::<Self, Self>(|this: Self| Self(-this.0)).into(),
+            "__bool__" => SingleTemplate::<Self, PtyBool>(|this: &Self| PtyBool(this.0 != 0)).into(),
+            "__neg__" => SingleTemplate::<Self, Self>(|this: &Self| Self(-this.0)).into(),
             "__not__" => {
-                SingleTemplate::<Self, Self>(|this: Self| Self(i128::from(this.0 == 0))).into()
+                SingleTemplate::<Self, Self>(|this: &Self| Self(i128::from(this.0 == 0))).into()
             }
-            "__repr__" => SingleTemplate::<Self, PtyStr>(|this| PtyStr::from_obj(&this)).into(),
+            "__repr__" => SingleTemplate::<Self, PtyStr>(|this| PtyStr::from_obj(this)).into(),
             "abs" => SingleTemplate::<Self, Self>(|this| Self(this.0.abs())).into(),
             _ => todo!("{str}"),
         }

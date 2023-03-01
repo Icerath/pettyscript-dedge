@@ -40,7 +40,7 @@ impl PettyObjectType for PettyClassInstance {
         }
         match str {
             "__repr__" => {
-                SingleTemplate(|this: Self| PtyStr(format!("Class Instance").into())).into()
+                SingleTemplate(|this: &Self| PtyStr(format!("Class Instance at {:?}", this as *const Self).into())).into()
             }
             _ => todo!("{str}"),
         }

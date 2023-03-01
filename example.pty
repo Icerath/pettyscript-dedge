@@ -2,9 +2,8 @@ class Point(x, y) {
     fn __add__(self, other) {
         return Point(self.x + other.x, self.y + other.y);
     }
-    fn __repr__(self) {
-        return "Point { " + self.x.__repr__() + ", " + self.y.__repr__() + " }";
-    }
 }
-
-print(Point(1, 2) + Point(2, 3));
+point = Point(1, 2) + Point(2, 3);
+point2 = point;
+print(point);
+print(point2);

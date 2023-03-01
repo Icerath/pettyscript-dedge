@@ -14,7 +14,7 @@ pub struct BinOpTemplate<
 pub struct SingleTemplate<
     I: Into<PettyObject> + Clone + 'static,
     O: Into<PettyObject> + Clone + 'static,
->(pub fn(I) -> O);
+>(pub fn(&I) -> O);
 impl<
         Lhs: Into<PettyObject> + Clone,
         Rhs: Into<PettyObject> + Clone,
@@ -52,7 +52,7 @@ impl<I: Into<PettyObject> + Clone, O: Into<PettyObject> + Clone> PettyObjectType
         let Some(arg) = arg.as_any().downcast_ref::<I>() else {
             todo!("Incorrect Type")
         };
-        self.0(arg.clone()).into()
+        self.0(arg).into()
     }
     fn get_item(&self, _vm: &mut Vm, _this: PettyObject, _str: &str) -> PettyObject {
         todo!()
