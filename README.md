@@ -20,6 +20,8 @@ Currently inspired mostly by Python.
 - [x] Class Definitions
 - [ ] Last semicolon is optional
 - [x] Get item ([1, 2, 3].len())
+- [ ] Indexing support.
+- [ ] Maybe slicing support.
 - [x] Type Hinting
 
 ### Interpreter
@@ -32,11 +34,18 @@ Currently inspired mostly by Python.
 - [ ] For Loop
 - [x] While Loop
 - [x] If/Elif/Else Statements
-- [ ] Return/Break Statements
-- [ ] Clean up gross code (which is pretty much all of it)
+- [x] Return Statements
+- [ ] Break Statements
 - [ ] Tests
 - [ ] Finish Writing Task List
-- [ ] Maybe learn proc macros to make creating builtins easier!!!!!
+- [ ] Improve method for creating builtins.
+- [ ] Bring primitives to atleast the minimum usability.
+    - [ ] Minimum int
+    - [ ] Minimum str
+    - [ ] Minimum list
+    - [ ] Other primitives, (maybe tuple, dict and set?)
+- [ ] Change into bytecode interpreter instead of treewalk.
+
 ### CLI
 
 - [ ] Argparsing
