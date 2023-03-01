@@ -44,7 +44,11 @@ Currently inspired mostly by Python.
     - [ ] Minimum str
     - [ ] Minimum list
     - [ ] Other primitives, (maybe tuple, dict and set?)
+
+### Longterm
 - [ ] Change into bytecode interpreter instead of treewalk.
+- [ ] Add much more information to the AST and allow access to it from within the language.
+- [ ] Maybe some kind of macro support.
 
 ### CLI
 

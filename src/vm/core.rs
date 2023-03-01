@@ -53,7 +53,7 @@ impl VirtualMachine {
             Node::WhileLoop(condition, block) => self.while_loop(condition, block),
             Node::ForLoop(target, iter, block) => self.for_loop(target, iter, block),
             Node::ClassDef(name, fields, methods) => {
-                self.class_def(name.clone(), fields.clone(), methods)
+                self.class_def(name.clone(), fields.clone(), methods);
             }
             _ => todo!("{node:?}"),
         };
