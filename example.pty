@@ -1,5 +1,10 @@
-i = 0;
-while i < 10000000 {
-    i = i + 1;
+class Point(x, y) {
+    fn add(self, other) {
+        return Point(self.x + other.x, self.y + other.y);
+    }
+    fn __repr__(self) {
+        return "Point { " + self.x.__repr__() + ", " + self.y.__repr__() + " }";
+    }
 }
-print(i);
+
+print(Point(1, 2));

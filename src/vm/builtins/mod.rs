@@ -1,11 +1,11 @@
-mod function_template;
+pub mod function_template;
 mod int;
 mod null;
 mod print;
 mod pty_bool;
 mod string;
 
-pub use function_template::display_function_object;
+pub use function_template::{display_class_object, display_function_object};
 pub use int::PtyInt;
 pub use null::PtyNull;
 pub use print::PtyPrint;

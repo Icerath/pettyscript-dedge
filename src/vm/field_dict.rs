@@ -1,7 +1,7 @@
 use crate::rc_str::RcStr;
 
 use super::object::PettyObject;
-use std::{collections::BTreeMap};
+use std::collections::BTreeMap;
 
 #[derive(Default)]
 pub struct FieldDict {

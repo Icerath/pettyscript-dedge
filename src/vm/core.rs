@@ -9,6 +9,7 @@ use super::{
     field_dict::FieldDict,
     function_args::FuncArgs,
     object::{PettyObject, PettyObjectType},
+    petty_class::PettyClass,
     petty_function::PettyFunction,
 };
 
@@ -51,6 +52,9 @@ impl VirtualMachine {
             }
             Node::WhileLoop(condition, block) => self.while_loop(condition, block),
             Node::ForLoop(target, iter, block) => self.for_loop(target, iter, block),
+            Node::ClassDef(name, fields, methods) => {
+                self.class_def(name.clone(), fields.clone(), methods)
+            }
             _ => todo!("{node:?}"),
         };
         PtyNull.into()
@@ -134,6 +138,10 @@ impl VirtualMachine {
     }
     pub fn for_loop(&mut self, target: &str, iter: &Node, block: &[Node]) {
         todo!()
+    }
+    pub fn class_def(&mut self, name: RcStr, fields: Rc<[RcStr]>, methods: &Rc<[Node]>) {
+        let class = PettyClass::new(fields, methods.clone());
+        self.fields.write(name, class.into());
     }
 }
 

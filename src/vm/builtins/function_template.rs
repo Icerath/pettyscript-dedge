@@ -78,6 +78,16 @@ impl<I: Into<PettyObject> + Clone, O: Into<PettyObject> + Clone> fmt::Display
         display_function_object(self, f)
     }
 }
+
+#[inline]
+pub fn display_class_object<T: Into<PettyObject>>(
+    this: &T,
+    f: &mut fmt::Formatter<'_>,
+) -> fmt::Result {
+    let ptr = this as *const T;
+    write!(f, "class Object at {ptr:?}")
+}
+
 #[inline]
 pub fn display_function_object<T: Into<PettyObject>>(
     this: &T,
