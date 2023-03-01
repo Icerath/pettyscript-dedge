@@ -1,5 +1,6 @@
 # pettyscript
 Learning to write my own interpreted language for fun.
+Currently inspired mostly by Python.
 
 ### Parser
 - [x] Line Comments
@@ -26,8 +27,8 @@ Learning to write my own interpreted language for fun.
 - [x] Unary Expressions
 - [x] Variables
 - [x] Function Calls
-- [ ] Class Instantiation
-- [ ] Methods
+- [x] Class Instantiation
+- [x] Methods
 - [ ] For Loop
 - [x] While Loop
 - [x] If/Elif/Else Statements
@@ -36,7 +37,6 @@ Learning to write my own interpreted language for fun.
 - [ ] Tests
 - [ ] Finish Writing Task List
 - [ ] Maybe learn proc macros to make creating builtins easier!!!!!
-
 ### CLI
 
 - [ ] Argparsing
