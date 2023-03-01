@@ -5,8 +5,10 @@ class Point(x, y) {
     fn __repr__(self) {
         return "Point { " + repr(self.x) +  ", " + repr(self.y) + " }";
     }
+    fn __call__(self) {
+        print(self);
+    }
 }
 point = Point(1, 2) + Point(2, 3);
-point2 = point;
-print(point);
-print(point2);
+result = point();
+print(result);

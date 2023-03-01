@@ -6,7 +6,7 @@ use crate::vm::{
     object::{PettyObject, PettyObjectType},
 };
 
-use super::{function_template::SingleTemplate, PtyBool};
+use super::{function_template::SingleTemplate, PtyBool, PtyStr};
 
 #[derive(Clone)]
 pub struct PtyNull;
@@ -17,6 +17,7 @@ impl PettyObjectType for PtyNull {
     fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
         match str {
             "__bool__" => SingleTemplate(|_: &Self| PtyBool(false)).into(),
+            "__repr__" => SingleTemplate(|_: &Self| PtyStr("null".into())).into(),
             _ => todo!(),
         }
     }

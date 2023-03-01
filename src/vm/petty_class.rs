@@ -45,8 +45,10 @@ impl PettyObjectType for PettyClassInstance {
             _ => todo!("{str}"),
         }
     }
-    fn call(&self, vm: &mut Vm, this: PettyObject, args: FuncArgs) -> PettyObject {
-        todo!()
+    fn call(&self, vm: &mut Vm, this: PettyObject, mut args: FuncArgs) -> PettyObject {
+        let function = self.get_item(vm, this.clone(), "__call__");
+        args.0.push(this.clone());
+        function.call(vm, this, args)
     }
     fn as_any(&self) -> &dyn std::any::Any {
         self
@@ -58,6 +60,9 @@ impl PettyObjectType for PettyClass {
         self
     }
     fn call(&self, vm: &mut Vm, this: PettyObject, args: FuncArgs) -> PettyObject {
+        if self.fields.len() != args.0.len() {
+            todo!("Expected {} Arguments got {}", self.fields.len(), args.0.len());
+        }
         let mut fields: BTreeMap<Rc<str>, PettyObject> = self
             .fields
             .iter()

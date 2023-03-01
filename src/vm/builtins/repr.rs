@@ -6,7 +6,7 @@ use crate::vm::{
     object::{PettyObject, PettyObjectType},
 };
 
-use super::{function_template, PtyNull};
+use super::function_template;
 
 #[derive(Clone)]
 pub struct PtyRepr;
