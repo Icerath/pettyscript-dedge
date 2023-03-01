@@ -30,7 +30,7 @@ impl PettyObjectType for PettyFunction {
             );
         }
         for (param, arg) in self.args.iter().zip(args.0.into_iter()) {
-            vm.fields.write(param, arg);
+            vm.fields.write(param.clone(), arg);
         }
         vm.execute_nodes(&self.block);
         vm.fields.drop_scope();

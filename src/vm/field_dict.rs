@@ -1,17 +1,19 @@
+use crate::rc_str::RcStr;
+
 use super::object::PettyObject;
-use std::collections::HashMap;
+use std::{collections::BTreeMap};
 
 #[derive(Default)]
 pub struct FieldDict {
-    globals: HashMap<String, PettyObject>,
-    scopes: Vec<HashMap<String, PettyObject>>,
+    globals: BTreeMap<RcStr, PettyObject>,
+    scopes: Vec<BTreeMap<RcStr, PettyObject>>,
 }
 
 impl FieldDict {
-    pub fn write(&mut self, str: &str, value: PettyObject) {
-        self.current_scope().insert(str.into(), value);
+    pub fn write(&mut self, str: RcStr, value: PettyObject) {
+        self.current_scope().insert(str, value);
     }
-    pub fn read(&mut self, str: &str) -> PettyObject {
+    pub fn read(&mut self, str: &RcStr) -> PettyObject {
         for scope in self.scopes.iter().rev() {
             if let Some(object) = scope.get(str) {
                 return object.clone();
@@ -22,11 +24,11 @@ impl FieldDict {
             .unwrap_or_else(|| panic!("Not found: {str}"))
             .clone()
     }
-    fn current_scope(&mut self) -> &mut HashMap<String, PettyObject> {
+    fn current_scope(&mut self) -> &mut BTreeMap<RcStr, PettyObject> {
         self.scopes.last_mut().unwrap_or(&mut self.globals)
     }
     pub fn new_scope(&mut self) {
-        self.scopes.push(HashMap::new());
+        self.scopes.push(BTreeMap::new());
     }
     pub fn drop_scope(&mut self) {
         self.scopes.pop();

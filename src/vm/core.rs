@@ -27,7 +27,7 @@ impl VirtualMachine {
         }
     }
     pub fn load_builtin<PtyObj: PettyObjectType + 'static>(&mut self, name: &str, object: PtyObj) {
-        self.fields.write(name, object.into());
+        self.fields.write(name.into(), object.into());
     }
 }
 
@@ -35,7 +35,7 @@ impl VirtualMachine {
     pub fn evaluate(&mut self, node: &Node) -> PettyObject {
         match node {
             Node::Globals(nodes) | Node::Block(nodes) => self.execute_nodes(nodes),
-            Node::SetEq(name, expr) => self.set_eq(name, expr),
+            Node::SetEq(name, expr) => self.set_eq(name.clone(), expr),
             Node::BinExpr(op, nodes) if *op == BinOp::GetItem => {
                 return self.get_item(&nodes.0, &nodes.1)
             }
@@ -43,7 +43,7 @@ impl VirtualMachine {
             Node::Literal(literal) => return builtins::create_literal(literal),
             Node::Ident(ident) => return self.fields.read(ident),
             Node::FuncCall(name, args) => return self.func_call(name, args),
-            Node::FuncDef(name, args, block) => self.func_def(name, args, block),
+            Node::FuncDef(name, args, block) => self.func_def(name.clone(), args, block),
             Node::ReturnState(expr) => self.return_val = Some(self.evaluate(expr)),
             Node::UnaryOp(op, expr) => return self.unary_expr(*op, expr),
             Node::IfState(condition, block, or_else) => {
@@ -63,7 +63,7 @@ impl VirtualMachine {
             self.evaluate(node);
         }
     }
-    pub fn set_eq(&mut self, name: &str, expr: &Node) {
+    pub fn set_eq(&mut self, name: RcStr, expr: &Node) {
         let value = self.evaluate(expr);
         self.fields.write(name, value);
     }
@@ -93,7 +93,7 @@ impl VirtualMachine {
         let args = FuncArgs(vec![inner]);
         function.call(self, function.clone(), args)
     }
-    pub fn func_call(&mut self, name: &str, args: &[Node]) -> PettyObject {
+    pub fn func_call(&mut self, name: &RcStr, args: &[Node]) -> PettyObject {
         let args = self.evaluate_list(args);
         let function = self.fields.read(name);
         function.call(self, function.clone(), FuncArgs(args))
@@ -102,7 +102,7 @@ impl VirtualMachine {
         items.iter().map(|arg| self.evaluate(arg)).collect()
     }
     #[allow(clippy::borrowed_box)]
-    pub fn func_def(&mut self, name: &str, args: &Rc<[RcStr]>, block: &Rc<[Node]>) {
+    pub fn func_def(&mut self, name: RcStr, args: &Rc<[RcStr]>, block: &Rc<[Node]>) {
         let function = PettyFunction::new(args.clone(), block.clone());
         self.fields.write(name, function.into());
     }
