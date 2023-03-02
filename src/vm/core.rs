@@ -8,7 +8,7 @@ use super::{
     builtins::{self, PtyBool, PtyNull},
     field_dict::FieldDict,
     function_args::FuncArgs,
-    object::{PettyObject},
+    object::PettyObject,
     petty_class::PettyClass,
     petty_function::PettyFunction,
 };

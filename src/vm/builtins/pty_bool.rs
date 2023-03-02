@@ -6,7 +6,10 @@ use crate::vm::{
     object::{PettyObject, PettyObjectType},
 };
 
-use super::{function_template::{SingleTemplate, BinOpTemplate}, PtyStr};
+use super::{
+    function_template::{BinOpTemplate, SingleTemplate},
+    PtyStr,
+};
 
 #[derive(Clone)]
 pub struct PtyBool(pub bool);

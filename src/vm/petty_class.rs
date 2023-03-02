@@ -39,9 +39,10 @@ impl PettyObjectType for PettyClassInstance {
             return item.clone();
         }
         match str {
-            "__repr__" => {
-                SingleTemplate(|this: &Self| PtyStr(format!("Class Instance at {:?}", this as *const Self).into())).into()
-            }
+            "__repr__" => SingleTemplate(|this: &Self| {
+                PtyStr(format!("Class Instance at {:?}", this as *const Self).into())
+            })
+            .into(),
             _ => todo!("{str}"),
         }
     }
@@ -61,7 +62,11 @@ impl PettyObjectType for PettyClass {
     }
     fn call(&self, vm: &mut Vm, this: PettyObject, args: FuncArgs) -> PettyObject {
         if self.fields.len() != args.0.len() {
-            todo!("Expected {} Arguments got {}", self.fields.len(), args.0.len());
+            todo!(
+                "Expected {} Arguments got {}",
+                self.fields.len(),
+                args.0.len()
+            );
         }
         let mut fields: BTreeMap<Rc<str>, PettyObject> = self
             .fields
