@@ -124,7 +124,7 @@ impl VirtualMachine {
         };
     }
     pub fn while_loop(&mut self, condition: &Node, block: &[Node]) {
-        while {
+        while self.return_val.is_none() && {
             let condition = self.evaluate(condition);
             let condition = condition.call_method(self, "__bool__", FuncArgs(vec![]));
             let condition = condition
@@ -159,7 +159,10 @@ impl BinOp {
             Self::GT => "__gt__",
             Self::LTEq => "__lt_eq__",
             Self::GTEq => "__gt_eq__",
-            _ => todo!(),
+            Self::Mod => "__mod__",
+            Self::And => "__and__",
+            Self::Or => "__or__",
+            _ => todo!("{self}"),
         }
     }
 }

@@ -30,6 +30,9 @@ impl PettyObjectType for PtyInt {
             "__div__" => {
                 BinOpTemplate::<Self, Self, Self>(|left, right| Self(left.0 / right.0)).into()
             }
+            "__mod__" => {
+                BinOpTemplate::<Self, Self, Self>(|left, right| Self(left.0 % right.0)).into()
+            }
             "__is_eq__" => {
                 BinOpTemplate::<Self, Self, PtyBool>(|left, right| PtyBool(left.0 == right.0))
                     .into()
