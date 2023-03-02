@@ -27,6 +27,6 @@ impl PettyObjectType for PtyNull {
 }
 impl fmt::Display for PtyNull {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Null")
+        write!(f, "null")
     }
 }
