@@ -39,6 +39,7 @@ Currently inspired mostly by Python.
 - [ ] Tests
 - [ ] Finish Writing Task List
 - [ ] Improve method for creating builtins.
+- [ ] Implement the concept of types.
 - [ ] Bring primitives to atleast the minimum usability.
     - [ ] Minimum int
     - [ ] Minimum str
