@@ -206,10 +206,7 @@ fn err<'a, O, P: Parser<&'a str, O, NomErr<'a>>>(
 ) -> impl FnMut(&'a str) -> IResult<&'a str, O, NomErr<'a>> {
     move |i: &'a str| {
         parser.parse(i).map_err(|e| {
-            let err = ErrorTree::Base {
-                location: i,
-                kind: nom_supreme::error::BaseErrorKind::External(Box::new(msg)),
-            };
+            let err = new_error(i, msg);
             match e {
                 nom::Err::Error(_) => nom::Err::Error(err),
                 nom::Err::Failure(e) => match &e {
