@@ -6,20 +6,20 @@ use crate::vm::{
     object::{PettyObject, PettyObjectType},
 };
 
-pub struct BinOpTemplate<
-    Lhs: Into<PettyObject> + Clone + 'static,
-    Rhs: Into<PettyObject> + Clone + 'static,
-    Ret: Into<PettyObject> + Clone + 'static,
->(pub fn(Lhs, Rhs) -> Ret);
-pub struct SingleTemplate<
-    I: Into<PettyObject> + Clone + 'static,
-    O: Into<PettyObject> + Clone + 'static,
->(pub fn(&I) -> O);
-impl<
-        Lhs: Into<PettyObject> + Clone,
-        Rhs: Into<PettyObject> + Clone,
-        Ret: Into<PettyObject> + Clone,
-    > PettyObjectType for BinOpTemplate<Lhs, Rhs, Ret>
+pub struct BinOpTemplate<Lhs, Rhs, Ret>(pub fn(Lhs, Rhs) -> Ret)
+where
+    Lhs: Into<PettyObject> + 'static,
+    Rhs: Into<PettyObject> + 'static,
+    Ret: Into<PettyObject> + 'static;
+pub struct SingleTemplate<I, O>(pub fn(&I) -> O)
+where
+    I: Into<PettyObject> + 'static,
+    O: Into<PettyObject> + 'static;
+impl<Lhs, Rhs, Ret> PettyObjectType for BinOpTemplate<Lhs, Rhs, Ret>
+where
+    Lhs: Into<PettyObject> + Clone,
+    Rhs: Into<PettyObject> + Clone,
+    Ret: Into<PettyObject> + Clone,
 {
     fn call(&self, _vm: &mut Vm, _this: PettyObject, args: FuncArgs) -> PettyObject {
         if args.0.len() != 2 {
@@ -41,8 +41,10 @@ impl<
         self
     }
 }
-impl<I: Into<PettyObject> + Clone, O: Into<PettyObject> + Clone> PettyObjectType
-    for SingleTemplate<I, O>
+impl<I, O> PettyObjectType for SingleTemplate<I, O>
+where
+    I: Into<PettyObject> + Clone,
+    O: Into<PettyObject> + Clone,
 {
     fn call(&self, _vm: &mut Vm, _this: PettyObject, args: FuncArgs) -> PettyObject {
         if args.0.len() != 1 {
@@ -61,18 +63,20 @@ impl<I: Into<PettyObject> + Clone, O: Into<PettyObject> + Clone> PettyObjectType
         self
     }
 }
-impl<
-        Lhs: Into<PettyObject> + Clone,
-        Rhs: Into<PettyObject> + Clone,
-        Ret: Into<PettyObject> + Clone,
-    > fmt::Display for BinOpTemplate<Lhs, Rhs, Ret>
+impl<Lhs, Rhs, Ret> fmt::Display for BinOpTemplate<Lhs, Rhs, Ret>
+where
+    Lhs: Into<PettyObject> + Clone,
+    Rhs: Into<PettyObject> + Clone,
+    Ret: Into<PettyObject> + Clone,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         display_function_object(self, f)
     }
 }
-impl<I: Into<PettyObject> + Clone, O: Into<PettyObject> + Clone> fmt::Display
-    for SingleTemplate<I, O>
+impl<I, O> fmt::Display for SingleTemplate<I, O>
+where
+    I: Into<PettyObject> + Clone,
+    O: Into<PettyObject> + Clone,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         display_function_object(self, f)
@@ -80,19 +84,19 @@ impl<I: Into<PettyObject> + Clone, O: Into<PettyObject> + Clone> fmt::Display
 }
 
 #[inline]
-pub fn display_class_object<T: Into<PettyObject>>(
-    this: &T,
-    f: &mut fmt::Formatter<'_>,
-) -> fmt::Result {
+pub fn display_class_object<T>(this: &T, f: &mut fmt::Formatter<'_>) -> fmt::Result
+where
+    T: Into<PettyObject>,
+{
     let ptr = this as *const T;
     write!(f, "class Object at {ptr:?}")
 }
 
 #[inline]
-pub fn display_function_object<T: Into<PettyObject>>(
-    this: &T,
-    f: &mut fmt::Formatter<'_>,
-) -> fmt::Result {
+pub fn display_function_object<T>(this: &T, f: &mut fmt::Formatter<'_>) -> fmt::Result
+where
+    T: Into<PettyObject>,
+{
     let ptr = this as *const T;
     write!(f, "Function Object at {ptr:?}")
 }
