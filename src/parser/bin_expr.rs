@@ -36,7 +36,7 @@ fn get_item_suffix(input: &str) -> IRes {
     alt((function_call, map(sp(ident), Node::Ident)))(input)
 }
 fn factor(input: &str) -> IRes {
-    alt((paren_bin_expr, node_value))(input)
+    alt((paren_bin_expr, node_value, unary_expr))(input)
 }
 
 fn binop_lower(input: &str) -> IRes<BinOp> {

@@ -79,9 +79,10 @@ fn unary_expr(input: &str) -> IRes {
         map(char('+'), |_| UnaryOp::Plus),
         map(char('-'), |_| UnaryOp::Neg),
     )));
-    map(pair(unary_op, node_value), |(op, node)| {
-        Node::UnaryOp(op, Rc::new(node))
-    })(input)
+    map(
+        pair(unary_op, alt((node_value, node_expr))),
+        |(op, node)| Node::UnaryOp(op, Rc::new(node)),
+    )(input)
 }
 fn params(input: &str) -> IRes<Rc<[RcStr]>> {
     let (rem, nodes) = terminated(separated_list0(spar(','), type_hinted), opt(spar(',')))(input)?;
