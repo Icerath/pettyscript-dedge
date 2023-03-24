@@ -1,5 +1,3 @@
-pub mod function_template;
-
 mod int;
 mod null;
 mod print;
@@ -7,8 +5,9 @@ mod pty_bool;
 mod repr;
 mod string;
 
+use std::fmt;
+
 pub use self::repr::PtyRepr;
-pub use function_template::{display_class_object, display_function_object};
 pub use int::PtyInt;
 pub use null::PtyNull;
 pub use print::PtyPrint;
@@ -33,4 +32,22 @@ pub fn create_literal(literal: &Literal) -> PettyObject {
         Literal::String(string) => PtyStr(string.clone()).into(),
         _ => todo!(),
     }
+}
+
+#[inline]
+pub fn display_class_object<T>(this: &T, f: &mut fmt::Formatter<'_>) -> fmt::Result
+where
+    T: Into<PettyObject>,
+{
+    let ptr = this as *const T;
+    write!(f, "class Object at {ptr:?}")
+}
+
+#[inline]
+pub fn display_function_object<T>(this: &T, f: &mut fmt::Formatter<'_>) -> fmt::Result
+where
+    T: Into<PettyObject>,
+{
+    let ptr = this as *const T;
+    write!(f, "Function Object at {ptr:?}")
 }

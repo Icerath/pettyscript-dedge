@@ -6,7 +6,7 @@ use crate::vm::{
     object::{PettyObject, PettyObjectType},
 };
 
-use super::{function_template, PtyNull};
+use super::{display_function_object, PtyNull};
 
 #[derive(Clone)]
 pub struct PtyPrint;
@@ -28,6 +28,6 @@ impl PettyObjectType for PtyPrint {
 }
 impl fmt::Display for PtyPrint {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        function_template::display_function_object(self, f)
+        display_function_object(self, f)
     }
 }

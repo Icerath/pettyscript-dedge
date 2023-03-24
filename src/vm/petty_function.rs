@@ -3,7 +3,7 @@ use std::fmt;
 use crate::{ast::Node, rc_str::RcStr, slim_rc::Rc};
 
 use super::{
-    builtins::{self, PtyNull},
+    builtins::PtyNull,
     core::Vm,
     function_args::FuncArgs,
     object::{PettyObject, PettyObjectType},
@@ -46,6 +46,6 @@ impl PettyObjectType for PettyFunction {
 
 impl fmt::Display for PettyFunction {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        builtins::display_function_object(self, f)
+        write!(f, "")
     }
 }

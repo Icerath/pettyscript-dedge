@@ -1,18 +1,16 @@
 use std::{collections::BTreeMap, fmt};
 
-use crate::{
-    ast::Node,
-    rc_str::RcStr,
-    slim_rc::Rc,
-    vm::builtins::{function_template::SingleTemplate, PtyStr},
-};
+use macros::pettymethod;
+
+use crate::{ast::Node, rc_str::RcStr, slim_rc::Rc};
 
 use super::{
-    builtins::{self, PtyNull},
+    builtins::{self, PtyStr},
     core::Vm,
     function_args::FuncArgs,
     object::{PettyObject, PettyObjectType},
     petty_function::PettyFunction,
+    raw_function::RawFunction,
 };
 
 #[derive(Clone)]
@@ -39,10 +37,7 @@ impl PettyObjectType for PettyClassInstance {
             return item.clone();
         }
         match str {
-            "__repr__" => SingleTemplate(|this: &Self| {
-                PtyStr(format!("Class Instance at {:?}", this as *const Self).into())
-            })
-            .into(),
+            "__repr__" => RawFunction(__repr__).into(),
             _ => todo!("{str}"),
         }
     }
@@ -98,4 +93,9 @@ impl fmt::Display for PettyClass {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         builtins::display_class_object(self, f)
     }
+}
+
+#[pettymethod]
+fn __repr__(self_: PettyClassInstance) -> PtyStr {
+    PtyStr(format!("{self_}").into())
 }

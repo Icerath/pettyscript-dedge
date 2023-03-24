@@ -1,14 +1,17 @@
 use std::fmt;
 
+use macros::pettymethod;
+
 use crate::vm::{
     core::Vm,
     function_args::FuncArgs,
     object::{PettyObject, PettyObjectType},
+    raw_function::RawFunction,
 };
 
-use super::{function_template::SingleTemplate, PtyBool, PtyStr};
+use super::{PtyBool, PtyStr};
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct PtyNull;
 impl PettyObjectType for PtyNull {
     fn call(&self, _vm: &mut Vm, _this: PettyObject, _args: FuncArgs) -> PettyObject {
@@ -16,8 +19,8 @@ impl PettyObjectType for PtyNull {
     }
     fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
         match str {
-            "__bool__" => SingleTemplate(|_: &Self| PtyBool(false)).into(),
-            "__repr__" => SingleTemplate(|_: &Self| PtyStr("null".into())).into(),
+            "__bool__" => RawFunction(__bool__).into(),
+            "__repr__" => RawFunction(__repr__).into(),
             _ => todo!(),
         }
     }
@@ -29,4 +32,13 @@ impl fmt::Display for PtyNull {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "null")
     }
+}
+
+#[pettymethod]
+fn __bool__(_self: PtyNull) -> PtyBool {
+    PtyBool(false)
+}
+#[pettymethod]
+fn __repr__(_self: PtyNull) -> PtyStr {
+    PtyStr("null".into())
 }

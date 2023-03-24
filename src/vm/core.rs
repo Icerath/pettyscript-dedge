@@ -15,6 +15,7 @@ use super::{
 
 pub type Vm = VirtualMachine;
 
+#[derive(Default)]
 pub struct VirtualMachine {
     pub fields: FieldDict,
     pub return_val: Option<PettyObject>,
@@ -22,10 +23,7 @@ pub struct VirtualMachine {
 
 impl VirtualMachine {
     pub fn new() -> Self {
-        Self {
-            fields: FieldDict::default(),
-            return_val: None,
-        }
+        Self::default()
     }
     pub fn load_builtin(&mut self, name: &str, object: PettyObject) {
         self.fields.write(name.into(), object);

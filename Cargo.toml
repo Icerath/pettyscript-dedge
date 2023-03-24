@@ -9,3 +9,4 @@ edition = "2021"
 nom = "7.1.3"
 nom-supreme = "0.8.0"
 thiserror = "1.0.38"
+macros = { path = "./macros" }
