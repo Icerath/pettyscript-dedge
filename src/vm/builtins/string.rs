@@ -1,19 +1,16 @@
+use crate::slim_rc::Rc;
+use macros::pettymethod;
 use std::fmt;
 
-use macros::pettymethod;
-
-use crate::{
-    rc_str::RcStr,
-    vm::{
-        core::Vm,
-        function_args::FuncArgs,
-        object::{PettyObject, PettyObjectType},
-        raw_function::RawFunction,
-    },
+use crate::vm::{
+    core::Vm,
+    function_args::FuncArgs,
+    object::{PettyObject, PettyObjectType},
+    raw_function::RawFunction,
 };
 
 #[derive(Clone)]
-pub struct PtyStr(pub RcStr);
+pub struct PtyStr(pub Rc<str>);
 
 impl PettyObjectType for PtyStr {
     fn call(&self, _vm: &mut Vm, _this: PettyObject, _args: FuncArgs) -> PettyObject {

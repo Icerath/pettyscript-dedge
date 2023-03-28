@@ -1,6 +1,5 @@
 use crate::{
     ast::{BinOp, Node, UnaryOp},
-    rc_str::RcStr,
     slim_rc::Rc,
 };
 
@@ -65,7 +64,7 @@ impl VirtualMachine {
             self.evaluate(node);
         }
     }
-    pub fn set_eq(&mut self, name: RcStr, expr: &Node) {
+    pub fn set_eq(&mut self, name: Rc<str>, expr: &Node) {
         let value = self.evaluate(expr);
         self.fields.write(name, value);
     }
@@ -95,7 +94,7 @@ impl VirtualMachine {
         let args = FuncArgs(vec![inner]);
         function.call(self, function.clone(), args)
     }
-    pub fn func_call(&mut self, name: &RcStr, args: &[Node]) -> PettyObject {
+    pub fn func_call(&mut self, name: &Rc<str>, args: &[Node]) -> PettyObject {
         let args = self.evaluate_list(args);
         let function = self.fields.read(name);
         function.call(self, function.clone(), FuncArgs(args))
@@ -103,7 +102,7 @@ impl VirtualMachine {
     pub fn evaluate_list(&mut self, items: &[Node]) -> Vec<PettyObject> {
         items.iter().map(|arg| self.evaluate(arg)).collect()
     }
-    pub fn func_def(&mut self, name: RcStr, args: &Rc<[RcStr]>, block: &Rc<[Node]>) {
+    pub fn func_def(&mut self, name: Rc<str>, args: &Rc<[Rc<str>]>, block: &Rc<[Node]>) {
         let function = PettyFunction::new(args.clone(), block.clone());
         self.fields.write(name, function.into());
     }
@@ -137,7 +136,7 @@ impl VirtualMachine {
     pub fn for_loop(&mut self, target: &str, iter: &Node, block: &[Node]) {
         todo!()
     }
-    pub fn class_def(&mut self, name: RcStr, fields: Rc<[RcStr]>, methods: &Rc<[Node]>) {
+    pub fn class_def(&mut self, name: Rc<str>, fields: Rc<[Rc<str>]>, methods: &Rc<[Node]>) {
         let class = PettyClass::new(fields, methods.clone());
         self.fields.write(name, class.into());
     }

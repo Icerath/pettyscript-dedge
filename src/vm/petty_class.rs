@@ -1,12 +1,11 @@
-use std::{collections::BTreeMap, fmt};
-
+use crate::{ast::Node, slim_rc::Rc};
 use macros::pettymethod;
-
-use crate::{ast::Node, rc_str::RcStr, slim_rc::Rc};
+use std::fmt;
 
 use super::{
     builtins::{self, PtyStr},
     core::Vm,
+    dict::Dict,
     function_args::FuncArgs,
     object::{PettyObject, PettyObjectType},
     petty_function::PettyFunction,
@@ -15,19 +14,19 @@ use super::{
 
 #[derive(Clone)]
 pub struct PettyClassInstance {
-    pub fields: BTreeMap<RcStr, PettyObject>,
+    pub fields: Dict,
 }
 pub struct PettyClass {
-    pub fields: Rc<[RcStr]>,
+    pub fields: Rc<[Rc<str>]>,
     pub methods: Rc<[Node]>,
 }
 impl PettyClass {
-    pub fn new(fields: Rc<[RcStr]>, methods: Rc<[Node]>) -> Self {
+    pub fn new(fields: Rc<[Rc<str>]>, methods: Rc<[Node]>) -> Self {
         Self { fields, methods }
     }
 }
 impl PettyClassInstance {
-    pub fn new(fields: BTreeMap<RcStr, PettyObject>) -> Self {
+    pub fn new(fields: Dict) -> Self {
         Self { fields }
     }
 }
@@ -63,7 +62,7 @@ impl PettyObjectType for PettyClass {
                 args.0.len()
             );
         }
-        let mut fields: BTreeMap<Rc<str>, PettyObject> = self
+        let mut fields: Dict = self
             .fields
             .iter()
             .cloned()

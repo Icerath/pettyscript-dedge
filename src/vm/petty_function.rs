@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::{ast::Node, rc_str::RcStr, slim_rc::Rc};
+use crate::{ast::Node, slim_rc::Rc};
 
 use super::{
     builtins::PtyNull,
@@ -11,11 +11,11 @@ use super::{
 
 #[derive(Clone)]
 pub struct PettyFunction {
-    args: Rc<[RcStr]>,
+    args: Rc<[Rc<str>]>,
     block: Rc<[Node]>,
 }
 impl PettyFunction {
-    pub fn new(args: Rc<[RcStr]>, block: Rc<[Node]>) -> Self {
+    pub fn new(args: Rc<[Rc<str>]>, block: Rc<[Node]>) -> Self {
         Self { args, block }
     }
 }

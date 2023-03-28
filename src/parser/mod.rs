@@ -8,7 +8,6 @@ use statements::statement;
 use crate::{
     ast::{BinOp, Literal, Node, UnaryOp},
     error::PettyParseError,
-    rc_str::RcStr,
     slim_rc::Rc,
 };
 use nom::{
@@ -84,7 +83,7 @@ fn unary_expr(input: &str) -> IRes {
         |(op, node)| Node::UnaryOp(op, Rc::new(node)),
     )(input)
 }
-fn params(input: &str) -> IRes<Rc<[RcStr]>> {
+fn params(input: &str) -> IRes<Rc<[Rc<str>]>> {
     let (rem, nodes) = terminated(separated_list0(spar(','), type_hinted), opt(spar(',')))(input)?;
     Ok((rem, nodes.into()))
 }
@@ -123,18 +122,18 @@ fn eat_comments(mut input: &str) -> &str {
         input = input.trim();
     }
 }
-fn type_hinted(input: &str) -> IRes<RcStr> {
+fn type_hinted(input: &str) -> IRes<Rc<str>> {
     alt((
         terminated(sp(ident), opt(pair(spar(':'), sp(ident)))),
         sp(ident),
     ))(input)
 }
-fn ident(i: &str) -> IRes<RcStr> {
+fn ident(i: &str) -> IRes<Rc<str>> {
     err(
         recognize(tuple((alt((alpha, char('_'))), take_while(is_ident_char)))),
         ParseErr::Ident,
     )
-    .map(RcStr::from)
+    .map(Rc::from)
     .parse(i)
 }
 fn literal(i: &str) -> IRes<Literal> {

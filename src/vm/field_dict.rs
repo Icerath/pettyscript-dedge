@@ -1,19 +1,17 @@
-use crate::rc_str::RcStr;
-
-use super::object::PettyObject;
-use std::collections::BTreeMap;
+use super::{dict::Dict, object::PettyObject};
+use crate::slim_rc::Rc;
 
 #[derive(Default)]
 pub struct FieldDict {
-    globals: BTreeMap<RcStr, PettyObject>,
-    scopes: Vec<BTreeMap<RcStr, PettyObject>>,
+    globals: Dict,
+    scopes: Vec<Dict>,
 }
 
 impl FieldDict {
-    pub fn write(&mut self, str: RcStr, value: PettyObject) {
+    pub fn write(&mut self, str: Rc<str>, value: PettyObject) {
         self.current_scope().insert(str, value);
     }
-    pub fn read(&mut self, str: &RcStr) -> PettyObject {
+    pub fn read(&mut self, str: &Rc<str>) -> PettyObject {
         for scope in self.scopes.iter().rev() {
             if let Some(object) = scope.get(str) {
                 return object.clone();
@@ -24,11 +22,11 @@ impl FieldDict {
             .unwrap_or_else(|| panic!("Not found: {str}"))
             .clone()
     }
-    fn current_scope(&mut self) -> &mut BTreeMap<RcStr, PettyObject> {
+    fn current_scope(&mut self) -> &mut Dict {
         self.scopes.last_mut().unwrap_or(&mut self.globals)
     }
     pub fn new_scope(&mut self) {
-        self.scopes.push(BTreeMap::new());
+        self.scopes.push(Dict::new());
     }
     pub fn drop_scope(&mut self) {
         self.scopes.pop();

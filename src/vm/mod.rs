@@ -1,9 +1,9 @@
-use crate::ast::{self, Node};
-
 use self::object::PettyObject;
+use crate::ast::{self, Node};
 
 mod builtins;
 mod core;
+mod dict;
 mod field_dict;
 mod function_args;
 mod object;

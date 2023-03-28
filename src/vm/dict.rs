@@ -1,4 +1,4 @@
 use super::object::PettyObject;
-use std::collections::HashMap;
-
-pub type Dict<'a> = HashMap<&'a str, PettyObject<'a>>;
+use crate::slim_rc::Rc;
+use std::collections::BTreeMap;
+pub type Dict = BTreeMap<Rc<str>, PettyObject>;

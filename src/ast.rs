@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::{rc_str::RcStr, slim_rc::Rc};
+use crate::slim_rc::Rc;
 
 #[derive(PartialEq, Clone)]
 pub enum Node {
@@ -9,17 +9,17 @@ pub enum Node {
     Globals(Rc<[Node]>),
     BinExpr(BinOp, Rc<(Node, Node)>),
     UnaryOp(UnaryOp, Rc<Node>),
-    Ident(RcStr),
-    FuncCall(RcStr, Rc<[Node]>),
+    Ident(Rc<str>),
+    FuncCall(Rc<str>, Rc<[Node]>),
     IfState(Rc<Node>, Rc<[Node]>, Option<Rc<Node>>),
     WhileLoop(Rc<Node>, Rc<[Node]>),
-    ForLoop(RcStr, Rc<Node>, Rc<[Node]>),
+    ForLoop(Rc<str>, Rc<Node>, Rc<[Node]>),
     ReturnState(Rc<Node>),
     BreakState,
-    FuncDef(RcStr, Rc<[RcStr]>, Rc<[Node]>),
-    ClassDef(RcStr, Rc<[RcStr]>, Rc<[Node]>),
+    FuncDef(Rc<str>, Rc<[Rc<str>]>, Rc<[Node]>),
+    ClassDef(Rc<str>, Rc<[Rc<str>]>, Rc<[Node]>),
     Empty,
-    SetEq(RcStr, Rc<Node>),
+    SetEq(Rc<str>, Rc<Node>),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -53,7 +53,7 @@ pub enum UnaryOp {
 pub enum Literal {
     Int(i128),
     Float(f64),
-    String(RcStr),
+    String(Rc<str>),
     List(Rc<[Node]>),
     Null,
     Bool(bool),
@@ -195,7 +195,7 @@ impl Node {
         Self::IfState(Rc::new(condition), block.into(), or_else.map(Rc::new))
     }
 }
-fn vec_box_str(input: Vec<&str>) -> Rc<[RcStr]> {
+fn vec_box_str(input: Vec<&str>) -> Rc<[Rc<str>]> {
     input
         .into_iter()
         .map(std::convert::Into::into)
