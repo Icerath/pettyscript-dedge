@@ -1,5 +1,5 @@
-mod int;
 mod null;
+mod number;
 mod print;
 mod pty_bool;
 mod repr;
@@ -8,8 +8,8 @@ mod string;
 use std::fmt;
 
 pub use self::repr::PtyRepr;
-pub use int::PtyInt;
 pub use null::PtyNull;
+pub use number::PtyNum;
 pub use print::PtyPrint;
 pub use pty_bool::PtyBool;
 pub use string::PtyStr;
@@ -26,7 +26,8 @@ pub fn load_builtins(vm: &mut VirtualMachine) {
 
 pub fn create_literal(literal: &Literal) -> PettyObject {
     match literal {
-        Literal::Int(int) => PtyInt(*int).into(),
+        Literal::Int(int) => PtyNum(*int as f64).into(),
+        Literal::Float(float) => PtyNum(*float).into(),
         Literal::Null => PtyNull.into(),
         Literal::Bool(bool) => PtyBool(*bool).into(),
         Literal::String(string) => PtyStr(string.clone()).into(),
