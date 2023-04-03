@@ -1,6 +1,7 @@
 use std::fmt;
 
 use crate::vm::{
+    builtins::PtyNull,
     core::Vm,
     function_args::FuncArgs,
     object::{PettyObject, PettyObjectType},
@@ -15,9 +16,11 @@ impl PettyObjectType for PtyRepr {
         if args.0.len() != 1 {
             todo!("Expected 1 argument got {}", args.0.len());
         }
-        let arg = &args.0[0];
-        let repr_function = arg.get_item(vm, arg.clone(), "__repr__");
-        repr_function.call(vm, repr_function.clone(), FuncArgs(vec![arg.clone()]))
+        let Some(repr) = args.0[0].repr(vm) else {
+            eprintln!("TODO - {}", &args.0[0]);
+            return PtyNull.into();
+        };
+        repr.into()
     }
     fn get_item(&self, _vm: &mut Vm, _this: PettyObject, _str: &str) -> PettyObject {
         todo!()
