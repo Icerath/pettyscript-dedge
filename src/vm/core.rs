@@ -75,9 +75,12 @@ impl VirtualMachine {
             Node::FuncCall(name, args) => (left.get_item(self, left.clone(), name), args),
             _ => unreachable!(),
         };
-        let mut args = self.evaluate_list(args);
-        args.push(left);
-        function.call(self, function.clone(), FuncArgs(args))
+        let mut items = Vec::with_capacity(args.len());
+        items.push(left);
+        for arg in args.iter() {
+            items.push(self.evaluate(arg));
+        }
+        function.call(self, function.clone(), FuncArgs(items))
     }
     pub fn bin_expr(&mut self, op: BinOp, lhs: &Node, rhs: &Node) -> PettyObject {
         let lhs = self.evaluate(lhs);

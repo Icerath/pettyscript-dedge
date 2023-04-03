@@ -2,7 +2,7 @@ use std::{any::Any, fmt, ops::Deref};
 
 use crate::slim_rc::Rc;
 
-use super::{core::Vm, function_args::FuncArgs};
+use super::{builtins::PtyStr, core::Vm, function_args::FuncArgs};
 
 pub trait PettyObjectType: fmt::Display {
     fn get_item(&self, vm: &mut Vm, this: PettyObject, str: &str) -> PettyObject;
@@ -20,6 +20,10 @@ impl PettyObject {
         args.0.push(self.clone());
         let function = self.get_item(vm, self.clone(), func);
         function.call(vm, function.clone(), args)
+    }
+    pub fn repr(&self, vm: &mut Vm) -> Option<PtyStr> {
+        let repr = self.call_method(vm, "__repr__", FuncArgs(vec![]));
+        repr.as_any().downcast_ref::<PtyStr>().map(Clone::clone)
     }
 }
 impl<Pty: PettyObjectType + 'static> From<Pty> for PettyObject {
