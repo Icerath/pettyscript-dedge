@@ -1,13 +1,18 @@
+mod none;
 mod null;
 mod number;
+mod option;
 mod print;
 mod pty_bool;
 mod repr;
+mod some;
 mod string;
 
 use std::fmt;
 
+pub use self::none::PtyNone;
 pub use self::repr::PtyRepr;
+pub use self::some::PtySome;
 pub use null::PtyNull;
 pub use number::PtyNum;
 pub use print::PtyPrint;
@@ -18,7 +23,12 @@ use crate::ast::Literal;
 
 use super::{core::VirtualMachine, object::PettyObject};
 pub fn load_builtins(vm: &mut VirtualMachine) {
-    let builtins = [("print", PtyPrint.into()), ("repr", PtyRepr.into())];
+    let builtins = [
+        ("print", PtyPrint.into()),
+        ("repr", PtyRepr.into()),
+        ("Some", PtySome.into()),
+        ("None", PtyNone.into()),
+    ];
     for (name, builtin) in builtins {
         vm.load_builtin(name, builtin);
     }
