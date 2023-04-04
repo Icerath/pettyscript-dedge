@@ -40,7 +40,6 @@ impl VirtualMachine {
             Node::BinExpr(op, nodes) => return self.bin_expr(*op, &nodes.0, &nodes.1),
             Node::Literal(literal) => {
                 if let Literal::Int(int @ 0..=255) = literal {
-                    println!("{int}");
                     return self.preallocated.get(*int as usize).unwrap();
                 }
                 return builtins::create_literal(literal);
