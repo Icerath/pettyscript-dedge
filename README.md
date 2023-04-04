@@ -38,7 +38,8 @@ Currently inspired mostly by Python.
 - [ ] Break Statements
 - [ ] Tests
 - [ ] Finish Writing Task List
-- [ ] Improve method for creating builtins.
+- [x] Improve method for creating builtins.
+- [ ] Improve pettymethod with things like a variable number of args.
 - [ ] Implement the concept of types.
 - [ ] Bring primitives to atleast the minimum usability.
     - [ ] Minimum int
