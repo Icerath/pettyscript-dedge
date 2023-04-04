@@ -1,18 +1,14 @@
 #![allow(clippy::needless_pass_by_value)]
-mod none;
 mod null;
 mod number;
 mod option;
 mod print;
 mod pty_bool;
 mod repr;
-mod some;
 mod string;
 
 use std::fmt;
 
-pub use self::none::PtyNone;
-pub use self::some::PtySome;
 pub use null::PtyNull;
 pub use number::PtyNum;
 pub use pty_bool::PtyBool;
@@ -25,8 +21,8 @@ pub fn load_builtins(vm: &mut VirtualMachine) {
     let builtins = [
         ("print", RawFunction(print::print).into()),
         ("repr", RawFunction(repr::repr).into()),
-        ("Some", PtySome.into()),
-        ("None", PtyNone.into()),
+        ("Some", RawFunction(option::some).into()),
+        ("None", RawFunction(option::none).into()),
     ];
     for (name, builtin) in builtins {
         vm.load_builtin(name, builtin);

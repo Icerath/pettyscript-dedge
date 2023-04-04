@@ -58,3 +58,12 @@ fn __repr__(vm: &mut Vm, this: PettyObject, args: FuncArgs) -> PettyObject {
     let repr = inner.repr(vm).unwrap();
     PtyStr(format!("Some({})", repr.0).into()).into()
 }
+#[pettymethod]
+pub fn some(obj: PettyObject) -> PtyOption {
+    PtyOption(Some(obj))
+}
+
+#[pettymethod]
+pub fn none() -> PtyOption {
+    PtyOption(None)
+}
