@@ -14,6 +14,8 @@ pub use number::PtyNum;
 pub use pty_bool::PtyBool;
 pub use string::PtyStr;
 
+use self::option::PtyOption;
+
 use super::{core::VirtualMachine, object::PettyObject, raw_function::RawFunction};
 use crate::ast::Literal;
 
@@ -22,7 +24,7 @@ pub fn load_builtins(vm: &mut VirtualMachine) {
         ("print", RawFunction(print::print).into()),
         ("repr", RawFunction(repr::repr).into()),
         ("Some", RawFunction(option::some).into()),
-        ("None", RawFunction(option::none).into()),
+        ("None", PtyOption(None).into()),
     ];
     for (name, builtin) in builtins {
         vm.load_builtin(name, builtin);

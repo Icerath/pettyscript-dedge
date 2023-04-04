@@ -2,7 +2,7 @@ use std::fmt;
 
 use macros::pettymethod;
 
-use super::string::PtyStr;
+use super::{string::PtyStr, PtyBool};
 use crate::vm::{
     core::Vm,
     function_args::FuncArgs,
@@ -23,6 +23,8 @@ impl PettyObjectType for PtyOption {
     fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
         match str {
             "unwrap" => RawFunction(unwrap).into(),
+            "is_some" => RawFunction(is_some).into(),
+            "is_none" => RawFunction(is_none).into(),
             "__repr__" => RawFunction(__repr__).into(),
             _ => todo!(),
         }
@@ -52,11 +54,21 @@ fn __repr__(self_: PtyOption, vm: &mut Vm) -> PtyStr {
 }
 
 #[pettymethod]
+fn is_some(self_: PtyOption) -> PtyBool {
+    PtyBool(self_.0.is_some())
+}
+
+#[pettymethod]
+fn is_none(self_: PtyOption) -> PtyBool {
+    PtyBool(self_.0.is_none())
+}
+
+#[pettymethod]
 pub fn some(obj: PettyObject) -> PtyOption {
     PtyOption(Some(obj))
 }
 
-#[pettymethod]
-pub fn none() -> PtyOption {
-    PtyOption(None)
-}
+// #[pettymethod]
+// pub fn none() -> PtyOption {
+//     PtyOption(None)
+// }
