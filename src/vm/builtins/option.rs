@@ -7,7 +7,6 @@ use crate::vm::{
     core::Vm,
     function_args::FuncArgs,
     object::{PettyObject, PettyObjectType},
-    raw_function::RawFunction,
 };
 
 #[derive(Clone)]
@@ -22,10 +21,10 @@ impl PettyObjectType for PtyOption {
     }
     fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
         match str {
-            "unwrap" => RawFunction(unwrap).into(),
-            "is_some" => RawFunction(is_some).into(),
-            "is_none" => RawFunction(is_none).into(),
-            "__repr__" => RawFunction(__repr__).into(),
+            "unwrap" => UNWRAP.clone(),
+            "is_some" => IS_SOME.clone(),
+            "is_none" => IS_NONE.clone(),
+            "__repr__" => __REPR__.clone(),
             _ => todo!(),
         }
     }

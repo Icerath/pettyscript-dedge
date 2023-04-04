@@ -1,15 +1,17 @@
 use std::fmt;
 
 use macros::pettymethod;
+use once_cell::sync::Lazy;
 
 use crate::vm::{
     core::Vm,
     function_args::FuncArgs,
     object::{PettyObject, PettyObjectType},
-    raw_function::RawFunction,
 };
 
 use super::{PtyBool, PtyStr};
+
+pub static NULL: Lazy<PettyObject> = Lazy::new(|| PtyNull.into());
 
 #[derive(Clone, Copy)]
 pub struct PtyNull;
@@ -19,8 +21,8 @@ impl PettyObjectType for PtyNull {
     }
     fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
         match str {
-            "__bool__" => RawFunction(__bool__).into(),
-            "__repr__" => RawFunction(__repr__).into(),
+            "__bool__" => __BOOL__.clone(),
+            "__repr__" => __REPR__.clone(),
             _ => todo!(),
         }
     }
@@ -41,11 +43,4 @@ fn __bool__(_self: PtyNull) -> PtyBool {
 #[pettymethod]
 fn __repr__(_self: PtyNull) -> PtyStr {
     PtyStr("null".into())
-}
-
-impl From<()> for PtyNull {
-    #[inline]
-    fn from(_: ()) -> Self {
-        PtyNull
-    }
 }

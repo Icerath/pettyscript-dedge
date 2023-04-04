@@ -1,25 +1,22 @@
-use std::fmt;
-
-use macros::pettymethod;
-
 use super::PtyStr;
 use crate::vm::{
     core::Vm,
     function_args::FuncArgs,
     object::{PettyObject, PettyObjectType},
-    raw_function::RawFunction,
 };
+use macros::pettymethod;
+use std::fmt;
 
 #[derive(Clone, Copy)]
 pub struct PtyBool(pub bool);
 impl PettyObjectType for PtyBool {
     fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
         match str {
-            "__bool__" => RawFunction(__bool__).into(),
-            "__not__" => RawFunction(__not__).into(),
-            "__and__" => RawFunction(__and__).into(),
-            "__or__" => RawFunction(__or__).into(),
-            "__repr__" => RawFunction(__repr__).into(),
+            "__bool__" => __BOOL__.clone(),
+            "__not__" => __NOT__.clone(),
+            "__and__" => __AND__.clone(),
+            "__or__" => __OR__.clone(),
+            "__repr__" => __REPR__.clone(),
             _ => todo!("{str}"),
         }
     }

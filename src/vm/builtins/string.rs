@@ -18,8 +18,8 @@ impl PettyObjectType for PtyStr {
     }
     fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
         match str {
-            "__repr__" => RawFunction(__repr__).into(),
-            "__add__" => RawFunction(__add__).into(),
+            "__repr__" => __REPR__.clone(),
+            "__add__" => __ADD__.clone(),
             "format" => RawFunction(str_format).into(),
             _ => todo!(),
         }
@@ -44,6 +44,7 @@ fn __add__(lhs: PtyStr, rhs: PtyStr) -> PtyStr {
     PtyStr((lhs.0.to_string() + &rhs.0).into())
 }
 
+// TODO - use #[pettymethod]
 fn str_format(vm: &mut vm::core::Vm, _this: PettyObject, args: FuncArgs) -> PettyObject {
     let mut args = args.0.into_iter();
     let first_arg = args.next().unwrap();

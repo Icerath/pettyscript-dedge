@@ -9,7 +9,7 @@ mod string;
 
 use std::fmt;
 
-pub use null::PtyNull;
+pub use null::{PtyNull, NULL};
 pub use number::PtyNum;
 pub use pty_bool::PtyBool;
 pub use string::PtyStr;
@@ -36,7 +36,7 @@ pub fn create_literal(literal: &Literal) -> PettyObject {
         #[allow(clippy::cast_precision_loss)]
         Literal::Int(int) => PtyNum(*int as f64).into(),
         Literal::Float(float) => PtyNum(*float).into(),
-        Literal::Null => PtyNull.into(),
+        Literal::Null => NULL.clone(),
         Literal::Bool(bool) => PtyBool(*bool).into(),
         Literal::String(string) => PtyStr(string.clone()).into(),
         Literal::List(_list) => todo!(),

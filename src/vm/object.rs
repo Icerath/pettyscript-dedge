@@ -1,12 +1,10 @@
-use std::{fmt, ops::Deref};
-
-use crate::slim_rc::Rc;
-
 use super::{
-    builtins::{PtyNull, PtyStr},
+    builtins::{PtyStr, NULL},
     core::Vm,
     function_args::FuncArgs,
 };
+use crate::slim_rc::Rc;
+use std::{fmt, ops::Deref};
 
 pub trait PettyObjectType: fmt::Display + Sync + Send {
     fn get_item(&self, vm: &mut Vm, this: PettyObject, str: &str) -> PettyObject;
@@ -58,6 +56,6 @@ impl Deref for PettyObject {
 impl From<()> for PettyObject {
     #[inline]
     fn from(_: ()) -> Self {
-        PtyNull.into()
+        NULL.clone()
     }
 }

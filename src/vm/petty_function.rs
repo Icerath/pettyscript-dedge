@@ -3,7 +3,7 @@ use std::fmt;
 use crate::{ast::Node, slim_rc::Rc};
 
 use super::{
-    builtins::PtyNull,
+    builtins::NULL,
     core::Vm,
     function_args::FuncArgs,
     object::{PettyObject, PettyObjectType},
@@ -34,7 +34,7 @@ impl PettyObjectType for PettyFunction {
         }
         vm.execute_nodes(&self.block);
         vm.fields.drop_scope();
-        vm.return_val.take().unwrap_or_else(|| PtyNull.into())
+        vm.return_val.take().unwrap_or_else(|| NULL.clone())
     }
     fn get_item(&self, _vm: &mut Vm, _this: PettyObject, _str: &str) -> PettyObject {
         todo!()

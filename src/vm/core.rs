@@ -1,5 +1,5 @@
 use super::{
-    builtins::{self, PtyBool, PtyNull},
+    builtins::{self, PtyBool, PtyNull, NULL},
     field_dict::FieldDict,
     function_args::FuncArgs,
     object::PettyObject,
@@ -52,7 +52,7 @@ impl VirtualMachine {
             }
             _ => todo!("{node:?}"),
         };
-        PtyNull.into()
+        NULL.clone()
     }
     pub fn execute_nodes(&mut self, nodes: &[Node]) {
         for node in nodes {
