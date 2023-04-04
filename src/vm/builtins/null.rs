@@ -42,3 +42,9 @@ fn __bool__(_self: PtyNull) -> PtyBool {
 fn __repr__(_self: PtyNull) -> PtyStr {
     PtyStr("null".into())
 }
+
+impl From<()> for PtyNull {
+    fn from(value: ()) -> Self {
+        PtyNull
+    }
+}

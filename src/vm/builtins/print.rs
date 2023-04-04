@@ -1,10 +1,11 @@
-use super::PtyNull;
-use crate::vm::{core::Vm, function_args::FuncArgs, object::PettyObject};
+use macros::pettymethod;
 
-pub fn print(vm: &mut Vm, this: PettyObject, args: FuncArgs) -> PettyObject {
+use crate::vm::{core::Vm, function_args::FuncArgs};
+
+#[pettymethod]
+pub fn print(vm: &mut Vm, args: FuncArgs) {
     for arg in args.0 {
         print!("{} ", arg.force_repr(vm));
     }
     println!();
-    PtyNull.into()
 }

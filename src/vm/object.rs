@@ -2,7 +2,11 @@ use std::{any::Any, fmt, ops::Deref};
 
 use crate::slim_rc::Rc;
 
-use super::{builtins::PtyStr, core::Vm, function_args::FuncArgs};
+use super::{
+    builtins::{PtyNull, PtyStr},
+    core::Vm,
+    function_args::FuncArgs,
+};
 
 pub trait PettyObjectType: fmt::Display {
     fn get_item(&self, vm: &mut Vm, this: PettyObject, str: &str) -> PettyObject;
@@ -48,5 +52,12 @@ impl Deref for PettyObject {
     type Target = Rc<dyn PettyObjectType>;
     fn deref(&self) -> &Self::Target {
         &self.0
+    }
+}
+
+impl From<()> for PettyObject {
+    #[inline]
+    fn from(_: ()) -> Self {
+        PtyNull.into()
     }
 }
