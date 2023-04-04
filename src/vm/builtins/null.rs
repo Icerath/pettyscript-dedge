@@ -4,6 +4,7 @@ use macros::pettymethod;
 use once_cell::sync::Lazy;
 
 use crate::vm::{
+    builtins::pty_bool::FALSE,
     core::Vm,
     function_args::FuncArgs,
     object::{PettyObject, PettyObjectType},
@@ -37,8 +38,8 @@ impl fmt::Display for PtyNull {
 }
 
 #[pettymethod]
-fn __bool__(_self: PtyNull) -> PtyBool {
-    PtyBool(false)
+fn __bool__(_self: PtyNull) -> PettyObject {
+    FALSE.clone()
 }
 #[pettymethod]
 fn __repr__(_self: PtyNull) -> PtyStr {

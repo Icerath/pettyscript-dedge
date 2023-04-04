@@ -64,32 +64,32 @@ fn __mod__(lhs: PtyNum, rhs: PtyNum) -> PtyNum {
 }
 #[pettymethod]
 #[allow(clippy::float_cmp)]
-fn __is_eq__(lhs: PtyNum, rhs: PtyNum) -> PtyBool {
-    PtyBool(lhs.0 == rhs.0)
+fn __is_eq__(lhs: PtyNum, rhs: PtyNum) -> PettyObject {
+    PtyBool::new(lhs.0 == rhs.0)
 }
 #[pettymethod]
-fn __lt__(lhs: PtyNum, rhs: PtyNum) -> PtyBool {
-    PtyBool(lhs.0 < rhs.0)
+fn __lt__(lhs: PtyNum, rhs: PtyNum) -> PettyObject {
+    PtyBool::new(lhs.0 < rhs.0)
 }
 #[pettymethod]
-fn __gt__(lhs: PtyNum, rhs: PtyNum) -> PtyBool {
-    PtyBool(lhs.0 > rhs.0)
+fn __gt__(lhs: PtyNum, rhs: PtyNum) -> PettyObject {
+    PtyBool::new(lhs.0 > rhs.0)
 }
 #[pettymethod]
-fn __lt_eq__(lhs: PtyNum, rhs: PtyNum) -> PtyBool {
-    PtyBool(lhs.0 <= rhs.0)
+fn __lt_eq__(lhs: PtyNum, rhs: PtyNum) -> PettyObject {
+    PtyBool::new(lhs.0 <= rhs.0)
 }
 #[pettymethod]
-fn __gt_eq__(lhs: PtyNum, rhs: PtyNum) -> PtyBool {
-    PtyBool(lhs.0 >= rhs.0)
+fn __gt_eq__(lhs: PtyNum, rhs: PtyNum) -> PettyObject {
+    PtyBool::new(lhs.0 >= rhs.0)
 }
 #[pettymethod]
-fn __bool__(lhs: PtyNum) -> PtyBool {
-    PtyBool(lhs.0 != 0.0)
+fn __bool__(lhs: PtyNum) -> PettyObject {
+    PtyBool::new(lhs.0 != 0.0)
 }
 #[pettymethod]
-fn __not__(lhs: PtyNum) -> PtyBool {
-    PtyBool(lhs.0 == 0.0)
+fn __not__(lhs: PtyNum) -> PettyObject {
+    PtyBool::new(lhs.0 == 0.0)
 }
 #[pettymethod]
 fn __neg__(lhs: PtyNum) -> PtyNum {

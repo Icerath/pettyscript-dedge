@@ -5,10 +5,15 @@ use crate::vm::{
     object::{PettyObject, PettyObjectType},
 };
 use macros::pettymethod;
+use once_cell::sync::Lazy;
 use std::fmt;
+
+pub static TRUE: Lazy<PettyObject> = Lazy::new(|| PtyBool(true).into());
+pub static FALSE: Lazy<PettyObject> = Lazy::new(|| PtyBool(false).into());
 
 #[derive(Clone, Copy)]
 pub struct PtyBool(pub bool);
+
 impl PettyObjectType for PtyBool {
     fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
         match str {
@@ -28,6 +33,18 @@ impl PettyObjectType for PtyBool {
     }
 }
 
+impl PtyBool {
+    #[inline]
+    #[allow(clippy::new_ret_no_self)]
+    #[allow(clippy::match_bool)]
+    pub fn new(bool: bool) -> PettyObject {
+        match bool {
+            true => TRUE.clone(),
+            false => FALSE.clone(),
+        }
+    }
+}
+
 impl fmt::Display for PtyBool {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.0)
@@ -35,12 +52,16 @@ impl fmt::Display for PtyBool {
 }
 
 #[pettymethod]
-fn __bool__(self_: PtyBool) -> PtyBool {
+fn __bool__(self_: PettyObject) -> PettyObject {
     self_
 }
 #[pettymethod]
-fn __not__(self_: PtyBool) -> PtyBool {
-    PtyBool(!self_.0)
+fn __not__(self_: PtyBool) -> PettyObject {
+    #[allow(clippy::match_bool)]
+    match self_.0 {
+        true => FALSE.clone(),
+        false => TRUE.clone(),
+    }
 }
 #[pettymethod]
 fn __and__(lhs: PtyBool, rhs: PtyBool) -> PtyBool {
