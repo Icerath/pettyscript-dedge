@@ -1,3 +1,4 @@
+#![allow(clippy::needless_pass_by_value)]
 mod none;
 mod null;
 mod number;
