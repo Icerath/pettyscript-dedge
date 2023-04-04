@@ -1,4 +1,4 @@
-use std::{any::Any, fmt, ops::Deref};
+use std::{any::Any, fmt, ops::Deref, sync::Arc};
 
 use crate::slim_rc::Rc;
 
@@ -8,14 +8,14 @@ use super::{
     function_args::FuncArgs,
 };
 
-pub trait PettyObjectType: fmt::Display {
+pub trait PettyObjectType: fmt::Display + Sync + Send {
     fn get_item(&self, vm: &mut Vm, this: PettyObject, str: &str) -> PettyObject;
     fn call(&self, vm: &mut Vm, this: PettyObject, args: FuncArgs) -> PettyObject;
     fn as_any(&self) -> &dyn Any;
 }
 /// An actually petty object.
 #[derive(Clone)]
-pub struct PettyObject(Rc<dyn PettyObjectType>);
+pub struct PettyObject(Arc<dyn PettyObjectType>);
 impl PettyObject {
     pub fn new<Pty: PettyObjectType + 'static>(object: Pty) -> Self {
         Self(Rc::new(object))

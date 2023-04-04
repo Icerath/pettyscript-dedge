@@ -1,3 +1,4 @@
+use super::{PtyBool, PtyStr};
 use crate::vm::{
     core::Vm,
     function_args::FuncArgs,
@@ -5,10 +6,8 @@ use crate::vm::{
     raw_function::RawFunction,
 };
 use macros::pettymethod;
-
+use once_cell::sync::Lazy;
 use std::{any::Any, fmt};
-
-use super::{PtyBool, PtyStr};
 
 #[derive(Clone, Copy)]
 pub struct PtyNum(pub f64);
@@ -18,20 +17,20 @@ impl PettyObjectType for PtyNum {
     }
     fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
         match str {
-            "__add__" => RawFunction(__add__).into(),
-            "__sub__" => RawFunction(__sub__).into(),
-            "__mul__" => RawFunction(__mul__).into(),
-            "__div__" => RawFunction(__div__).into(),
-            "__mod__" => RawFunction(__mod__).into(),
-            "__is_eq__" => RawFunction(__is_eq__).into(),
-            "__lt__" => RawFunction(__lt__).into(),
-            "__gt__" => RawFunction(__gt__).into(),
-            "__lt_eq__" => RawFunction(__lt_eq__).into(),
-            "__gt_eq__" => RawFunction(__gt_eq__).into(),
-            "__bool__" => RawFunction(__bool__).into(),
-            "__neg__" => RawFunction(__neg__).into(),
-            "__repr__" => RawFunction(__repr__).into(),
-            "abs" => RawFunction(abs).into(),
+            "__add__" => __ADD__.clone(),
+            "__sub__" => __SUB__.clone(),
+            "__mul__" => __MUL__.clone(),
+            "__div__" => __DIV__.clone(),
+            "__mod__" => __MOD__.clone(),
+            "__is_eq__" => __IS_EQ__.clone(),
+            "__lt__" => __LT__.clone(),
+            "__gt__" => __GT__.clone(),
+            "__lt_eq__" => __LT_EQ__.clone(),
+            "__gt_eq__" => __GT_EQ__.clone(),
+            "__bool__" => __BOOL__.clone(),
+            "__neg__" => __NEG__.clone(),
+            "__repr__" => __REPR__.clone(),
+            "abs" => ABS.clone(),
             _ => todo!("{str}"),
         }
     }

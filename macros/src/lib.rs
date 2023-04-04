@@ -11,8 +11,10 @@ pub fn pettymethod(_attr: TokenStream, input: TokenStream) -> TokenStream {
     let args = get_signature_args(&tokens.sig);
     let (variables, args) = load_args(args);
     let name = tokens.sig.ident;
+    let name_upper: proc_macro2::TokenStream = name.to_string().to_uppercase().parse().unwrap();
     let vis = tokens.vis;
     let stream: TokenStream = quote!(
+        static #name_upper: once_cell::sync::Lazy<crate::vm::object::PettyObject> = once_cell::sync::Lazy::new(|| crate::vm::raw_function::RawFunction(#name).into());
         #vis fn #name (
             vm: &mut crate::vm::core::Vm,
             this: crate::vm::object::PettyObject,

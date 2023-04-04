@@ -23,6 +23,6 @@ impl PettyObjectType for RawFunction {
 
 impl fmt::Display for RawFunction {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        todo!()
+        write!(f, "Raw Function at {:?}", self as *const Self)
     }
 }
