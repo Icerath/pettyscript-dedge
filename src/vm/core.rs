@@ -5,15 +5,17 @@ use super::{
     object::PettyObject,
     petty_class::PettyClass,
     petty_function::PettyFunction,
+    preallocated::PreAllocated,
 };
 use crate::{
-    ast::{BinOp, Node, UnaryOp},
+    ast::{BinOp, Literal, Node, UnaryOp},
     slim_rc::Rc,
 };
 pub type Vm = VirtualMachine;
 
 #[derive(Default)]
 pub struct VirtualMachine {
+    pub preallocated: PreAllocated,
     pub fields: FieldDict,
     pub return_val: Option<PettyObject>,
 }
@@ -36,7 +38,13 @@ impl VirtualMachine {
                 return self.get_item(&nodes.0, &nodes.1)
             }
             Node::BinExpr(op, nodes) => return self.bin_expr(*op, &nodes.0, &nodes.1),
-            Node::Literal(literal) => return builtins::create_literal(literal),
+            Node::Literal(literal) => {
+                if let Literal::Int(int @ 0..=255) = literal {
+                    println!("{int}");
+                    return self.preallocated.get(*int as usize).unwrap();
+                }
+                return builtins::create_literal(literal);
+            }
             Node::Ident(ident) => return self.fields.read(ident),
             Node::FuncCall(name, args) => return self.func_call(name, args),
             Node::FuncDef(name, args, block) => self.func_def(name.clone(), args, block),

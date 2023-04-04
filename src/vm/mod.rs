@@ -9,6 +9,7 @@ mod function_args;
 mod object;
 mod petty_class;
 mod petty_function;
+mod preallocated;
 mod raw_function;
 
 pub fn run_virtual_machine(ast: &ast::Node) -> Vec<PettyObject> {
