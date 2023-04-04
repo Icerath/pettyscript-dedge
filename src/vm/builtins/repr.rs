@@ -4,5 +4,5 @@ use macros::pettymethod;
 
 #[pettymethod]
 pub fn repr(obj: PettyObject, vm: &mut Vm) -> PtyStr {
-    obj.repr(vm).unwrap()
+    obj.force_repr(vm)
 }
