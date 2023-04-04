@@ -17,10 +17,10 @@ impl PettyObjectType for PtyOption {
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
-    fn call(&self, vm: &mut Vm, this: PettyObject, args: FuncArgs) -> PettyObject {
+    fn call(&self, _vm: &mut Vm, _this: PettyObject, _args: FuncArgs) -> PettyObject {
         todo!()
     }
-    fn get_item(&self, vm: &mut Vm, this: PettyObject, str: &str) -> PettyObject {
+    fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
         match str {
             "unwrap" => RawFunction(unwrap).into(),
             "__repr__" => RawFunction(__repr__).into(),
@@ -38,26 +38,19 @@ impl fmt::Display for PtyOption {
     }
 }
 
-fn unwrap(vm: &mut Vm, this: PettyObject, args: FuncArgs) -> PettyObject {
-    let Some(self_) = args.0.get(0) else {
-        todo!()
-    };
-    let Some(self_) = self_.as_any().downcast_ref::<PtyOption>() else {
-        todo!()
-    };
-    self_.0.clone().unwrap()
+#[pettymethod]
+fn unwrap(opt: PtyOption) -> PettyObject {
+    opt.0.unwrap()
 }
 
-fn __repr__(vm: &mut Vm, this: PettyObject, args: FuncArgs) -> PettyObject {
-    let Some(self_) = args.0[0].as_any().downcast_ref::<PtyOption>() else {
-        todo!()
-    };
-    let Some(inner) = &self_.0 else {
-        return PtyStr("None".into()).into()
-    };
-    let repr = inner.repr(vm).unwrap();
-    PtyStr(format!("Some({})", repr.0).into()).into()
+#[pettymethod]
+fn __repr__(self_: PtyOption, vm: &mut Vm) -> PtyStr {
+    match self_.0 {
+        Some(obj) => obj.force_repr(vm),
+        None => PtyStr("None".into()),
+    }
 }
+
 #[pettymethod]
 pub fn some(obj: PettyObject) -> PtyOption {
     PtyOption(Some(obj))

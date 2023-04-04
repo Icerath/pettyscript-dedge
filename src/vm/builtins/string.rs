@@ -9,8 +9,6 @@ use crate::vm::{
     raw_function::RawFunction,
 };
 
-use super::PtyNull;
-
 #[derive(Clone)]
 pub struct PtyStr(pub Rc<str>);
 

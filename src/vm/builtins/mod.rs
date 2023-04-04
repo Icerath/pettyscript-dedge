@@ -31,12 +31,13 @@ pub fn load_builtins(vm: &mut VirtualMachine) {
 
 pub fn create_literal(literal: &Literal) -> PettyObject {
     match literal {
+        #[allow(clippy::cast_precision_loss)]
         Literal::Int(int) => PtyNum(*int as f64).into(),
         Literal::Float(float) => PtyNum(*float).into(),
         Literal::Null => PtyNull.into(),
         Literal::Bool(bool) => PtyBool(*bool).into(),
         Literal::String(string) => PtyStr(string.clone()).into(),
-        _ => todo!(),
+        Literal::List(_list) => todo!(),
     }
 }
 
@@ -47,13 +48,4 @@ where
 {
     let ptr = this as *const T;
     write!(f, "class Object at {ptr:?}")
-}
-
-#[inline]
-pub fn display_function_object<T>(this: &T, f: &mut fmt::Formatter<'_>) -> fmt::Result
-where
-    T: Into<PettyObject>,
-{
-    let ptr = this as *const T;
-    write!(f, "Function Object at {ptr:?}")
 }

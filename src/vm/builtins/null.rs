@@ -44,7 +44,8 @@ fn __repr__(_self: PtyNull) -> PtyStr {
 }
 
 impl From<()> for PtyNull {
-    fn from(value: ()) -> Self {
+    #[inline]
+    fn from(_: ()) -> Self {
         PtyNull
     }
 }

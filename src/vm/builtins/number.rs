@@ -66,6 +66,7 @@ fn __mod__(lhs: PtyNum, rhs: PtyNum) -> PtyNum {
     PtyNum(lhs.0 % rhs.0)
 }
 #[pettymethod]
+#[allow(clippy::float_cmp)]
 fn __is_eq__(lhs: PtyNum, rhs: PtyNum) -> PtyBool {
     PtyBool(lhs.0 == rhs.0)
 }
