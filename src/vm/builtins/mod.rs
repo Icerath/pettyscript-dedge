@@ -14,16 +14,15 @@ pub use self::none::PtyNone;
 pub use self::some::PtySome;
 pub use null::PtyNull;
 pub use number::PtyNum;
-pub use print::PtyPrint;
 pub use pty_bool::PtyBool;
 pub use string::PtyStr;
 
+use super::{core::VirtualMachine, object::PettyObject, raw_function::RawFunction};
 use crate::ast::Literal;
 
-use super::{core::VirtualMachine, object::PettyObject, raw_function::RawFunction};
 pub fn load_builtins(vm: &mut VirtualMachine) {
     let builtins = [
-        ("print", PtyPrint.into()),
+        ("print", RawFunction(print::print).into()),
         ("repr", RawFunction(repr::repr).into()),
         ("Some", PtySome.into()),
         ("None", PtyNone.into()),
