@@ -1,18 +1,19 @@
+extern crate proc_macro;
+
 use proc_macro::TokenStream;
-use quote::quote;
-use syn::{FnArg, Pat, Signature, Type};
+use quote::{quote, ToTokens};
+use syn::{FnArg, Pat, Signature, Type, TypeReference};
 
 #[proc_macro_attribute]
 pub fn pettymethod(_attr: TokenStream, input: TokenStream) -> TokenStream {
     let tokens = syn::parse_macro_input!(input as syn::ItemFn);
     let original_func = tokens.clone();
-    let sig = tokens.sig;
-
-    let args = get_signature_args(&sig);
+    let args = get_signature_args(&tokens.sig);
     let (variables, args) = load_args(args);
-    let name = sig.ident;
+    let name = tokens.sig.ident;
+    let vis = tokens.vis;
     let stream: TokenStream = quote!(
-        fn #name (
+        #vis fn #name (
             vm: &mut crate::vm::core::Vm,
             this: crate::vm::object::PettyObject,
             args: crate::vm::function_args::FuncArgs,
@@ -27,20 +28,32 @@ pub fn pettymethod(_attr: TokenStream, input: TokenStream) -> TokenStream {
     stream
 }
 
-fn get_path_name(type_: Type) -> String {
-    let Type::Path(type_) = type_ else {
-        panic!();
-    };
-    let mut path = String::new();
-    for segment in type_.path.segments {
-        path.push_str(&segment.ident.to_string());
-        path.push_str("::");
+fn get_type_name(typ: Type) -> String {
+    match typ {
+        Type::Path(typ) => get_path_name(typ.path),
+        Type::Reference(typ) => get_ref_type_name(typ),
+        _ => todo!(),
     }
-    path.truncate(path.len() - 2);
-    path
 }
 
-fn get_signature_args(sig: &Signature) -> Vec<(String, String)> {
+fn get_path_name(path: syn::Path) -> String {
+    path.segments
+        .into_iter()
+        .map(|seg| seg.ident.to_string())
+        .collect::<Vec<String>>()
+        .join("::")
+}
+
+fn get_ref_type_name(typ: TypeReference) -> String {
+    typ.into_token_stream().to_string()
+}
+
+struct VariableDeclaration {
+    ident: String,
+    typ: String,
+}
+
+fn get_signature_args(sig: &Signature) -> Vec<VariableDeclaration> {
     let mut args = vec![];
     for arg in &sig.inputs {
         let FnArg::Typed(arg) = arg else {
@@ -50,25 +63,39 @@ fn get_signature_args(sig: &Signature) -> Vec<(String, String)> {
             panic!();
         };
         let ident = ident.ident.to_string();
-        let type_ = get_path_name(*arg.ty.clone());
-
-        args.push((ident, type_));
+        let typ = get_type_name(*arg.ty.clone());
+        args.push(VariableDeclaration { ident, typ });
     }
     args
 }
 
-fn load_args(args: Vec<(String, String)>) -> (proc_macro2::TokenStream, proc_macro2::TokenStream) {
-    let mut variables = String::new();
-    let mut out_args = String::new();
-    for (name, typ) in args {
-        variables.push_str(&format!(
-            "let arg = args.next().expect(\"Too few Arguments\");
-            let Some({name}) = arg.as_any().downcast_ref::<{typ}>() else {{
-                todo!();
-            }};",
-        ));
-        out_args.push_str(&name);
-        out_args.push_str(".clone(), ");
+fn load_args(
+    args: Vec<VariableDeclaration>,
+) -> (proc_macro2::TokenStream, proc_macro2::TokenStream) {
+    let mut out_args = quote!();
+    let mut variables = quote!();
+    for var in args {
+        let name: proc_macro2::TokenStream = var.ident.parse().unwrap();
+        let typ: proc_macro2::TokenStream = var.typ.parse().unwrap();
+        match var.typ.as_str() {
+            "& mut Vm" => out_args = quote!(#out_args vm, ),
+            "PettyObject" => {
+                variables = quote!(let #name = args.next().expect("Too Few Arguments"););
+                out_args = quote!(#out_args #name, );
+            }
+            _ => {
+                variables = quote!(
+                    #variables
+                    let #name = args.next().expect("Too Few Arguments");
+                    let Some(#name) = #name.as_any().downcast_ref::<#typ>() else {
+                        todo!();
+                    };
+                );
+                out_args = quote!(
+                    #out_args #name.clone(),
+                );
+            }
+        }
     }
-    (variables.parse().unwrap(), out_args.parse().unwrap())
+    (variables, out_args)
 }

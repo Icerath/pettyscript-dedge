@@ -11,7 +11,6 @@ mod string;
 use std::fmt;
 
 pub use self::none::PtyNone;
-pub use self::repr::PtyRepr;
 pub use self::some::PtySome;
 pub use null::PtyNull;
 pub use number::PtyNum;
@@ -21,11 +20,11 @@ pub use string::PtyStr;
 
 use crate::ast::Literal;
 
-use super::{core::VirtualMachine, object::PettyObject};
+use super::{core::VirtualMachine, object::PettyObject, raw_function::RawFunction};
 pub fn load_builtins(vm: &mut VirtualMachine) {
     let builtins = [
         ("print", PtyPrint.into()),
-        ("repr", PtyRepr.into()),
+        ("repr", RawFunction(repr::repr).into()),
         ("Some", PtySome.into()),
         ("None", PtyNone.into()),
     ];
