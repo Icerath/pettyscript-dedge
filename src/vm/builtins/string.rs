@@ -1,6 +1,6 @@
 use crate::{slim_rc::Rc, vm};
 use macros::pettymethod;
-use std::{fmt, sync::Arc};
+use std::fmt;
 
 use crate::vm::{
     core::Vm,
@@ -10,7 +10,7 @@ use crate::vm::{
 };
 
 #[derive(Clone)]
-pub struct PtyStr(pub Arc<str>);
+pub struct PtyStr(pub Rc<str>);
 
 impl PettyObjectType for PtyStr {
     fn call(&self, _vm: &mut Vm, _this: PettyObject, _args: FuncArgs) -> PettyObject {

@@ -1,8 +1,3 @@
-use crate::{
-    ast::{BinOp, Node, UnaryOp},
-    slim_rc::Rc,
-};
-
 use super::{
     builtins::{self, PtyBool, PtyNull},
     field_dict::FieldDict,
@@ -11,7 +6,10 @@ use super::{
     petty_class::PettyClass,
     petty_function::PettyFunction,
 };
-
+use crate::{
+    ast::{BinOp, Node, UnaryOp},
+    slim_rc::Rc,
+};
 pub type Vm = VirtualMachine;
 
 #[derive(Default)]

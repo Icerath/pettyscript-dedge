@@ -3,11 +3,9 @@ use crate::vm::{
     core::Vm,
     function_args::FuncArgs,
     object::{PettyObject, PettyObjectType},
-    raw_function::RawFunction,
 };
 use macros::pettymethod;
-use once_cell::sync::Lazy;
-use std::{any::Any, fmt};
+use std::fmt;
 
 #[derive(Clone, Copy)]
 pub struct PtyNum(pub f64);
@@ -34,7 +32,7 @@ impl PettyObjectType for PtyNum {
             _ => todo!("{str}"),
         }
     }
-    fn as_any(&self) -> &dyn Any {
+    fn as_any(&self) -> &dyn std::any::Any {
         self
     }
 }
