@@ -1,21 +1,19 @@
-use std::fmt;
-
-use crate::{ast::Node, slim_rc::Rc};
-
 use super::{
     builtins::NULL,
     core::Vm,
     function_args::FuncArgs,
     object::{PettyObject, PettyObjectType},
 };
+use crate::ast::Node;
+use std::{fmt, sync::Arc};
 
 #[derive(Clone)]
 pub struct PettyFunction {
-    args: Rc<[Rc<str>]>,
-    block: Rc<[Node]>,
+    args: Arc<[Arc<str>]>,
+    block: Arc<[Node]>,
 }
 impl PettyFunction {
-    pub fn new(args: Rc<[Rc<str>]>, block: Rc<[Node]>) -> Self {
+    pub fn new(args: Arc<[Arc<str>]>, block: Arc<[Node]>) -> Self {
         Self { args, block }
     }
 }

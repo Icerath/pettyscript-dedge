@@ -1,6 +1,6 @@
-use crate::{ast::Node, slim_rc::Rc};
+use crate::ast::Node;
 use macros::pettymethod;
-use std::fmt;
+use std::{fmt, sync::Arc};
 
 use super::{
     builtins::{self, PtyStr},
@@ -17,11 +17,11 @@ pub struct PettyClassInstance {
     pub fields: Dict,
 }
 pub struct PettyClass {
-    pub fields: Rc<[Rc<str>]>,
-    pub methods: Rc<[Node]>,
+    pub fields: Arc<[Arc<str>]>,
+    pub methods: Arc<[Node]>,
 }
 impl PettyClass {
-    pub fn new(fields: Rc<[Rc<str>]>, methods: Rc<[Node]>) -> Self {
+    pub fn new(fields: Arc<[Arc<str>]>, methods: Arc<[Node]>) -> Self {
         Self { fields, methods }
     }
 }

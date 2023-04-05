@@ -1,5 +1,6 @@
+use std::sync::Arc;
+
 use super::{dict::Dict, object::PettyObject};
-use crate::slim_rc::Rc;
 
 #[derive(Default)]
 pub struct FieldDict {
@@ -8,10 +9,10 @@ pub struct FieldDict {
 }
 
 impl FieldDict {
-    pub fn write(&mut self, str: Rc<str>, value: PettyObject) {
+    pub fn write(&mut self, str: Arc<str>, value: PettyObject) {
         self.current_scope().insert(str, value);
     }
-    pub fn read(&mut self, str: &Rc<str>) -> PettyObject {
+    pub fn read(&mut self, str: &str) -> PettyObject {
         for scope in self.scopes.iter().rev() {
             if let Some(object) = scope.get(str) {
                 return object.clone();

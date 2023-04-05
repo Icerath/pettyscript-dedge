@@ -1,7 +1,6 @@
 pub mod ast;
 pub mod error;
 pub mod parser;
-pub mod slim_rc;
 pub mod vm;
 
 use ast::Node;

@@ -2,13 +2,14 @@ mod bin_expr;
 mod statements;
 mod tests;
 
+use std::sync::Arc;
+
 use bin_expr::bin_expr;
 use statements::statement;
 
 use crate::{
     ast::{BinOp, Literal, Node, UnaryOp},
     error::PettyParseError,
-    slim_rc::Rc,
 };
 use nom::{
     branch::alt,
@@ -35,8 +36,8 @@ type ParseErr = PettyParseError;
 pub fn parse(input: &str) -> Result<Node, NomErr> {
     final_parser(map(nodes, Node::Globals))(input)
 }
-fn nodes(input: &str) -> IRes<Rc<[Node]>> {
-    map(many0(node), Rc::from)(input)
+fn nodes(input: &str) -> IRes<Arc<[Node]>> {
+    map(many0(node), Arc::from)(input)
 }
 #[inline]
 fn node(input: &str) -> IRes {
@@ -55,7 +56,7 @@ fn terminated_expr(input: &str) -> IRes {
 fn set_equals(input: &str) -> IRes {
     map(
         separated_pair(type_hinted, spar('='), node_expr),
-        |(ident, expr)| Node::SetEq(ident, Rc::new(expr)),
+        |(ident, expr)| Node::SetEq(ident, Arc::new(expr)),
     )(input)
 }
 #[inline]
@@ -80,10 +81,10 @@ fn unary_expr(input: &str) -> IRes {
     )));
     map(
         pair(unary_op, alt((node_value, node_expr))),
-        |(op, node)| Node::UnaryOp(op, Rc::new(node)),
+        |(op, node)| Node::UnaryOp(op, Arc::new(node)),
     )(input)
 }
-fn params(input: &str) -> IRes<Rc<[Rc<str>]>> {
+fn params(input: &str) -> IRes<Arc<[Arc<str>]>> {
     let (rem, nodes) = terminated(separated_list0(spar(','), type_hinted), opt(spar(',')))(input)?;
     Ok((rem, nodes.into()))
 }
@@ -95,16 +96,16 @@ fn function_call(i: &str) -> IRes {
     .map(|(name, args)| Node::FuncCall(name, args))
     .parse(i)
 }
-fn function_args(i: &str) -> IRes<Rc<[Node]>> {
+fn function_args(i: &str) -> IRes<Arc<[Node]>> {
     let (rem, nodes) = sp(separated_list0(spar(','), sp(node_expr)))(i)?;
     Ok((rem, nodes.into()))
 }
-fn block(i: &str) -> IRes<Rc<[Node]>> {
+fn block(i: &str) -> IRes<Arc<[Node]>> {
     delimited(spar('{'), nodes, spar('}'))(i)
 }
 fn fold_exprs(initial: Node, remainder: Vec<(BinOp, Node)>) -> Node {
     remainder.into_iter().fold(initial, |acc, (op, expr)| {
-        Node::BinExpr(op, Rc::new((acc, expr)))
+        Node::BinExpr(op, Arc::new((acc, expr)))
     })
 }
 fn eat_comments(mut input: &str) -> &str {
@@ -122,18 +123,18 @@ fn eat_comments(mut input: &str) -> &str {
         input = input.trim();
     }
 }
-fn type_hinted(input: &str) -> IRes<Rc<str>> {
+fn type_hinted(input: &str) -> IRes<Arc<str>> {
     alt((
         terminated(sp(ident), opt(pair(spar(':'), sp(ident)))),
         sp(ident),
     ))(input)
 }
-fn ident(i: &str) -> IRes<Rc<str>> {
+fn ident(i: &str) -> IRes<Arc<str>> {
     err(
         recognize(tuple((alt((alpha, char('_'))), take_while(is_ident_char)))),
         ParseErr::Ident,
     )
-    .map(Rc::from)
+    .map(Arc::from)
     .parse(i)
 }
 fn literal(i: &str) -> IRes<Literal> {

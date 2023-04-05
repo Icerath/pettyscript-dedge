@@ -1,4 +1,4 @@
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 
 use super::{
     builtins::{PtyBool, PtyList, PtyNum, PtyStr, NULL},
@@ -9,10 +9,7 @@ use super::{
     petty_function::PettyFunction,
     preallocated::PreAllocated,
 };
-use crate::{
-    ast::{BinOp, Literal, Node, UnaryOp},
-    slim_rc::Rc,
-};
+use crate::ast::{BinOp, Literal, Node, UnaryOp};
 pub type Vm = VirtualMachine;
 
 #[derive(Default)]
@@ -49,7 +46,7 @@ impl VirtualMachine {
             Node::ReturnState(expr) => self.return_val = Some(self.evaluate(expr)),
             Node::UnaryOp(op, expr) => return self.unary_expr(*op, expr),
             Node::IfState(condition, block, or_else) => {
-                self.if_statement(condition, block, or_else.as_ref().map(Rc::as_ref));
+                self.if_statement(condition, block, or_else.as_ref().map(Arc::as_ref));
             }
             Node::WhileLoop(condition, block) => self.while_loop(condition, block),
             Node::ForLoop(target, iter, block) => self.for_loop(target, iter, block),
@@ -68,7 +65,7 @@ impl VirtualMachine {
             self.evaluate(node);
         }
     }
-    pub fn set_eq(&mut self, name: Rc<str>, expr: &Node) {
+    pub fn set_eq(&mut self, name: Arc<str>, expr: &Node) {
         let value = self.evaluate(expr);
         self.fields.write(name, value);
     }
@@ -101,7 +98,7 @@ impl VirtualMachine {
         let args = FuncArgs(vec![inner]);
         function.call(self, function.clone(), args)
     }
-    pub fn func_call(&mut self, name: &Rc<str>, args: &[Node]) -> PettyObject {
+    pub fn func_call(&mut self, name: &Arc<str>, args: &[Node]) -> PettyObject {
         let args = self.evaluate_list(args);
         let function = self.fields.read(name);
         function.call(self, function.clone(), FuncArgs(args))
@@ -109,7 +106,7 @@ impl VirtualMachine {
     pub fn evaluate_list(&mut self, items: &[Node]) -> Vec<PettyObject> {
         items.iter().map(|arg| self.evaluate(arg)).collect()
     }
-    pub fn func_def(&mut self, name: Rc<str>, args: &Rc<[Rc<str>]>, block: &Rc<[Node]>) {
+    pub fn func_def(&mut self, name: Arc<str>, args: &Arc<[Arc<str>]>, block: &Arc<[Node]>) {
         let function = PettyFunction::new(args.clone(), block.clone());
         self.fields.write(name, function.into());
     }
@@ -143,7 +140,7 @@ impl VirtualMachine {
     pub fn for_loop(&mut self, target: &str, iter: &Node, block: &[Node]) {
         todo!()
     }
-    pub fn class_def(&mut self, name: Rc<str>, fields: Rc<[Rc<str>]>, methods: &Rc<[Node]>) {
+    pub fn class_def(&mut self, name: Arc<str>, fields: Arc<[Arc<str>]>, methods: &Arc<[Node]>) {
         let class = PettyClass::new(fields, methods.clone());
         self.fields.write(name, class.into());
     }

@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod parser_tests {
-    use crate::slim_rc::Rc;
+    use std::sync::Arc;
 
     use super::super::{bin_expr, parse, BinOp, Node, UnaryOp};
     fn assert_expected(source: &str, expected: Vec<Node>) {
@@ -136,7 +136,7 @@ mod parser_tests {
             vec![Node::func_def(
                 "add",
                 vec!["self", "other"],
-                vec![Node::ReturnState(Rc::new(Node::func_call(
+                vec![Node::ReturnState(Arc::new(Node::func_call(
                     "Point",
                     vec![
                         Node::bin_expr(
@@ -171,7 +171,7 @@ mod parser_tests {
         let expected = Node::func_def(
             "squared",
             vec!["num"],
-            vec![Node::ReturnState(Rc::new(Node::bin_expr(
+            vec![Node::ReturnState(Arc::new(Node::bin_expr(
                 BinOp::Mul,
                 Node::ident("num"),
                 Node::ident("num"),

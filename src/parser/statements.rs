@@ -48,7 +48,7 @@ fn if_segment(input: &str) -> IRes {
         keyword_name("if"),
         cut(tuple((node_expr, block, opt(or_else_segment)))),
     )
-    .map(|(expr, block, or_else)| Node::IfState(Rc::new(expr), block, or_else.map(Rc::new)))
+    .map(|(expr, block, or_else)| Node::IfState(Arc::new(expr), block, or_else.map(Arc::new)))
     .parse(input)
 }
 fn or_else_segment(input: &str) -> IRes {
@@ -57,7 +57,7 @@ fn or_else_segment(input: &str) -> IRes {
             keyword_name("elif"),
             cut(tuple((node_expr, block, opt(or_else_segment)))),
         )
-        .map(|(expr, block, or_else)| Node::IfState(Rc::new(expr), block, or_else.map(Rc::new))),
+        .map(|(expr, block, or_else)| Node::IfState(Arc::new(expr), block, or_else.map(Arc::new))),
         preceded(keyword_name("else"), map(block, Node::Block)),
     ))
     .parse(input)
@@ -65,7 +65,7 @@ fn or_else_segment(input: &str) -> IRes {
 
 fn while_statement(i: &str) -> IRes {
     preceded(keyword_name("while"), cut(pair(node_expr, block)))
-        .map(|(n1, n2)| Node::WhileLoop(Rc::new(n1), n2))
+        .map(|(n1, n2)| Node::WhileLoop(Arc::new(n1), n2))
         .parse(i)
 }
 fn for_loop(i: &str) -> IRes {
@@ -73,7 +73,7 @@ fn for_loop(i: &str) -> IRes {
         keyword_name("for"),
         cut(tuple((terminated(sp(ident), spar(':')), node_expr, block))),
     )
-    .map(|(name, expr, block)| Node::ForLoop(name, Rc::new(expr), block))
+    .map(|(name, expr, block)| Node::ForLoop(name, Arc::new(expr), block))
     .parse(i)
 }
 fn break_statement(i: &str) -> IRes {
@@ -86,7 +86,7 @@ fn return_statement(i: &str) -> IRes {
         opt(preceded(one_of(" \n"), node_expr)),
         cut(spar(';')),
     )
-    .map(|node| Node::ReturnState(Rc::new(node.unwrap_or(Node::Literal(Literal::Null)))))
+    .map(|node| Node::ReturnState(Arc::new(node.unwrap_or(Node::Literal(Literal::Null)))))
     .parse(i)
 }
 pub fn keyword_name<'a>(name: &'static str) -> impl FnMut(&'a str) -> IRes<&'a str> {

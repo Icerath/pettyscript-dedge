@@ -3,8 +3,7 @@ use super::{
     core::Vm,
     function_args::FuncArgs,
 };
-use crate::slim_rc::Rc;
-use std::{fmt, ops::Deref};
+use std::{fmt, ops::Deref, sync::Arc};
 
 pub trait PettyObjectType: fmt::Display + Sync + Send {
     fn get_item(&self, vm: &mut Vm, this: PettyObject, str: &str) -> PettyObject;
@@ -13,10 +12,10 @@ pub trait PettyObjectType: fmt::Display + Sync + Send {
 }
 /// An actually petty object.
 #[derive(Clone)]
-pub struct PettyObject(Rc<dyn PettyObjectType>);
+pub struct PettyObject(Arc<dyn PettyObjectType>);
 impl PettyObject {
     pub fn new<Pty: PettyObjectType + 'static>(object: Pty) -> Self {
-        Self(Rc::new(object))
+        Self(Arc::new(object))
     }
     pub fn call_method(&self, vm: &mut Vm, func: &str, mut args: FuncArgs) -> PettyObject {
         args.0.push(self.clone());
@@ -47,7 +46,7 @@ impl fmt::Display for PettyObject {
 }
 
 impl Deref for PettyObject {
-    type Target = Rc<dyn PettyObjectType>;
+    type Target = Arc<dyn PettyObjectType>;
     fn deref(&self) -> &Self::Target {
         &self.0
     }

@@ -1,25 +1,23 @@
-use std::fmt;
-
-use crate::slim_rc::Rc;
+use std::{fmt, sync::Arc};
 
 #[derive(PartialEq, Clone)]
 pub enum Node {
     Literal(Literal),
-    Block(Rc<[Node]>),
-    Globals(Rc<[Node]>),
-    BinExpr(BinOp, Rc<(Node, Node)>),
-    UnaryOp(UnaryOp, Rc<Node>),
-    Ident(Rc<str>),
-    FuncCall(Rc<str>, Rc<[Node]>),
-    IfState(Rc<Node>, Rc<[Node]>, Option<Rc<Node>>),
-    WhileLoop(Rc<Node>, Rc<[Node]>),
-    ForLoop(Rc<str>, Rc<Node>, Rc<[Node]>),
-    ReturnState(Rc<Node>),
+    Block(Arc<[Node]>),
+    Globals(Arc<[Node]>),
+    BinExpr(BinOp, Arc<(Node, Node)>),
+    UnaryOp(UnaryOp, Arc<Node>),
+    Ident(Arc<str>),
+    FuncCall(Arc<str>, Arc<[Node]>),
+    IfState(Arc<Node>, Arc<[Node]>, Option<Arc<Node>>),
+    WhileLoop(Arc<Node>, Arc<[Node]>),
+    ForLoop(Arc<str>, Arc<Node>, Arc<[Node]>),
+    ReturnState(Arc<Node>),
     BreakState,
-    FuncDef(Rc<str>, Rc<[Rc<str>]>, Rc<[Node]>),
-    ClassDef(Rc<str>, Rc<[Rc<str>]>, Rc<[Node]>),
+    FuncDef(Arc<str>, Arc<[Arc<str>]>, Arc<[Node]>),
+    ClassDef(Arc<str>, Arc<[Arc<str>]>, Arc<[Node]>),
     Empty,
-    SetEq(Rc<str>, Rc<Node>),
+    SetEq(Arc<str>, Arc<Node>),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -53,8 +51,8 @@ pub enum UnaryOp {
 pub enum Literal {
     Int(i128),
     Float(f64),
-    String(Rc<str>),
-    List(Rc<[Node]>),
+    String(Arc<str>),
+    List(Arc<[Node]>),
     Null,
     Bool(bool),
 }
@@ -165,13 +163,13 @@ impl Node {
         Self::Ident(string.into())
     }
     pub fn unary_expr(op: UnaryOp, node: Node) -> Self {
-        Self::UnaryOp(op, Rc::new(node))
+        Self::UnaryOp(op, Arc::new(node))
     }
     pub fn literal_expr<L: Into<Literal>, R: Into<Literal>>(op: BinOp, left: L, right: R) -> Self {
         Self::bin_expr(op, Node::literal(left), Node::literal(right))
     }
     pub fn bin_expr(op: BinOp, left: Node, right: Node) -> Self {
-        Node::BinExpr(op, Rc::new((left, right)))
+        Node::BinExpr(op, Arc::new((left, right)))
     }
     pub fn func_call(name: &str, args: Vec<Node>) -> Self {
         Self::FuncCall(name.into(), args.into())
@@ -183,7 +181,7 @@ impl Node {
         Self::Block(nodes.into())
     }
     pub fn set_eq(ident: &str, value: Node) -> Self {
-        Self::SetEq(ident.into(), Rc::new(value))
+        Self::SetEq(ident.into(), Arc::new(value))
     }
     pub fn class_def(name: &str, fields: Vec<&str>, methods: Vec<Node>) -> Self {
         Self::ClassDef(name.into(), vec_box_str(fields), methods.into())
@@ -192,10 +190,10 @@ impl Node {
         Self::FuncDef(name.into(), vec_box_str(params), block.into())
     }
     pub fn if_state(condition: Node, block: Vec<Node>, or_else: Option<Node>) -> Self {
-        Self::IfState(Rc::new(condition), block.into(), or_else.map(Rc::new))
+        Self::IfState(Arc::new(condition), block.into(), or_else.map(Arc::new))
     }
 }
-fn vec_box_str(input: Vec<&str>) -> Rc<[Rc<str>]> {
+fn vec_box_str(input: Vec<&str>) -> Arc<[Arc<str>]> {
     input
         .into_iter()
         .map(std::convert::Into::into)
