@@ -52,11 +52,11 @@ fn __sub__(lhs: PtyNum, rhs: PtyNum) -> PtyNum {
 }
 #[pettymethod]
 fn __mul__(lhs: PtyNum, rhs: PtyNum) -> PtyNum {
-    PtyNum(lhs.0 - rhs.0)
+    PtyNum(lhs.0 * rhs.0)
 }
 #[pettymethod]
 fn __div__(lhs: PtyNum, rhs: PtyNum) -> PtyNum {
-    PtyNum(lhs.0 - rhs.0)
+    PtyNum(lhs.0 / rhs.0)
 }
 #[pettymethod]
 fn __mod__(lhs: PtyNum, rhs: PtyNum) -> PtyNum {
