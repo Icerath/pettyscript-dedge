@@ -9,7 +9,10 @@ use super::{
     petty_function::PettyFunction,
     preallocated::PreAllocated,
 };
-use crate::ast::{BinOp, Literal, Node, UnaryOp};
+use crate::{
+    ast::{BinOp, Literal, Node, UnaryOp},
+    vm::{builtins::PtyOption, object::PettyObjectType},
+};
 pub type Vm = VirtualMachine;
 
 #[derive(Default)]
@@ -49,7 +52,7 @@ impl VirtualMachine {
                 self.if_statement(condition, block, or_else.as_ref().map(Arc::as_ref));
             }
             Node::WhileLoop(condition, block) => self.while_loop(condition, block),
-            Node::ForLoop(target, iter, block) => self.for_loop(target, iter, block),
+            Node::ForLoop(target, iter, block) => self.for_loop(target.clone(), iter, block),
             Node::ClassDef(name, fields, methods) => {
                 self.class_def(name.clone(), fields.clone(), methods);
             }
@@ -137,8 +140,23 @@ impl VirtualMachine {
             self.execute_nodes(block);
         }
     }
-    pub fn for_loop(&mut self, target: &str, iter: &Node, block: &[Node]) {
-        todo!()
+    pub fn for_loop(&mut self, target: Arc<str>, iter: &Node, block: &[Node]) {
+        let iter = self.evaluate(iter);
+        let iter = iter.call_method(self, "__iter__", FuncArgs(vec![iter.clone()]));
+
+        loop {
+            let next = iter.call_method(self, "__next__", FuncArgs(vec![iter.clone()]));
+            let Some(option) = next.as_any().downcast_ref::<PtyOption>() else {
+                todo!()
+            };
+            let Some(value) = &option.0 else {
+                break;
+            };
+            self.fields.write(target.clone(), value.clone());
+            for node in block {
+                self.evaluate(node);
+            }
+        }
     }
     pub fn class_def(&mut self, name: Arc<str>, fields: Arc<[Arc<str>]>, methods: &Arc<[Node]>) {
         let class = PettyClass::new(fields, methods.clone());

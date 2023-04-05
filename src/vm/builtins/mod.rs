@@ -11,13 +11,12 @@ mod string;
 
 use std::fmt;
 
+pub use self::option::PtyOption;
 pub use list::PtyList;
 pub use null::{PtyNull, NULL};
 pub use number::PtyNum;
 pub use pty_bool::PtyBool;
 pub use string::PtyStr;
-
-use self::option::PtyOption;
 
 use super::{core::VirtualMachine, object::PettyObject, raw_function::RawFunction};
 
