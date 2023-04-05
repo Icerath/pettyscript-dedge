@@ -17,7 +17,7 @@ use super::PtyBool;
 pub struct PtyList(pub Arc<Mutex<Vec<PettyObject>>>);
 
 impl PettyObjectType for PtyList {
-    fn get_item(&self, vm: &mut Vm, this: PettyObject, str: &str) -> PettyObject {
+    fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
         match str {
             "push" => PUSH.clone(),
             "len" => LEN.clone(),
@@ -28,7 +28,7 @@ impl PettyObjectType for PtyList {
             _ => todo!("{str}"),
         }
     }
-    fn call(&self, vm: &mut Vm, this: PettyObject, args: FuncArgs) -> PettyObject {
+    fn call(&self, _vm: &mut Vm, _this: PettyObject, _args: FuncArgs) -> PettyObject {
         todo!()
     }
     fn as_any(&self) -> &dyn std::any::Any {
@@ -86,7 +86,8 @@ fn __add__(lhs: PtyList, rhs: PtyList) -> PtyList {
 
 #[pettymethod]
 fn __mul__(lhs: PtyList, rhs: PtyNum) -> PtyList {
-    let repeat = rhs.0 as usize;
+    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+    let repeat = rhs.0.max(0.0) as usize;
     let mut vec = Vec::with_capacity(repeat * lhs.0.lock().unwrap().len());
     for _ in 0..repeat {
         for obj in lhs.0.lock().unwrap().iter() {

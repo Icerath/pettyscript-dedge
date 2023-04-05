@@ -48,7 +48,8 @@ fn __add__(lhs: PtyStr, rhs: PtyStr) -> PtyStr {
 
 #[pettymethod]
 fn __mul__(lhs: PtyStr, rhs: PtyNum) -> PtyStr {
-    PtyStr(lhs.0.repeat(rhs.0 as usize).into())
+    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+    PtyStr(lhs.0.repeat(rhs.0.max(0.0) as usize).into())
 }
 
 // TODO - use #[pettymethod]
