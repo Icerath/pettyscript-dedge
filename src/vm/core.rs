@@ -52,7 +52,7 @@ impl VirtualMachine {
                 self.if_statement(condition, block, or_else.as_ref().map(Arc::as_ref));
             }
             Node::WhileLoop(condition, block) => self.while_loop(condition, block),
-            Node::ForLoop(target, iter, block) => self.for_loop(target.clone(), iter, block),
+            Node::ForLoop(target, iter, block) => self.for_loop(target, iter, block),
             Node::ClassDef(name, fields, methods) => {
                 self.class_def(name.clone(), fields.clone(), methods);
             }
@@ -116,10 +116,7 @@ impl VirtualMachine {
     pub fn if_statement(&mut self, condition: &Node, block: &[Node], or_else: Option<&Node>) {
         let condition = self.evaluate(condition);
         let condition = condition.call_method(self, "__bool__", FuncArgs(vec![]));
-        let condition = condition
-            .as_any()
-            .downcast_ref::<PtyBool>()
-            .expect("Expected bool");
+        let condition = condition.downcast_ref::<PtyBool>().expect("Expected Bool");
         if condition.0 {
             return self.execute_nodes(block);
         }
@@ -131,22 +128,19 @@ impl VirtualMachine {
         while self.return_val.is_none() && {
             let condition = self.evaluate(condition);
             let condition = condition.call_method(self, "__bool__", FuncArgs(vec![]));
-            let condition = condition
-                .as_any()
-                .downcast_ref::<PtyBool>()
-                .expect("Expected bool");
+            let condition = condition.downcast_ref::<PtyBool>().expect("Expected Bool");
             condition.0
         } {
             self.execute_nodes(block);
         }
     }
-    pub fn for_loop(&mut self, target: Arc<str>, iter: &Node, block: &[Node]) {
+    pub fn for_loop(&mut self, target: &Arc<str>, iter: &Node, block: &[Node]) {
         let iter = self.evaluate(iter);
         let iter = iter.call_method(self, "__iter__", FuncArgs(vec![iter.clone()]));
 
         loop {
             let next = iter.call_method(self, "__next__", FuncArgs(vec![iter.clone()]));
-            let Some(option) = next.as_any().downcast_ref::<PtyOption>() else {
+            let Some(option) = next.downcast::<PtyOption>() else {
                 todo!()
             };
             let Some(value) = &option.0 else {

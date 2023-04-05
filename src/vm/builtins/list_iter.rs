@@ -45,7 +45,7 @@ fn __repr__(this: PtyListIter) -> PtyStr {
 }
 
 #[pettymethod]
-fn __next__(mut this: PtyListIter) -> PtyOption {
+fn __next__(this: PtyListIter) -> PtyOption {
     let mut int = this.1.lock().unwrap();
     let next = this.0.lock().unwrap().get(*int).cloned();
     *int += 1;

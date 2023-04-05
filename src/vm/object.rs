@@ -25,12 +25,20 @@ impl PettyObject {
     #[inline]
     pub fn repr(&self, vm: &mut Vm) -> Option<PtyStr> {
         let repr = self.call_method(vm, "__repr__", FuncArgs(vec![]));
-        repr.as_any().downcast_ref::<PtyStr>().map(Clone::clone)
+        repr.downcast::<PtyStr>()
     }
     #[inline]
     pub fn force_repr(&self, vm: &mut Vm) -> PtyStr {
         self.repr(vm)
             .unwrap_or_else(|| panic!("{self} did not have repr"))
+    }
+    #[inline]
+    pub fn downcast_ref<T: PettyObjectType + 'static>(&self) -> Option<&T> {
+        self.as_any().downcast_ref::<T>()
+    }
+    #[inline]
+    pub fn downcast<T: PettyObjectType + Clone + 'static>(&self) -> Option<T> {
+        self.as_any().downcast_ref::<T>().cloned()
     }
 }
 impl<Pty: PettyObjectType + 'static> From<Pty> for PettyObject {
