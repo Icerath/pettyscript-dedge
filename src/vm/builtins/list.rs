@@ -20,6 +20,8 @@ impl PettyObjectType for PtyList {
     fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
         match str {
             "push" => PUSH.clone(),
+            "get" => GET.clone(),
+            "set" => SET.clone(),
             "len" => LEN.clone(),
             "__repr__" => __REPR__.clone(),
             "__add__" => __ADD__.clone(),
@@ -50,8 +52,28 @@ impl fmt::Display for PtyList {
 }
 
 #[pettymethod]
+fn get(self_: PtyList, index: PtyNum) -> PettyObject {
+    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+    let index = index.0.max(0.0) as usize;
+    self_.0.lock().unwrap()[index].clone()
+}
+
+#[pettymethod]
+fn set(self_: PtyList, index: PtyNum, obj: PettyObject) {
+    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+    let index = index.0.max(0.0) as usize;
+    self_.0.lock().unwrap()[index] = obj;
+}
+
+#[pettymethod]
 fn push(self_: PtyList, obj: PettyObject) {
     self_.0.lock().unwrap().push(obj);
+}
+
+#[pettymethod]
+#[allow(clippy::cast_precision_loss)]
+fn len(self_: PtyList) -> PtyNum {
+    PtyNum(self_.0.lock().unwrap().len() as f64)
 }
 
 #[pettymethod]
@@ -64,12 +86,6 @@ fn __repr__(self_: PtyList, vm: &mut Vm) -> PtyStr {
     }
     string.push(']');
     PtyStr(string.into())
-}
-
-#[pettymethod]
-#[allow(clippy::cast_precision_loss)]
-fn len(self_: PtyList) -> PtyNum {
-    PtyNum(self_.0.lock().unwrap().len() as f64)
 }
 
 #[pettymethod]
