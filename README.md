@@ -31,7 +31,7 @@ Currently inspired mostly by Python.
 - [x] Function Calls
 - [x] Class Instantiation
 - [x] Methods
-- [ ] For Loop
+- [x] For Loop
 - [x] While Loop
 - [x] If/Elif/Else Statements
 - [x] Return Statements
