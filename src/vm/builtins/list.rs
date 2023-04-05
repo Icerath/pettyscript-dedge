@@ -1,7 +1,7 @@
 use macros::pettymethod;
 
 use crate::vm::{
-    builtins::PtyStr,
+    builtins::{PtyNum, PtyStr},
     core::Vm,
     function_args::FuncArgs,
     object::{PettyObject, PettyObjectType},
@@ -11,6 +11,8 @@ use std::{
     sync::{Arc, Mutex},
 };
 
+use super::PtyBool;
+
 #[derive(Clone)]
 pub struct PtyList(pub Arc<Mutex<Vec<PettyObject>>>);
 
@@ -18,7 +20,10 @@ impl PettyObjectType for PtyList {
     fn get_item(&self, vm: &mut Vm, this: PettyObject, str: &str) -> PettyObject {
         match str {
             "push" => PUSH.clone(),
+            "len" => LEN.clone(),
             "__repr__" => __REPR__.clone(),
+            "__add__" => __ADD__.clone(),
+            "__bool__" => __BOOL__.clone(),
             _ => todo!("{str}"),
         }
     }
@@ -57,4 +62,23 @@ fn __repr__(self_: PtyList, vm: &mut Vm) -> PtyStr {
     }
     string.push(']');
     PtyStr(string.into())
+}
+
+#[pettymethod]
+#[allow(clippy::cast_precision_loss)]
+fn len(self_: PtyList) -> PtyNum {
+    PtyNum(self_.0.lock().unwrap().len() as f64)
+}
+
+#[pettymethod]
+fn __bool__(self_: PtyList) -> PettyObject {
+    PtyBool::new(!self_.0.lock().unwrap().is_empty())
+}
+
+#[pettymethod]
+fn __add__(self_: PtyList, other: PtyList) -> PtyList {
+    let mut vec = { self_.0.lock().unwrap().clone() };
+    vec.extend_from_slice(&other.0.lock().unwrap());
+
+    PtyList(Mutex::new(vec).into())
 }
