@@ -14,7 +14,7 @@ pub fn pettymethod(_attr: TokenStream, input: TokenStream) -> TokenStream {
     let name_upper: proc_macro2::TokenStream = name.to_string().to_uppercase().parse().unwrap();
     let vis = tokens.vis;
     let stream: TokenStream = quote!(
-        static #name_upper: once_cell::sync::Lazy<crate::vm::object::PettyObject> = once_cell::sync::Lazy::new(|| crate::vm::raw_function::RawFunction(#name).into());
+        #vis static #name_upper: once_cell::sync::Lazy<crate::vm::object::PettyObject> = once_cell::sync::Lazy::new(|| crate::vm::raw_function::RawFunction(#name).into());
         #vis fn #name (
             vm: &mut crate::vm::core::Vm,
             this: crate::vm::object::PettyObject,

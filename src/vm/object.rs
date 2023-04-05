@@ -13,6 +13,7 @@ pub trait PettyObjectType: fmt::Display + Sync + Send {
 /// An actually petty object.
 #[derive(Clone)]
 pub struct PettyObject(Arc<dyn PettyObjectType>);
+
 impl PettyObject {
     pub fn new<Pty: PettyObjectType + 'static>(object: Pty) -> Self {
         Self(Arc::new(object))

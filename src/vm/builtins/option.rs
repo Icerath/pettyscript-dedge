@@ -1,6 +1,7 @@
 use std::fmt;
 
 use macros::pettymethod;
+use once_cell::sync::Lazy;
 
 use super::{string::PtyStr, PtyBool};
 use crate::vm::{
@@ -9,8 +10,19 @@ use crate::vm::{
     object::{PettyObject, PettyObjectType},
 };
 
+pub static NONE: Lazy<PettyObject> = Lazy::new(|| PtyOption(None).into());
 #[derive(Clone)]
 pub struct PtyOption(pub Option<PettyObject>);
+
+impl PtyOption {
+    #[inline]
+    pub fn new(inner: Option<PettyObject>) -> PettyObject {
+        match inner {
+            Some(_) => Self(inner).into(),
+            None => NONE.clone(),
+        }
+    }
+}
 
 impl PettyObjectType for PtyOption {
     fn as_any(&self) -> &dyn std::any::Any {
