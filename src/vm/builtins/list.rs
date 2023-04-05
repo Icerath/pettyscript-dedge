@@ -23,6 +23,7 @@ impl PettyObjectType for PtyList {
             "len" => LEN.clone(),
             "__repr__" => __REPR__.clone(),
             "__add__" => __ADD__.clone(),
+            "__mul__" => __MUL__.clone(),
             "__bool__" => __BOOL__.clone(),
             _ => todo!("{str}"),
         }
@@ -76,9 +77,21 @@ fn __bool__(self_: PtyList) -> PettyObject {
 }
 
 #[pettymethod]
-fn __add__(self_: PtyList, other: PtyList) -> PtyList {
-    let mut vec = { self_.0.lock().unwrap().clone() };
-    vec.extend_from_slice(&other.0.lock().unwrap());
+fn __add__(lhs: PtyList, rhs: PtyList) -> PtyList {
+    let mut vec = { lhs.0.lock().unwrap().clone() };
+    vec.extend_from_slice(&rhs.0.lock().unwrap());
 
+    PtyList(Mutex::new(vec).into())
+}
+
+#[pettymethod]
+fn __mul__(lhs: PtyList, rhs: PtyNum) -> PtyList {
+    let repeat = rhs.0 as usize;
+    let mut vec = Vec::with_capacity(repeat * lhs.0.lock().unwrap().len());
+    for _ in 0..repeat {
+        for obj in lhs.0.lock().unwrap().iter() {
+            vec.push(obj.clone());
+        }
+    }
     PtyList(Mutex::new(vec).into())
 }

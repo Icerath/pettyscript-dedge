@@ -1,4 +1,4 @@
-use crate::vm;
+use crate::vm::{self, builtins::PtyNum};
 use macros::pettymethod;
 use std::{fmt, sync::Arc};
 
@@ -20,6 +20,7 @@ impl PettyObjectType for PtyStr {
         match str {
             "__repr__" => __REPR__.clone(),
             "__add__" => __ADD__.clone(),
+            "__mul__" => __MUL__.clone(),
             "format" => RawFunction(str_format).into(),
             _ => todo!(),
         }
@@ -39,9 +40,15 @@ impl fmt::Display for PtyStr {
 fn __repr__(self_: PtyStr) -> PtyStr {
     self_
 }
+
 #[pettymethod]
 fn __add__(lhs: PtyStr, rhs: PtyStr) -> PtyStr {
     PtyStr((lhs.0.to_string() + &rhs.0).into())
+}
+
+#[pettymethod]
+fn __mul__(lhs: PtyStr, rhs: PtyNum) -> PtyStr {
+    PtyStr(lhs.0.repeat(rhs.0 as usize).into())
 }
 
 // TODO - use #[pettymethod]
