@@ -1,7 +1,7 @@
 use macros::pettymethod;
 
 use crate::vm::{
-    builtins::{PtyNum, PtyStr},
+    builtins::{list_iter::PtyListIter, PtyNum, PtyStr},
     core::Vm,
     function_args::FuncArgs,
     object::{PettyObject, PettyObjectType},
@@ -25,6 +25,7 @@ impl PettyObjectType for PtyList {
             "__add__" => __ADD__.clone(),
             "__mul__" => __MUL__.clone(),
             "__bool__" => __BOOL__.clone(),
+            "__iter__" | "iter" => __ITER__.clone(),
             _ => todo!("{str}"),
         }
     }
@@ -95,4 +96,9 @@ fn __mul__(lhs: PtyList, rhs: PtyNum) -> PtyList {
         }
     }
     PtyList(Mutex::new(vec).into())
+}
+
+#[pettymethod]
+fn __iter__(this: PtyList) -> PtyListIter {
+    PtyListIter(this.0, Mutex::new(0).into())
 }
