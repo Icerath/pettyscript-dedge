@@ -10,9 +10,10 @@ use crate::vm::{
     object::{PettyObject, PettyObjectType},
 };
 
-use super::{PtyBool, PtyStr};
+use super::PtyStr;
 
 pub static NULL: Lazy<PettyObject> = Lazy::new(|| PtyNull.into());
+pub static NULL_STR: Lazy<PettyObject> = Lazy::new(|| PtyStr("null".into()).into());
 
 #[derive(Clone, Copy)]
 pub struct PtyNull;
@@ -41,7 +42,8 @@ impl fmt::Display for PtyNull {
 fn __bool__(_self: PtyNull) -> PettyObject {
     FALSE.clone()
 }
+
 #[pettymethod]
-fn __repr__(_self: PtyNull) -> PtyStr {
-    PtyStr("null".into())
+fn __repr__(_self: PtyNull) -> PettyObject {
+    NULL_STR.clone()
 }

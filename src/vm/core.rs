@@ -1,5 +1,7 @@
+use std::sync::Mutex;
+
 use super::{
-    builtins::{self, PtyBool, PtyNull, NULL},
+    builtins::{PtyBool, PtyList, PtyNum, PtyStr, NULL},
     field_dict::FieldDict,
     function_args::FuncArgs,
     object::PettyObject,
@@ -39,10 +41,7 @@ impl VirtualMachine {
             }
             Node::BinExpr(op, nodes) => return self.bin_expr(*op, &nodes.0, &nodes.1),
             Node::Literal(literal) => {
-                if let Literal::Int(int @ 0..=255) = literal {
-                    return self.preallocated.get(*int as usize).unwrap();
-                }
-                return builtins::create_literal(literal);
+                return self.create_literal(literal);
             }
             Node::Ident(ident) => return self.fields.read(ident),
             Node::FuncCall(name, args) => return self.func_call(name, args),
@@ -147,6 +146,19 @@ impl VirtualMachine {
     pub fn class_def(&mut self, name: Rc<str>, fields: Rc<[Rc<str>]>, methods: &Rc<[Node]>) {
         let class = PettyClass::new(fields, methods.clone());
         self.fields.write(name, class.into());
+    }
+    pub fn create_literal(&mut self, literal: &Literal) -> PettyObject {
+        match literal {
+            #[allow(clippy::cast_sign_loss)]
+            Literal::Int(int @ 0..=255) => self.preallocated.get(*int as usize).unwrap(),
+            #[allow(clippy::cast_precision_loss)]
+            Literal::Int(int) => PtyNum(*int as f64).into(),
+            Literal::Float(float) => PtyNum(*float).into(),
+            Literal::Null => NULL.clone(),
+            Literal::Bool(bool) => PtyBool(*bool).into(),
+            Literal::String(string) => PtyStr(string.clone()).into(),
+            Literal::List(list) => PtyList(Mutex::new(self.evaluate_list(list)).into()).into(),
+        }
     }
 }
 

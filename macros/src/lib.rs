@@ -83,7 +83,7 @@ fn load_args(
             "& mut Vm" => out_args = quote!(#out_args vm, ),
             "FuncArgs" => out_args = quote!(#out_args FuncArgs(args.collect())),
             "PettyObject" => {
-                variables = quote!(let #name = args.next().expect("Too Few Arguments"););
+                variables = quote!(#variables let #name = args.next().expect("Too Few Arguments"););
                 out_args = quote!(#out_args #name, );
             }
             _ => {

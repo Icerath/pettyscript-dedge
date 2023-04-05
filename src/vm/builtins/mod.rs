@@ -1,4 +1,5 @@
 #![allow(clippy::needless_pass_by_value)]
+mod list;
 mod null;
 mod number;
 mod option;
@@ -9,6 +10,7 @@ mod string;
 
 use std::fmt;
 
+pub use list::PtyList;
 pub use null::{PtyNull, NULL};
 pub use number::PtyNum;
 pub use pty_bool::PtyBool;
@@ -17,7 +19,6 @@ pub use string::PtyStr;
 use self::option::PtyOption;
 
 use super::{core::VirtualMachine, object::PettyObject, raw_function::RawFunction};
-use crate::ast::Literal;
 
 pub fn load_builtins(vm: &mut VirtualMachine) {
     let builtins = [
@@ -28,18 +29,6 @@ pub fn load_builtins(vm: &mut VirtualMachine) {
     ];
     for (name, builtin) in builtins {
         vm.load_builtin(name, builtin);
-    }
-}
-
-pub fn create_literal(literal: &Literal) -> PettyObject {
-    match literal {
-        #[allow(clippy::cast_precision_loss)]
-        Literal::Int(int) => PtyNum(*int as f64).into(),
-        Literal::Float(float) => PtyNum(*float).into(),
-        Literal::Null => NULL.clone(),
-        Literal::Bool(bool) => PtyBool(*bool).into(),
-        Literal::String(string) => PtyStr(string.clone()).into(),
-        Literal::List(_list) => todo!(),
     }
 }
 
