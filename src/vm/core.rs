@@ -141,15 +141,17 @@ impl VirtualMachine {
         loop {
             let next = iter.call_method(self, "__next__", FuncArgs(vec![iter.clone()]));
             let Some(option) = next.downcast::<PtyOption>() else {
-                todo!()
+                todo!("{next}");
             };
-            let Some(value) = &option.0 else {
+
+            if let Some(value) = &option.0 {
+                self.fields.write(target.clone(), value.clone());
+                for node in block {
+                    self.evaluate(node);
+                }
+            } else {
                 break;
             };
-            self.fields.write(target.clone(), value.clone());
-            for node in block {
-                self.evaluate(node);
-            }
         }
     }
     pub fn class_def(&mut self, name: Arc<str>, fields: Arc<[Arc<str>]>, methods: &Arc<[Node]>) {
