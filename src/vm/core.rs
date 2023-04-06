@@ -166,7 +166,7 @@ impl VirtualMachine {
             Literal::Int(int) => PtyNum(*int as f64).into(),
             Literal::Float(float) => PtyNum(*float).into(),
             Literal::Null => NULL.clone(),
-            Literal::Bool(bool) => PtyBool(*bool).into(),
+            Literal::Bool(bool) => PtyBool::new(*bool),
             Literal::String(string) => PtyStr(string.clone()).into(),
             Literal::List(list) => PtyList(Mutex::new(self.evaluate_list(list)).into()).into(),
         }
