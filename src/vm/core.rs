@@ -81,6 +81,7 @@ impl VirtualMachine {
         };
         let mut items = Vec::with_capacity(args.len());
         items.push(left);
+        items.extend(args.iter().map(|node| self.evaluate(node)));
         for arg in args.iter() {
             items.push(self.evaluate(arg));
         }

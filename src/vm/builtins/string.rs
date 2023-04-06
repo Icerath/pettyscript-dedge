@@ -54,7 +54,7 @@ fn __mul__(lhs: PtyStr, rhs: PtyNum) -> PtyStr {
 
 // TODO - use #[pettymethod]
 fn str_format(vm: &mut vm::core::Vm, _this: &PettyObject, args: FuncArgs) -> PettyObject {
-    let mut args = args.0.into_iter();
+    let mut args = args.0.iter();
     let first_arg = args.next().unwrap();
     let Some(PtyStr(format_str)) = first_arg.downcast_ref::<PtyStr>() else {
         println!("{first_arg}");

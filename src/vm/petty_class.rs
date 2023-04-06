@@ -40,9 +40,9 @@ impl PettyObjectType for PettyClassInstance {
             _ => todo!("{str}"),
         }
     }
-    fn call<'a>(&self, vm: &mut Vm, this: &'a PettyObject, mut args: FuncArgs<'a>) -> PettyObject {
+    fn call<'a>(&self, vm: &mut Vm, this: &'a PettyObject, args: FuncArgs<'a>) -> PettyObject {
         let function = self.get_item(vm, this, "__call__");
-        let mut args: Vec<&PettyObject> = args.0.iter().copied().collect();
+        let mut args: Vec<&PettyObject> = args.0.to_vec();
         args.push(this);
         function.call(vm, this, FuncArgs(&args))
     }
