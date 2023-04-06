@@ -27,7 +27,7 @@ impl PettyObjectType for PettyFunction {
                 args.0.len()
             );
         }
-        for (param, arg) in self.args.iter().zip(args.0.into_iter()) {
+        for (param, &arg) in self.args.iter().zip(args.0.into_iter()) {
             vm.fields.write(param.clone(), arg.clone());
         }
         vm.execute_nodes(&self.block);

@@ -81,7 +81,7 @@ fn load_args(
         let typ: proc_macro2::TokenStream = var.typ.parse().unwrap();
         match var.typ.as_str() {
             "& mut Vm" => out_args = quote!(#out_args vm, ),
-            "FuncArgs" => out_args = quote!(#out_args FuncArgs(args.collect())),
+            "FuncArgs" => out_args = quote!(#out_args FuncArgs(&args.copied().collect::<Vec<_>>())),
             "PettyObject" => {
                 variables = quote!(#variables let #name = args.next().expect("Too Few Arguments"););
                 out_args = quote!(#out_args #name, );

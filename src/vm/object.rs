@@ -24,13 +24,14 @@ impl PettyObject {
         func: &str,
         mut args: FuncArgs<'a>,
     ) -> PettyObject {
-        args.0.push(self);
+        let mut args: Vec<&PettyObject> = args.0.iter().copied().collect();
+        args.push(&self);
         let function = self.get_item(vm, self, func);
-        function.call(vm, &function, args)
+        function.call(vm, &function, FuncArgs(&args))
     }
     #[inline]
     pub fn repr(&self, vm: &mut Vm) -> Option<PtyStr> {
-        let repr = self.call_method(vm, "__repr__", FuncArgs(vec![]));
+        let repr = self.call_method(vm, "__repr__", FuncArgs(&[]));
         repr.downcast::<PtyStr>()
     }
     #[inline]

@@ -84,27 +84,37 @@ impl VirtualMachine {
         for arg in args.iter() {
             items.push(self.evaluate(arg));
         }
-        function.call(self, &function, FuncArgs(items.iter().collect()))
+        function.call(
+            self,
+            &function,
+            FuncArgs(items.iter().collect::<Vec<_>>().as_slice()),
+        )
     }
     pub fn bin_expr(&mut self, op: BinOp, lhs: &Node, rhs: &Node) -> PettyObject {
         let lhs = self.evaluate(lhs);
         let rhs = self.evaluate(rhs);
         let function_name = op.into_petty_function();
         let function = lhs.get_item(self, &lhs, function_name);
-        let args = FuncArgs(vec![&lhs, &rhs]);
+        let binding = [&lhs, &rhs];
+        let args = FuncArgs(&binding);
         function.call(self, &function, args)
     }
     pub fn unary_expr(&mut self, op: UnaryOp, expr: &Node) -> PettyObject {
         let inner = self.evaluate(expr);
         let function_name = op.into_petty_function();
         let function = inner.get_item(self, &inner, function_name);
-        let args = FuncArgs(vec![&inner]);
+        let binding = [&inner];
+        let args = FuncArgs(&binding);
         function.call(self, &function, args)
     }
     pub fn func_call(&mut self, name: &Arc<str>, args: &[Node]) -> PettyObject {
         let args = self.evaluate_list(args);
         let function = self.fields.read(name);
-        function.call(self, &function, FuncArgs(args.iter().collect()))
+        function.call(
+            self,
+            &function,
+            FuncArgs(args.iter().collect::<Vec<_>>().as_slice()),
+        )
     }
     pub fn evaluate_list(&mut self, items: &[Node]) -> Vec<PettyObject> {
         items.iter().map(|arg| self.evaluate(arg)).collect()
@@ -115,7 +125,7 @@ impl VirtualMachine {
     }
     pub fn if_statement(&mut self, condition: &Node, block: &[Node], or_else: Option<&Node>) {
         let condition = self.evaluate(condition);
-        let condition = condition.call_method(self, "__bool__", FuncArgs(vec![]));
+        let condition = condition.call_method(self, "__bool__", FuncArgs(&[]));
         let condition = condition.downcast_ref::<PtyBool>().expect("Expected Bool");
         if condition.0 {
             return self.execute_nodes(block);
@@ -127,7 +137,7 @@ impl VirtualMachine {
     pub fn while_loop(&mut self, condition: &Node, block: &[Node]) {
         while self.return_val.is_none() && {
             let condition = self.evaluate(condition);
-            let condition = condition.call_method(self, "__bool__", FuncArgs(vec![]));
+            let condition = condition.call_method(self, "__bool__", FuncArgs(&[]));
             let condition = condition.downcast_ref::<PtyBool>().expect("Expected Bool");
             condition.0
         } {
@@ -136,10 +146,10 @@ impl VirtualMachine {
     }
     pub fn for_loop(&mut self, target: &Arc<str>, iter: &Node, block: &[Node]) {
         let iter = self.evaluate(iter);
-        let iter = iter.call_method(self, "__iter__", FuncArgs(vec![&iter]));
+        let iter = iter.call_method(self, "__iter__", FuncArgs(&[&iter]));
 
         loop {
-            let next = iter.call_method(self, "__next__", FuncArgs(vec![&iter]));
+            let next = iter.call_method(self, "__next__", FuncArgs(&[&iter]));
             let Some(option) = next.downcast::<PtyOption>() else {
                 todo!("{next}");
             };

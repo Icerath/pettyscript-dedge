@@ -42,8 +42,9 @@ impl PettyObjectType for PettyClassInstance {
     }
     fn call<'a>(&self, vm: &mut Vm, this: &'a PettyObject, mut args: FuncArgs<'a>) -> PettyObject {
         let function = self.get_item(vm, this, "__call__");
-        args.0.push(this);
-        function.call(vm, this, args)
+        let mut args: Vec<&PettyObject> = args.0.iter().copied().collect();
+        args.push(this);
+        function.call(vm, this, FuncArgs(&args))
     }
     fn as_any(&self) -> &dyn std::any::Any {
         self
