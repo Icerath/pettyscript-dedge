@@ -7,6 +7,7 @@ pub struct PreAllocated {
 }
 impl PreAllocated {
     pub fn new() -> Self {
+        #[allow(clippy::cast_precision_loss)]
         let ints = std::array::from_fn(|i| PtyNum(i as f64).into());
         Self { ints }
     }

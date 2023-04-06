@@ -16,7 +16,7 @@ impl PettyObjectType for RawFunction {
     fn call(&self, vm: &mut Vm, this: PettyObject, args: FuncArgs) -> PettyObject {
         self.0(vm, this, args)
     }
-    fn get_item(&self, vm: &mut Vm, this: PettyObject, str: &str) -> PettyObject {
+    fn get_item(&self, _vm: &mut Vm, _this: PettyObject, _str: &str) -> PettyObject {
         todo!()
     }
 }

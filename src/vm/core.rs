@@ -11,7 +11,7 @@ use super::{
 };
 use crate::{
     ast::{BinOp, Literal, Node, UnaryOp},
-    vm::{builtins::PtyOption, object::PettyObjectType},
+    vm::builtins::PtyOption,
 };
 pub type Vm = VirtualMachine;
 
@@ -176,6 +176,7 @@ impl VirtualMachine {
 impl BinOp {
     #[must_use]
     #[inline]
+    /// # Panics
     pub fn into_petty_function(self) -> &'static str {
         match self {
             Self::Add => "__add__",
@@ -198,6 +199,7 @@ impl BinOp {
 impl UnaryOp {
     #[must_use]
     #[inline]
+    /// # Panics
     pub fn into_petty_function(self) -> &'static str {
         match self {
             Self::Neg => "__neg__",

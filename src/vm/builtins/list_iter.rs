@@ -17,7 +17,7 @@ use super::{option::PtyOption, PtyNum, PtyStr};
 pub struct PtyListIter(pub Arc<Mutex<Vec<PettyObject>>>, pub Arc<Mutex<usize>>);
 
 impl PettyObjectType for PtyListIter {
-    fn get_item(&self, vm: &mut Vm, this: PettyObject, str: &str) -> PettyObject {
+    fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
         match str {
             "__next__" => __NEXT__.clone(),
             "__iter__" | "iter" => __ITER__.clone(),
@@ -26,7 +26,7 @@ impl PettyObjectType for PtyListIter {
             _ => todo!("{str}"),
         }
     }
-    fn call(&self, vm: &mut Vm, this: PettyObject, args: FuncArgs) -> PettyObject {
+    fn call(&self, _vm: &mut Vm, _this: PettyObject, _args: FuncArgs) -> PettyObject {
         todo!()
     }
     fn as_any(&self) -> &dyn std::any::Any {

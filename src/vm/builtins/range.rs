@@ -12,18 +12,17 @@ use crate::vm::{
     object::{PettyObject, PettyObjectType},
 };
 
-use super::{PtyNull, PtyNum, PtyStr};
+use super::{PtyNum, PtyStr};
 
 #[derive(Clone)]
 pub struct PtyRange {
-    start: f64,
     end: f64,
     step: f64,
     current: Arc<Mutex<f64>>,
 }
 
 impl PettyObjectType for PtyRange {
-    fn get_item(&self, vm: &mut Vm, this: PettyObject, str: &str) -> PettyObject {
+    fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
         match str {
             "__iter__" | "iter" => __ITER__.clone(),
             "__next__" | "next" => __NEXT__.clone(),
@@ -33,7 +32,7 @@ impl PettyObjectType for PtyRange {
             _ => todo!("{str}"),
         }
     }
-    fn call(&self, vm: &mut Vm, this: PettyObject, args: FuncArgs) -> PettyObject {
+    fn call(&self, _vm: &mut Vm, _this: PettyObject, _args: FuncArgs) -> PettyObject {
         todo!()
     }
     fn as_any(&self) -> &dyn std::any::Any {
@@ -50,7 +49,6 @@ impl fmt::Display for PtyRange {
 #[pettymethod]
 pub fn range(end: PtyNum) -> PtyRange {
     PtyRange {
-        start: 0.0,
         end: end.0,
         current: Mutex::new(0.0).into(),
         step: 1.0,
@@ -74,7 +72,7 @@ fn __next__(this: PtyRange) -> PettyObject {
 }
 
 #[pettymethod]
-fn __len__(this: PtyRange) -> PtyNum {
+fn __len__(_this: PtyRange) -> PtyNum {
     todo!()
 }
 

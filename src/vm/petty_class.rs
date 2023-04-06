@@ -31,7 +31,7 @@ impl PettyClassInstance {
     }
 }
 impl PettyObjectType for PettyClassInstance {
-    fn get_item(&self, vm: &mut Vm, this: PettyObject, str: &str) -> PettyObject {
+    fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
         if let Some(item) = self.fields.get(str) {
             return item.clone();
         }
@@ -54,7 +54,7 @@ impl PettyObjectType for PettyClass {
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
-    fn call(&self, vm: &mut Vm, this: PettyObject, args: FuncArgs) -> PettyObject {
+    fn call(&self, _vm: &mut Vm, _this: PettyObject, args: FuncArgs) -> PettyObject {
         if self.fields.len() != args.0.len() {
             todo!(
                 "Expected {} Arguments got {}",
@@ -77,7 +77,7 @@ impl PettyObjectType for PettyClass {
         }
         PettyClassInstance::new(fields).into()
     }
-    fn get_item(&self, vm: &mut Vm, this: PettyObject, str: &str) -> PettyObject {
+    fn get_item(&self, _vm: &mut Vm, _this: PettyObject, _str: &str) -> PettyObject {
         todo!()
     }
 }
@@ -94,6 +94,7 @@ impl fmt::Display for PettyClass {
     }
 }
 
+#[allow(clippy::needless_pass_by_value)]
 #[pettymethod]
 fn __repr__(self_: PettyClassInstance) -> PtyStr {
     PtyStr(format!("{self_}").into())

@@ -8,6 +8,7 @@ use nom_supreme::error::ErrorTree;
 pub type NomErr<'a> = nom_supreme::error::ErrorTree<&'a str>;
 pub type IRes<'a, T = ast::Node, E = NomErr<'a>> = nom::IResult<&'a str, T, E>;
 
+#[allow(clippy::result_unit_err)]
 pub fn read_ast(input: &str) -> Result<Node, ()> {
     match parser::parse(input) {
         Ok(ast) => return Ok(ast),
@@ -16,6 +17,7 @@ pub fn read_ast(input: &str) -> Result<Node, ()> {
     Err(())
 }
 
+/// # Panics
 pub fn print_error(original_input: &str, err: ErrorTree<&str>) {
     let ErrorTree::Base { location, kind } = err else {
         panic!("{err:?}: Invalid Error Kind!\n");

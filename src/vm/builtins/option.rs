@@ -16,6 +16,7 @@ pub struct PtyOption(pub Option<PettyObject>);
 
 impl PtyOption {
     #[inline]
+    #[allow(clippy::new_ret_no_self)]
     pub fn new(inner: Option<PettyObject>) -> PettyObject {
         match inner {
             Some(_) => Self(inner).into(),
