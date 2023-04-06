@@ -3,7 +3,7 @@ use crate::vm::builtins::PtyNum;
 use super::object::PettyObject;
 
 pub struct PreAllocated {
-    ints: [PettyObject; 255],
+    ints: [PettyObject; 256],
 }
 impl PreAllocated {
     pub fn new() -> Self {
