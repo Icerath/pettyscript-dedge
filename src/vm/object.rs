@@ -6,8 +6,8 @@ use super::{
 use std::{fmt, ops::Deref, sync::Arc};
 
 pub trait PettyObjectType: fmt::Display + Sync + Send {
-    fn get_item(&self, vm: &mut Vm, this: PettyObject, str: &str) -> PettyObject;
-    fn call(&self, vm: &mut Vm, this: PettyObject, args: FuncArgs) -> PettyObject;
+    fn get_item(&self, vm: &mut Vm, this: &PettyObject, str: &str) -> PettyObject;
+    fn call(&self, vm: &mut Vm, this: &PettyObject, args: FuncArgs) -> PettyObject;
     fn as_any(&self) -> &dyn std::any::Any;
 }
 /// An actually petty object.
@@ -20,8 +20,8 @@ impl PettyObject {
     }
     pub fn call_method(&self, vm: &mut Vm, func: &str, mut args: FuncArgs) -> PettyObject {
         args.0.push(self.clone());
-        let function = self.get_item(vm, self.clone(), func);
-        function.call(vm, function.clone(), args)
+        let function = self.get_item(vm, self, func);
+        function.call(vm, &function, args)
     }
     #[inline]
     pub fn repr(&self, vm: &mut Vm) -> Option<PtyStr> {

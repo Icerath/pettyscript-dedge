@@ -75,8 +75,8 @@ impl VirtualMachine {
     pub fn get_item(&mut self, left: &Node, right: &Node) -> PettyObject {
         let left = self.evaluate(left);
         let (function, args) = match right {
-            Node::Ident(ident) => return left.get_item(self, left.clone(), ident),
-            Node::FuncCall(name, args) => (left.get_item(self, left.clone(), name), args),
+            Node::Ident(ident) => return left.get_item(self, &left, ident),
+            Node::FuncCall(name, args) => (left.get_item(self, &left, name), args),
             _ => unreachable!(),
         };
         let mut items = Vec::with_capacity(args.len());
@@ -84,27 +84,27 @@ impl VirtualMachine {
         for arg in args.iter() {
             items.push(self.evaluate(arg));
         }
-        function.call(self, function.clone(), FuncArgs(items))
+        function.call(self, &function, FuncArgs(items))
     }
     pub fn bin_expr(&mut self, op: BinOp, lhs: &Node, rhs: &Node) -> PettyObject {
         let lhs = self.evaluate(lhs);
         let rhs = self.evaluate(rhs);
         let function_name = op.into_petty_function();
-        let function = lhs.get_item(self, lhs.clone(), function_name);
+        let function = lhs.get_item(self, &lhs, function_name);
         let args = FuncArgs(vec![lhs, rhs]);
-        function.call(self, function.clone(), args)
+        function.call(self, &function, args)
     }
     pub fn unary_expr(&mut self, op: UnaryOp, expr: &Node) -> PettyObject {
         let inner = self.evaluate(expr);
         let function_name = op.into_petty_function();
-        let function = inner.get_item(self, inner.clone(), function_name);
+        let function = inner.get_item(self, &inner, function_name);
         let args = FuncArgs(vec![inner]);
-        function.call(self, function.clone(), args)
+        function.call(self, &function, args)
     }
     pub fn func_call(&mut self, name: &Arc<str>, args: &[Node]) -> PettyObject {
         let args = self.evaluate_list(args);
         let function = self.fields.read(name);
-        function.call(self, function.clone(), FuncArgs(args))
+        function.call(self, &function, FuncArgs(args))
     }
     pub fn evaluate_list(&mut self, items: &[Node]) -> Vec<PettyObject> {
         items.iter().map(|arg| self.evaluate(arg)).collect()

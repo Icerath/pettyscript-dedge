@@ -15,7 +15,7 @@ pub static FALSE: Lazy<PettyObject> = Lazy::new(|| PtyBool(false).into());
 pub struct PtyBool(pub bool);
 
 impl PettyObjectType for PtyBool {
-    fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
+    fn get_item(&self, _vm: &mut Vm, _this: &PettyObject, str: &str) -> PettyObject {
         match str {
             "__bool__" => __BOOL__.clone(),
             "__not__" => __NOT__.clone(),
@@ -25,7 +25,7 @@ impl PettyObjectType for PtyBool {
             _ => todo!("{str}"),
         }
     }
-    fn call(&self, _vm: &mut Vm, _this: PettyObject, _args: FuncArgs) -> PettyObject {
+    fn call(&self, _vm: &mut Vm, _this: &PettyObject, _args: FuncArgs) -> PettyObject {
         todo!()
     }
     fn as_any(&self) -> &dyn std::any::Any {

@@ -10,10 +10,10 @@ use std::fmt;
 #[derive(Clone, Copy)]
 pub struct PtyNum(pub f64);
 impl PettyObjectType for PtyNum {
-    fn call(&self, _vm: &mut Vm, _this: PettyObject, _args: FuncArgs) -> PettyObject {
+    fn call(&self, _vm: &mut Vm, _this: &PettyObject, _args: FuncArgs) -> PettyObject {
         todo!()
     }
-    fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
+    fn get_item(&self, _vm: &mut Vm, _this: &PettyObject, str: &str) -> PettyObject {
         match str {
             "__add__" => __ADD__.clone(),
             "__sub__" => __SUB__.clone(),

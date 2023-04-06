@@ -13,10 +13,10 @@ use crate::vm::{
 pub struct PtyStr(pub Arc<str>);
 
 impl PettyObjectType for PtyStr {
-    fn call(&self, _vm: &mut Vm, _this: PettyObject, _args: FuncArgs) -> PettyObject {
+    fn call(&self, _vm: &mut Vm, _this: &PettyObject, _args: FuncArgs) -> PettyObject {
         todo!("String is not Callable")
     }
-    fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
+    fn get_item(&self, _vm: &mut Vm, _this: &PettyObject, str: &str) -> PettyObject {
         match str {
             "__repr__" => __REPR__.clone(),
             "__add__" => __ADD__.clone(),
@@ -53,7 +53,7 @@ fn __mul__(lhs: PtyStr, rhs: PtyNum) -> PtyStr {
 }
 
 // TODO - use #[pettymethod]
-fn str_format(vm: &mut vm::core::Vm, _this: PettyObject, args: FuncArgs) -> PettyObject {
+fn str_format(vm: &mut vm::core::Vm, _this: &PettyObject, args: FuncArgs) -> PettyObject {
     let mut args = args.0.into_iter();
     let first_arg = args.next().unwrap();
     let Some(PtyStr(format_str)) = first_arg.downcast_ref::<PtyStr>() else {

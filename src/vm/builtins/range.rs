@@ -22,7 +22,7 @@ pub struct PtyRange {
 }
 
 impl PettyObjectType for PtyRange {
-    fn get_item(&self, _vm: &mut Vm, _this: PettyObject, str: &str) -> PettyObject {
+    fn get_item(&self, _vm: &mut Vm, _this: &PettyObject, str: &str) -> PettyObject {
         match str {
             "__iter__" | "iter" => __ITER__.clone(),
             "__next__" | "next" => __NEXT__.clone(),
@@ -32,7 +32,7 @@ impl PettyObjectType for PtyRange {
             _ => todo!("{str}"),
         }
     }
-    fn call(&self, _vm: &mut Vm, _this: PettyObject, _args: FuncArgs) -> PettyObject {
+    fn call(&self, _vm: &mut Vm, _this: &PettyObject, _args: FuncArgs) -> PettyObject {
         todo!()
     }
     fn as_any(&self) -> &dyn std::any::Any {

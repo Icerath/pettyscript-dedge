@@ -17,7 +17,7 @@ pub fn pettymethod(_attr: TokenStream, input: TokenStream) -> TokenStream {
         #vis static #name_upper: once_cell::sync::Lazy<crate::vm::object::PettyObject> = once_cell::sync::Lazy::new(|| crate::vm::raw_function::RawFunction(#name).into());
         #vis fn #name (
             vm: &mut crate::vm::core::Vm,
-            this: crate::vm::object::PettyObject,
+            this: &crate::vm::object::PettyObject,
             args: crate::vm::function_args::FuncArgs,
         ) -> crate::vm::object::PettyObject {
             #original_func

@@ -5,7 +5,7 @@ use super::{
 };
 use std::fmt;
 
-pub type RawFn = fn(vm: &mut Vm, this: PettyObject, args: FuncArgs) -> PettyObject;
+pub type RawFn = fn(vm: &mut Vm, this: &PettyObject, args: FuncArgs) -> PettyObject;
 #[derive(Clone)]
 pub struct RawFunction(pub RawFn);
 
@@ -13,10 +13,10 @@ impl PettyObjectType for RawFunction {
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
-    fn call(&self, vm: &mut Vm, this: PettyObject, args: FuncArgs) -> PettyObject {
+    fn call(&self, vm: &mut Vm, this: &PettyObject, args: FuncArgs) -> PettyObject {
         self.0(vm, this, args)
     }
-    fn get_item(&self, _vm: &mut Vm, _this: PettyObject, _str: &str) -> PettyObject {
+    fn get_item(&self, _vm: &mut Vm, _this: &PettyObject, _str: &str) -> PettyObject {
         todo!()
     }
 }

@@ -18,7 +18,7 @@ impl PettyFunction {
     }
 }
 impl PettyObjectType for PettyFunction {
-    fn call(&self, vm: &mut Vm, _this: PettyObject, args: FuncArgs) -> PettyObject {
+    fn call(&self, vm: &mut Vm, _this: &PettyObject, args: FuncArgs) -> PettyObject {
         vm.fields.new_scope();
         if self.args.len() != args.0.len() {
             todo!(
@@ -34,7 +34,7 @@ impl PettyObjectType for PettyFunction {
         vm.fields.drop_scope();
         vm.return_val.take().unwrap_or_else(|| NULL.clone())
     }
-    fn get_item(&self, _vm: &mut Vm, _this: PettyObject, _str: &str) -> PettyObject {
+    fn get_item(&self, _vm: &mut Vm, _this: &PettyObject, _str: &str) -> PettyObject {
         todo!()
     }
     fn as_any(&self) -> &dyn std::any::Any {
