@@ -15,10 +15,10 @@ pub fn pettymethod(_attr: TokenStream, input: TokenStream) -> TokenStream {
     let vis = tokens.vis;
     let stream: TokenStream = quote!(
         #vis static #name_upper: once_cell::sync::Lazy<crate::vm::object::PettyObject> = once_cell::sync::Lazy::new(|| crate::vm::raw_function::RawFunction(#name).into());
-        #vis fn #name (
+        #vis fn #name <'__a> (
             vm: &mut crate::vm::core::Vm,
             this: &crate::vm::object::PettyObject,
-            args: crate::vm::function_args::FuncArgs,
+            args: crate::vm::function_args::FuncArgs<'__a>,
         ) -> crate::vm::object::PettyObject {
             #original_func
             let mut args = args.0.into_iter();

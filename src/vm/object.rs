@@ -18,8 +18,13 @@ impl PettyObject {
     pub fn new<Pty: PettyObjectType + 'static>(object: Pty) -> Self {
         Self(Arc::new(object))
     }
-    pub fn call_method(&self, vm: &mut Vm, func: &str, mut args: FuncArgs) -> PettyObject {
-        args.0.push(self.clone());
+    pub fn call_method<'a>(
+        &'a self,
+        vm: &mut Vm,
+        func: &str,
+        mut args: FuncArgs<'a>,
+    ) -> PettyObject {
+        args.0.push(self);
         let function = self.get_item(vm, self, func);
         function.call(vm, &function, args)
     }

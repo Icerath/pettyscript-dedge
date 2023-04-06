@@ -40,9 +40,9 @@ impl PettyObjectType for PettyClassInstance {
             _ => todo!("{str}"),
         }
     }
-    fn call(&self, vm: &mut Vm, this: &PettyObject, mut args: FuncArgs) -> PettyObject {
+    fn call<'a>(&self, vm: &mut Vm, this: &'a PettyObject, mut args: FuncArgs<'a>) -> PettyObject {
         let function = self.get_item(vm, this, "__call__");
-        args.0.push(this.clone());
+        args.0.push(this);
         function.call(vm, this, args)
     }
     fn as_any(&self) -> &dyn std::any::Any {
@@ -66,7 +66,7 @@ impl PettyObjectType for PettyClass {
             .fields
             .iter()
             .cloned()
-            .zip(args.0.iter().cloned())
+            .zip(args.0.iter().copied().cloned())
             .collect();
         for function in self.methods.iter().cloned() {
             let Node::FuncDef(name, params, body) = function else {

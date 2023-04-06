@@ -76,8 +76,8 @@ fn is_none(self_: PtyOption) -> PtyBool {
 }
 
 #[pettymethod]
-pub fn some(obj: PettyObject) -> PtyOption {
-    PtyOption(Some(obj))
+pub fn some(obj: &PettyObject) -> PtyOption {
+    PtyOption(Some(obj.clone()))
 }
 
 // #[pettymethod]

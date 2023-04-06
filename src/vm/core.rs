@@ -84,27 +84,27 @@ impl VirtualMachine {
         for arg in args.iter() {
             items.push(self.evaluate(arg));
         }
-        function.call(self, &function, FuncArgs(items))
+        function.call(self, &function, FuncArgs(items.iter().collect()))
     }
     pub fn bin_expr(&mut self, op: BinOp, lhs: &Node, rhs: &Node) -> PettyObject {
         let lhs = self.evaluate(lhs);
         let rhs = self.evaluate(rhs);
         let function_name = op.into_petty_function();
         let function = lhs.get_item(self, &lhs, function_name);
-        let args = FuncArgs(vec![lhs, rhs]);
+        let args = FuncArgs(vec![&lhs, &rhs]);
         function.call(self, &function, args)
     }
     pub fn unary_expr(&mut self, op: UnaryOp, expr: &Node) -> PettyObject {
         let inner = self.evaluate(expr);
         let function_name = op.into_petty_function();
         let function = inner.get_item(self, &inner, function_name);
-        let args = FuncArgs(vec![inner]);
+        let args = FuncArgs(vec![&inner]);
         function.call(self, &function, args)
     }
     pub fn func_call(&mut self, name: &Arc<str>, args: &[Node]) -> PettyObject {
         let args = self.evaluate_list(args);
         let function = self.fields.read(name);
-        function.call(self, &function, FuncArgs(args))
+        function.call(self, &function, FuncArgs(args.iter().collect()))
     }
     pub fn evaluate_list(&mut self, items: &[Node]) -> Vec<PettyObject> {
         items.iter().map(|arg| self.evaluate(arg)).collect()
@@ -136,10 +136,10 @@ impl VirtualMachine {
     }
     pub fn for_loop(&mut self, target: &Arc<str>, iter: &Node, block: &[Node]) {
         let iter = self.evaluate(iter);
-        let iter = iter.call_method(self, "__iter__", FuncArgs(vec![iter.clone()]));
+        let iter = iter.call_method(self, "__iter__", FuncArgs(vec![&iter]));
 
         loop {
-            let next = iter.call_method(self, "__next__", FuncArgs(vec![iter.clone()]));
+            let next = iter.call_method(self, "__next__", FuncArgs(vec![&iter]));
             let Some(option) = next.downcast::<PtyOption>() else {
                 todo!("{next}");
             };

@@ -52,8 +52,8 @@ impl fmt::Display for PtyBool {
 }
 
 #[pettymethod]
-fn __bool__(self_: PettyObject) -> PettyObject {
-    self_
+fn __bool__(self_: &PettyObject) -> PettyObject {
+    self_.clone()
 }
 #[pettymethod]
 fn __not__(self_: PtyBool) -> PettyObject {
