@@ -77,7 +77,7 @@ fn len(self_: PtyList) -> PtyNum {
 }
 
 #[pettymethod]
-fn __repr__(self_: PtyList, vm: &mut Vm) -> PtyStr {
+fn __repr__(self_: &PtyList, vm: &mut Vm) -> PtyStr {
     let mut string = String::from("[");
     for (index, item) in self_.0.lock().unwrap().iter().enumerate() {
         let seperator = if index == 0 { "" } else { ", " };
@@ -89,12 +89,12 @@ fn __repr__(self_: PtyList, vm: &mut Vm) -> PtyStr {
 }
 
 #[pettymethod]
-fn __bool__(self_: PtyList) -> PettyObject {
+fn __bool__(self_: &PtyList) -> PettyObject {
     PtyBool::new(!self_.0.lock().unwrap().is_empty())
 }
 
 #[pettymethod]
-fn __add__(lhs: PtyList, rhs: PtyList) -> PtyList {
+fn __add__(lhs: &PtyList, rhs: &PtyList) -> PtyList {
     let mut vec = { lhs.0.lock().unwrap().clone() };
     vec.extend_from_slice(&rhs.0.lock().unwrap());
 
@@ -102,7 +102,7 @@ fn __add__(lhs: PtyList, rhs: PtyList) -> PtyList {
 }
 
 #[pettymethod]
-fn __mul__(lhs: PtyList, rhs: PtyNum) -> PtyList {
+fn __mul__(lhs: &PtyList, rhs: PtyNum) -> PtyList {
     #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     let repeat = rhs.0.max(0.0) as usize;
     let mut vec = Vec::with_capacity(repeat * lhs.0.lock().unwrap().len());

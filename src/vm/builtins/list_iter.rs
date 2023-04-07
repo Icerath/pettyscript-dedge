@@ -41,12 +41,12 @@ impl fmt::Display for PtyListIter {
 }
 
 #[pettymethod]
-fn __repr__(this: PtyListIter) -> PtyStr {
+fn __repr__(this: &PtyListIter) -> PtyStr {
     PtyStr(format!("{this}").into())
 }
 
 #[pettymethod]
-fn __next__(this: PtyListIter) -> PettyObject {
+fn __next__(this: &PtyListIter) -> PettyObject {
     let mut int = this.1.lock().unwrap();
     let next = this.0.lock().unwrap().get(*int).cloned();
     *int += 1;
@@ -59,7 +59,7 @@ fn __iter__(this: PtyListIter) -> PtyListIter {
 }
 
 #[pettymethod]
-fn __len__(this: PtyListIter) -> PtyNum {
+fn __len__(this: &PtyListIter) -> PtyNum {
     let total_len = this.0.lock().unwrap().len();
     let consumed = this.1.lock().unwrap();
     #[allow(clippy::cast_precision_loss)]

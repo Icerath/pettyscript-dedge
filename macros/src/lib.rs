@@ -20,6 +20,7 @@ pub fn pettymethod(_attr: TokenStream, input: TokenStream) -> TokenStream {
             this: &crate::vm::object::PettyObject,
             args: crate::vm::function_args::FuncArgs<'__a>,
         ) -> crate::vm::object::PettyObject {
+            #[inline]
             #original_func
             let mut args = args.0.into_iter();
             #variables
@@ -78,13 +79,25 @@ fn load_args(
     let mut variables = quote!();
     for var in args {
         let name: proc_macro2::TokenStream = var.ident.parse().unwrap();
-        let typ: proc_macro2::TokenStream = var.typ.parse().unwrap();
+        let typ: proc_macro2::TokenStream = var.typ.trim_start_matches('&').trim().parse().unwrap();
         match var.typ.as_str() {
             "& mut Vm" => out_args = quote!(#out_args vm, ),
             "FuncArgs" => out_args = quote!(#out_args FuncArgs(&args.copied().collect::<Vec<_>>())),
-            "PettyObject" => {
+            "& PettyObject" => {
                 variables = quote!(#variables let #name = args.next().expect("Too Few Arguments"););
                 out_args = quote!(#out_args #name, );
+            }
+            _ if var.typ.as_str().starts_with('&') => {
+                variables = quote!(
+                    #variables
+                    let #name = args.next().expect("Too Few Arguments");
+                    let Some(#name) = #name.as_any().downcast_ref::<#typ>() else {
+                        todo!();
+                    };
+                );
+                out_args = quote!(
+                    #out_args #name,
+                );
             }
             _ => {
                 variables = quote!(

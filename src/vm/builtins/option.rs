@@ -58,20 +58,20 @@ fn unwrap(opt: PtyOption) -> PettyObject {
 }
 
 #[pettymethod]
-fn __repr__(self_: PtyOption, vm: &mut Vm) -> PtyStr {
-    match self_.0 {
+fn __repr__(self_: &PtyOption, vm: &mut Vm) -> PtyStr {
+    match &self_.0 {
         Some(obj) => obj.force_repr(vm),
         None => PtyStr("None".into()),
     }
 }
 
 #[pettymethod]
-fn is_some(self_: PtyOption) -> PtyBool {
+fn is_some(self_: &PtyOption) -> PtyBool {
     PtyBool(self_.0.is_some())
 }
 
 #[pettymethod]
-fn is_none(self_: PtyOption) -> PtyBool {
+fn is_none(self_: &PtyOption) -> PtyBool {
     PtyBool(self_.0.is_none())
 }
 

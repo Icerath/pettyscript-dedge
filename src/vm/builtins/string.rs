@@ -42,12 +42,12 @@ fn __repr__(self_: PtyStr) -> PtyStr {
 }
 
 #[pettymethod]
-fn __add__(lhs: PtyStr, rhs: PtyStr) -> PtyStr {
+fn __add__(lhs: &PtyStr, rhs: &PtyStr) -> PtyStr {
     PtyStr((lhs.0.to_string() + &rhs.0).into())
 }
 
 #[pettymethod]
-fn __mul__(lhs: PtyStr, rhs: PtyNum) -> PtyStr {
+fn __mul__(lhs: &PtyStr, rhs: PtyNum) -> PtyStr {
     #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     PtyStr(lhs.0.repeat(rhs.0.max(0.0) as usize).into())
 }
