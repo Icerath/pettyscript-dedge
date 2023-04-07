@@ -74,17 +74,21 @@ impl VirtualMachine {
     }
     pub fn get_item(&mut self, left: &Node, right: &Node) -> PettyObject {
         let left = self.evaluate(left);
+
         let (function, args) = match right {
             Node::Ident(ident) => return left.get_item(self, &left, ident),
             Node::FuncCall(name, args) => (left.get_item(self, &left, name), args),
             _ => unreachable!(),
         };
+
         let mut items = Vec::with_capacity(args.len());
         items.push(left);
         items.extend(args.iter().map(|node| self.evaluate(node)));
+
         for arg in args.iter() {
             items.push(self.evaluate(arg));
         }
+
         function.call(
             self,
             &function,

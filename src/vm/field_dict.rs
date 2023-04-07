@@ -20,7 +20,7 @@ impl FieldDict {
         }
         self.globals
             .get(str)
-            .unwrap_or_else(|| panic!("Not found: {str}"))
+            .unwrap_or_else(|| panic!("Not found: ({str})"))
             .clone()
     }
     fn current_scope(&mut self) -> &mut Dict {
