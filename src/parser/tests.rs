@@ -270,6 +270,19 @@ mod parser_tests {
         );
         assert_expected(source, vec![expected]);
     }
+    #[test]
+    fn closures() {
+        let source = "|x, y| { return x + y; };";
+        let expected = Node::closure(
+            vec!["x", "y"],
+            &[Node::ReturnState(Arc::new(Node::bin_expr(
+                BinOp::Add,
+                Node::ident("x"),
+                Node::ident("y"),
+            )))],
+        );
+        assert_expected(source, vec![expected]);
+    }
 }
 
 #[cfg(test)]

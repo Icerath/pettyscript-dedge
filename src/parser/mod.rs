@@ -53,6 +53,13 @@ fn terminated_expr(input: &str) -> IRes {
         ParseErr::TermExpr,
     )(input)
 }
+fn closure(input: &str) -> IRes {
+    map(
+        pair(delimited(spar('|'), params, spar('|')), block),
+        |(args, body)| Node::Closure(args, body),
+    )(input)
+}
+
 fn set_equals(input: &str) -> IRes {
     map(
         separated_pair(type_hinted, spar('='), node_expr),
@@ -64,7 +71,7 @@ fn node_expr(input: &str) -> IRes {
     bin_expr(input)
 }
 fn node_value(input: &str) -> IRes {
-    alt((unary_expr, node_value_raw))(input)
+    alt((unary_expr, node_value_raw, closure))(input)
 }
 fn node_value_raw(input: &str) -> IRes {
     alt((

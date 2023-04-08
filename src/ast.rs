@@ -5,6 +5,7 @@ pub enum Node {
     Literal(Literal),
     Block(Arc<[Node]>),
     Globals(Arc<[Node]>),
+    Closure(Arc<[Arc<str>]>, Arc<[Node]>),
     BinExpr(BinOp, Arc<(Node, Node)>),
     UnaryOp(UnaryOp, Arc<Node>),
     Ident(Arc<str>),
@@ -96,6 +97,11 @@ impl fmt::Debug for Literal {
 impl fmt::Debug for Node {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Self::Closure(args, body) => f
+                .debug_struct("closure")
+                .field("args", args)
+                .field("body", body)
+                .finish(),
             Self::BinExpr(op, nodes) => f
                 .debug_struct("expr")
                 .field("op", op)
@@ -191,6 +197,9 @@ impl Node {
     }
     pub fn if_state(condition: Node, block: Vec<Node>, or_else: Option<Node>) -> Self {
         Self::IfState(Arc::new(condition), block.into(), or_else.map(Arc::new))
+    }
+    pub fn closure(args: Vec<&str>, body: &[Node]) -> Self {
+        Self::Closure(vec_box_str(args), body.into())
     }
 }
 fn vec_box_str(input: Vec<&str>) -> Arc<[Arc<str>]> {
