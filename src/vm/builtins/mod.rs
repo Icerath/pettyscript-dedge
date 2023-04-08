@@ -9,6 +9,7 @@ mod pty_bool;
 mod range;
 mod repr;
 mod string;
+pub mod threading;
 
 use std::fmt;
 
@@ -28,6 +29,7 @@ pub fn load_builtins(vm: &mut VirtualMachine) {
         ("repr", RawFunction(repr::repr).into()),
         ("range", RANGE.clone()),
         ("Some", RawFunction(option::some).into()),
+        ("sleep", RawFunction(threading::sleep::sleep).into()),
         ("None", PtyOption(None).into()),
     ];
     for (name, builtin) in builtins {
