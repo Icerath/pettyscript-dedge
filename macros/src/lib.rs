@@ -16,7 +16,7 @@ pub fn pettymethod(_attr: TokenStream, input: TokenStream) -> TokenStream {
     let stream: TokenStream = quote!(
         #vis static #name_upper: once_cell::sync::Lazy<crate::vm::object::PettyObject> = once_cell::sync::Lazy::new(|| crate::vm::raw_function::RawFunction(#name).into());
         #vis fn #name <'__a> (
-            vm: &mut crate::vm::core::Vm,
+            vm: &crate::vm::core::Vm,
             this: &crate::vm::object::PettyObject,
             args: crate::vm::function_args::FuncArgs<'__a>,
         ) -> crate::vm::object::PettyObject {
@@ -81,7 +81,7 @@ fn load_args(
         let name: proc_macro2::TokenStream = var.ident.parse().unwrap();
         let typ: proc_macro2::TokenStream = var.typ.trim_start_matches('&').trim().parse().unwrap();
         match var.typ.as_str() {
-            "& mut Vm" => out_args = quote!(#out_args vm, ),
+            "& Vm" => out_args = quote!(#out_args vm, ),
             "FuncArgs" => out_args = quote!(#out_args FuncArgs(&args.copied().collect::<Vec<_>>())),
             "& PettyObject" => {
                 variables = quote!(#variables let #name = args.next().expect("Too Few Arguments"););

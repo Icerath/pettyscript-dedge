@@ -24,9 +24,9 @@ impl PettyFunction {
     }
 }
 impl PettyObjectType for PettyFunction {
-    fn call(&self, vm: &mut Vm, _this: &PettyObject, args: FuncArgs) -> PettyObject {
+    fn call(&self, vm: &Vm, _this: &PettyObject, args: FuncArgs) -> PettyObject {
         for scope in &self.scopes {
-            vm.fields.scopes.push(scope.clone());
+            vm.get().fields.scopes.push(scope.clone());
         }
         if self.args.len() != args.0.len() {
             todo!(
@@ -36,16 +36,16 @@ impl PettyObjectType for PettyFunction {
             );
         }
         for (param, &arg) in self.args.iter().zip(args.0.into_iter()) {
-            vm.fields.write(param.clone(), arg.clone());
+            vm.get().fields.write(param.clone(), arg.clone());
         }
         vm.execute_nodes(&self.block);
         for _ in 0..self.scopes.len() {
-            vm.fields.drop_scope();
+            vm.get().fields.drop_scope();
         }
-        vm.fields.drop_scope();
-        vm.return_val.take().unwrap_or_else(|| NULL.clone())
+        vm.get().fields.drop_scope();
+        vm.get().return_val.take().unwrap_or_else(|| NULL.clone())
     }
-    fn get_item(&self, _vm: &mut Vm, _this: &PettyObject, _str: &str) -> PettyObject {
+    fn get_item(&self, _vm: &Vm, _this: &PettyObject, _str: &str) -> PettyObject {
         todo!()
     }
     fn as_any(&self) -> &dyn std::any::Any {

@@ -14,6 +14,7 @@ pub mod threading;
 use std::fmt;
 
 pub use self::option::PtyOption;
+use self::threading::thread::SPAWN_THREAD;
 pub use list::PtyList;
 pub use null::{PtyNull, NULL};
 pub use number::PtyNum;
@@ -21,15 +22,16 @@ pub use pty_bool::PtyBool;
 pub use range::RANGE;
 pub use string::PtyStr;
 
-use super::{core::VirtualMachine, object::PettyObject, raw_function::RawFunction};
+use super::{core::Vm, object::PettyObject, raw_function::RawFunction};
 
-pub fn load_builtins(vm: &mut VirtualMachine) {
+pub fn load_builtins(vm: &Vm) {
     let builtins = [
         ("print", RawFunction(print::print).into()),
         ("repr", RawFunction(repr::repr).into()),
         ("range", RANGE.clone()),
         ("Some", RawFunction(option::some).into()),
         ("sleep", RawFunction(threading::sleep::sleep).into()),
+        ("spawn_thread", SPAWN_THREAD.clone()),
         ("None", PtyOption(None).into()),
     ];
     for (name, builtin) in builtins {

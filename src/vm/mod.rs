@@ -1,3 +1,5 @@
+use std::sync::Mutex;
+
 use self::object::PettyObject;
 use crate::ast::{self, Node};
 
@@ -13,8 +15,8 @@ mod preallocated;
 mod raw_function;
 
 pub fn run_virtual_machine(ast: &ast::Node) -> Vec<PettyObject> {
-    let mut vm = core::VirtualMachine::new();
-    builtins::load_builtins(&mut vm);
+    let vm = core::Vm::new();
+    builtins::load_builtins(&vm);
     match ast {
         Node::Block(nodes) | Node::Globals(nodes) => vm.evaluate_list(nodes),
         node => vec![vm.evaluate(node)],
