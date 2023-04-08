@@ -1,5 +1,3 @@
-use std::sync::Mutex;
-
 use self::object::PettyObject;
 use crate::ast::{self, Node};
 

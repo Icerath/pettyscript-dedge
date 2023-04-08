@@ -19,14 +19,14 @@ pub struct ThreadHandle {
 }
 
 impl PettyObjectType for ThreadHandle {
-    fn get_item(&self, vm: &Vm, this: &PettyObject, str: &str) -> PettyObject {
+    fn get_item(&self, _vm: &Vm, _this: &PettyObject, str: &str) -> PettyObject {
         match str {
             "join" => JOIN.clone(),
             "__repr__" => __REPR__.clone(),
             _ => todo!("{str}"),
         }
     }
-    fn call(&self, vm: &Vm, this: &PettyObject, args: FuncArgs) -> PettyObject {
+    fn call(&self, _vm: &Vm, _this: &PettyObject, _args: FuncArgs) -> PettyObject {
         todo!()
     }
     fn as_any(&self) -> &dyn std::any::Any {

@@ -1,4 +1,4 @@
-use crate::vm::{self, builtins::PtyNum};
+use crate::vm::builtins::PtyNum;
 use macros::pettymethod;
 use std::{fmt, sync::Arc};
 

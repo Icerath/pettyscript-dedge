@@ -93,11 +93,8 @@ impl Vm {
         items.push(left);
         items.extend(args.iter().map(|node| self.evaluate(node)));
 
-        function.call(
-            &self,
-            &function,
-            FuncArgs(items.iter().collect::<Vec<_>>().as_slice()),
-        )
+        let refs: Vec<_> = items.iter().collect();
+        function.call(self, &function, FuncArgs(&refs))
     }
     pub fn bin_expr(&self, op: BinOp, lhs: &Node, rhs: &Node) -> PettyObject {
         let lhs = self.evaluate(lhs);
