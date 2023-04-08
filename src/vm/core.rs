@@ -56,7 +56,7 @@ impl VirtualMachine {
             Node::ClassDef(name, fields, methods) => {
                 self.class_def(name.clone(), fields.clone(), methods);
             }
-            Node::Closure(params, body) => return Self::closure(params, body),
+            Node::Closure(params, body) => return self.closure(params, body),
             _ => todo!("{node:?}"),
         };
         NULL.clone()
@@ -126,11 +126,11 @@ impl VirtualMachine {
         items.iter().map(|arg| self.evaluate(arg)).collect()
     }
     pub fn func_def(&mut self, name: Arc<str>, args: &Arc<[Arc<str>]>, block: &Arc<[Node]>) {
-        let function = Self::closure(args, block);
+        let function = self.closure(args, block);
         self.fields.write(name, function);
     }
-    pub fn closure(args: &Arc<[Arc<str>]>, block: &Arc<[Node]>) -> PettyObject {
-        PettyFunction::new(args.clone(), block.clone()).into()
+    pub fn closure(&self, args: &Arc<[Arc<str>]>, block: &Arc<[Node]>) -> PettyObject {
+        PettyFunction::new(args.clone(), block.clone(), self.fields.scopes.clone()).into()
     }
     pub fn if_statement(&mut self, condition: &Node, block: &[Node], or_else: Option<&Node>) {
         let condition = self.evaluate(condition);

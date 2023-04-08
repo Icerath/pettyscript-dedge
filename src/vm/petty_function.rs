@@ -1,6 +1,7 @@
 use super::{
     builtins::NULL,
     core::Vm,
+    dict::Dict,
     function_args::FuncArgs,
     object::{PettyObject, PettyObjectType},
 };
@@ -11,15 +12,22 @@ use std::{fmt, sync::Arc};
 pub struct PettyFunction {
     args: Arc<[Arc<str>]>,
     block: Arc<[Node]>,
+    scopes: Vec<Dict>,
 }
 impl PettyFunction {
-    pub fn new(args: Arc<[Arc<str>]>, block: Arc<[Node]>) -> Self {
-        Self { args, block }
+    pub fn new(args: Arc<[Arc<str>]>, block: Arc<[Node]>, scopes: Vec<Dict>) -> Self {
+        Self {
+            args,
+            block,
+            scopes,
+        }
     }
 }
 impl PettyObjectType for PettyFunction {
     fn call(&self, vm: &mut Vm, _this: &PettyObject, args: FuncArgs) -> PettyObject {
-        vm.fields.new_scope();
+        for scope in &self.scopes {
+            vm.fields.scopes.push(scope.clone());
+        }
         if self.args.len() != args.0.len() {
             todo!(
                 "Expected {} arguments, got {}.",
@@ -31,6 +39,9 @@ impl PettyObjectType for PettyFunction {
             vm.fields.write(param.clone(), arg.clone());
         }
         vm.execute_nodes(&self.block);
+        for _ in 0..self.scopes.len() {
+            vm.fields.drop_scope();
+        }
         vm.fields.drop_scope();
         vm.return_val.take().unwrap_or_else(|| NULL.clone())
     }

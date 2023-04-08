@@ -5,7 +5,7 @@ use super::{dict::Dict, object::PettyObject};
 #[derive(Default)]
 pub struct FieldDict {
     globals: Dict,
-    scopes: Vec<Dict>,
+    pub scopes: Vec<Dict>,
 }
 
 impl FieldDict {

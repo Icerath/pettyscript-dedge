@@ -55,7 +55,7 @@ impl PettyObjectType for PettyClass {
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
-    fn call(&self, _vm: &mut Vm, _this: &PettyObject, args: FuncArgs) -> PettyObject {
+    fn call(&self, vm: &mut Vm, _this: &PettyObject, args: FuncArgs) -> PettyObject {
         if self.fields.len() != args.0.len() {
             todo!(
                 "Expected {} Arguments got {}",
@@ -73,7 +73,7 @@ impl PettyObjectType for PettyClass {
             let Node::FuncDef(name, params, body) = function else {
             unreachable!();
         };
-            let function = PettyFunction::new(params, body);
+            let function = PettyFunction::new(params, body, vm.fields.scopes.clone());
             fields.insert(name, function.into());
         }
         PettyClassInstance::new(fields).into()
