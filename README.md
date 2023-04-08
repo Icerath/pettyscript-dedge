@@ -46,6 +46,7 @@ Currently inspired mostly by Python.
     - [ ] Minimum str
     - [ ] Minimum list
     - [ ] Other primitives, (maybe tuple, dict and set?)
+- [x] Threading.
 
 ### Longterm
 - [ ] Change into bytecode interpreter instead of treewalk.
