@@ -15,8 +15,22 @@ use crate::vm::{
 
 #[derive(Clone)]
 pub struct ThreadHandle {
-    id: ThreadId,
-    handle: Arc<Mutex<Option<JoinHandle<PettyObject>>>>,
+    pub id: ThreadId,
+    pub handle: Arc<Mutex<Option<JoinHandle<PettyObject>>>>,
+}
+
+impl ThreadHandle {
+    #[inline]
+    pub fn spawn(vm: &mut Vm, func: &PettyObject) -> Self {
+        let mut vm = vm.spawn_thread();
+        let func = func.clone();
+        let join_handle = std::thread::spawn(move || func.call(&mut vm, &func, FuncArgs(&[])));
+        let id = join_handle.thread().id();
+        Self {
+            handle: Mutex::new(Some(join_handle)).into(),
+            id,
+        }
+    }
 }
 
 impl PettyObjectType for ThreadHandle {
@@ -32,18 +46,6 @@ impl PettyObjectType for ThreadHandle {
     }
     fn as_any(&self) -> &dyn std::any::Any {
         self
-    }
-}
-
-#[pettymethod]
-pub fn spawn_thread(vm: &mut Vm, func: &PettyObject) -> ThreadHandle {
-    let mut vm = vm.spawn_thread();
-    let func = func.clone();
-    let join_handle = std::thread::spawn(move || func.call(&mut vm, &func, FuncArgs(&[])));
-    let id = join_handle.thread().id();
-    ThreadHandle {
-        handle: Mutex::new(Some(join_handle)).into(),
-        id,
     }
 }
 

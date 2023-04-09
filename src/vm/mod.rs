@@ -10,6 +10,7 @@ mod petty_class;
 mod petty_function;
 mod preallocated;
 mod raw_function;
+mod stdlib;
 
 pub fn run_virtual_machine(ast: &ast::Node) -> Vec<PettyObject> {
     let mut vm = core::Vm::new();

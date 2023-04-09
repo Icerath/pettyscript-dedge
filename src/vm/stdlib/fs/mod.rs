@@ -1,4 +1,5 @@
-use super::{Module, PtyStr};
+use super::Module;
+use crate::vm::builtins::PtyStr;
 use crate::vm::dict::Dict;
 use macros::pettymethod;
 use std::sync::Mutex;

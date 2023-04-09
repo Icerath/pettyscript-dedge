@@ -1,5 +1,4 @@
 #![allow(clippy::needless_pass_by_value)]
-mod filesystem;
 mod list;
 mod list_iter;
 mod module;
@@ -13,10 +12,8 @@ mod ref_count;
 mod repr;
 mod string;
 
-pub mod threading;
-
 use self::ref_count::GETREFCOUNT;
-use super::{core::Vm, object::PettyObject, raw_function::RawFunction};
+use super::{core::Vm, object::PettyObject, raw_function::RawFunction, stdlib};
 pub use list::PtyList;
 pub use module::Module;
 pub use null::{PtyNull, NULL};
@@ -26,7 +23,6 @@ pub use pty_bool::PtyBool;
 pub use range::RANGE;
 use std::fmt;
 pub use string::PtyStr;
-use threading::thread::SPAWN_THREAD;
 
 pub fn load_builtins(vm: &mut Vm) {
     let builtins = [
@@ -34,11 +30,9 @@ pub fn load_builtins(vm: &mut Vm) {
         ("repr", RawFunction(repr::repr).into()),
         ("range", RANGE.clone()),
         ("Some", RawFunction(option::some).into()),
-        ("sleep", RawFunction(threading::sleep::sleep).into()),
-        ("spawn_thread", SPAWN_THREAD.clone()),
         ("getrefcount", GETREFCOUNT.clone()),
-        ("fs", filesystem::init().into()),
         ("None", PtyOption(None).into()),
+        ("std", stdlib::init().into()),
     ];
     for (name, builtin) in builtins {
         vm.load_builtin(name, builtin);
