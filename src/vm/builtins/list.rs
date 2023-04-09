@@ -52,27 +52,27 @@ impl fmt::Display for PtyList {
 }
 
 #[pettymethod]
-fn get(self_: PtyList, index: PtyNum) -> PettyObject {
+fn get(self_: &PtyList, index: PtyNum) -> PettyObject {
     #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     let index = index.0.max(0.0) as usize;
     self_.0.lock().unwrap()[index].clone()
 }
 
 #[pettymethod]
-fn set(self_: PtyList, index: PtyNum, obj: &PettyObject) {
+fn set(self_: &PtyList, index: PtyNum, obj: &PettyObject) {
     #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     let index = index.0.max(0.0) as usize;
     self_.0.lock().unwrap()[index] = obj.clone();
 }
 
 #[pettymethod]
-fn push(self_: PtyList, obj: &PettyObject) {
+fn push(self_: &PtyList, obj: &PettyObject) {
     self_.0.lock().unwrap().push(obj.clone());
 }
 
 #[pettymethod]
 #[allow(clippy::cast_precision_loss)]
-fn len(self_: PtyList) -> PtyNum {
+fn len(self_: &PtyList) -> PtyNum {
     PtyNum(self_.0.lock().unwrap().len() as f64)
 }
 
