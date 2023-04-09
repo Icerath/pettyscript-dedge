@@ -20,7 +20,7 @@ Currently inspired mostly by Python.
 - [x] Class Definitions
 - [ ] Last semicolon is optional
 - [x] Get item ([1, 2, 3].len())
-- [ ] Indexing support.
+- [x] Indexing support.
 - [ ] Maybe slicing support.
 - [x] Type Hinting
 
