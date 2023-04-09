@@ -1,11 +1,4 @@
-use super::{PtyBool, PtyStr};
-use crate::vm::{
-    core::Vm,
-    function_args::FuncArgs,
-    object::{PettyObject, PettyObjectType},
-};
-use macros::pettymethod;
-use std::fmt;
+use crate::vm::prelude::*;
 
 #[derive(Clone, Copy)]
 pub struct PtyNum(pub f64);

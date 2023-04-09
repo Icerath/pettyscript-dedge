@@ -1,16 +1,4 @@
-use std::fmt;
-
-use macros::pettymethod;
-use once_cell::sync::Lazy;
-
-use crate::vm::{
-    builtins::pty_bool::FALSE,
-    core::Vm,
-    function_args::FuncArgs,
-    object::{PettyObject, PettyObjectType},
-};
-
-use super::PtyStr;
+use crate::vm::prelude::*;
 
 pub static NULL: Lazy<PettyObject> = Lazy::new(|| PtyNull.into());
 pub static NULL_STR: Lazy<PettyObject> = Lazy::new(|| PtyStr("null".into()).into());

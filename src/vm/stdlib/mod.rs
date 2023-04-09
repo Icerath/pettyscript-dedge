@@ -2,8 +2,7 @@ mod fs;
 mod thread;
 mod time;
 
-use super::{builtins::Module, dict::Dict};
-use std::sync::Mutex;
+use super::prelude::*;
 
 pub fn init() -> Module {
     let dict = Dict::from([

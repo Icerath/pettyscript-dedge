@@ -1,8 +1,5 @@
+use crate::vm::prelude::*;
 use std::io::{self, Write};
-
-use macros::pettymethod;
-
-use crate::vm::{core::Vm, function_args::FuncArgs};
 
 #[pettymethod]
 pub fn print(vm: &mut Vm, args: FuncArgs) {

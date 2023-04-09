@@ -1,14 +1,4 @@
-use std::fmt;
-
-use macros::pettymethod;
-use once_cell::sync::Lazy;
-
-use super::{string::PtyStr, PtyBool};
-use crate::vm::{
-    core::Vm,
-    function_args::FuncArgs,
-    object::{PettyObject, PettyObjectType},
-};
+use crate::vm::prelude::*;
 
 pub static NONE: Lazy<PettyObject> = Lazy::new(|| PtyOption(None).into());
 #[derive(Clone)]

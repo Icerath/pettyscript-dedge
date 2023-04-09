@@ -1,14 +1,4 @@
-use std::{
-    fmt,
-    sync::{Arc, Mutex},
-};
-
-use crate::vm::{
-    core::Vm,
-    dict::Dict,
-    function_args::FuncArgs,
-    object::{PettyObject, PettyObjectType},
-};
+use crate::vm::prelude::*;
 
 pub struct Module {
     pub name: Arc<str>,

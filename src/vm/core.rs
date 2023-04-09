@@ -1,21 +1,8 @@
-use std::{
-    ops::Deref,
-    sync::{Arc, Mutex},
-};
-
 use super::{
-    builtins::{Module, PtyBool, PtyList, PtyNum, PtyStr, NULL},
-    dict::Dict,
-    function_args::FuncArgs,
-    object::PettyObject,
-    petty_class::PettyClass,
-    petty_function::PettyFunction,
-    preallocated::PreAllocated,
+    petty_class::PettyClass, petty_function::PettyFunction, preallocated::PreAllocated, prelude::*,
 };
-use crate::{
-    ast::{BinOp, Literal, Node, UnaryOp},
-    vm::builtins::PtyOption,
-};
+use crate::ast::{BinOp, Literal, Node, UnaryOp};
+use std::ops::Deref;
 
 #[derive(Default, Clone)]
 pub struct VirtualMachine {

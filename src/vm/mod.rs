@@ -9,6 +9,7 @@ mod object;
 mod petty_class;
 mod petty_function;
 mod preallocated;
+pub mod prelude;
 mod raw_function;
 mod stdlib;
 

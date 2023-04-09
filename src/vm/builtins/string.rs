@@ -1,13 +1,4 @@
-use crate::vm::builtins::PtyNum;
-use macros::pettymethod;
-use std::{fmt, sync::Arc};
-
-use crate::vm::{
-    core::Vm,
-    function_args::FuncArgs,
-    object::{PettyObject, PettyObjectType},
-    raw_function::RawFunction,
-};
+use crate::vm::prelude::*;
 
 #[derive(Clone)]
 pub struct PtyStr(pub Arc<str>);

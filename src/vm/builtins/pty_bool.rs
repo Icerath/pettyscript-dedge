@@ -1,12 +1,4 @@
-use super::PtyStr;
-use crate::vm::{
-    core::Vm,
-    function_args::FuncArgs,
-    object::{PettyObject, PettyObjectType},
-};
-use macros::pettymethod;
-use once_cell::sync::Lazy;
-use std::fmt;
+use crate::vm::prelude::*;
 
 pub static TRUE: Lazy<PettyObject> = Lazy::new(|| PtyBool(true).into());
 pub static FALSE: Lazy<PettyObject> = Lazy::new(|| PtyBool(false).into());
