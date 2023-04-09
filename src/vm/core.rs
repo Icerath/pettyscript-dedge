@@ -203,20 +203,17 @@ impl Vm {
 
         let get_next = iter.get_item(self, &iter, "__next__");
 
-        loop {
+        while let Some(next) = {
             let next = get_next.call(self, &get_next, FuncArgs(&[&iter]));
-            let Some(option) = next.downcast::<PtyOption>() else {
-                todo!("{next}");
-            };
-
-            if let Some(value) = &option.0 {
-                self.write(target.clone(), value.clone());
-                for node in block {
-                    self.evaluate(node);
-                }
-            } else {
-                break;
-            };
+            match next.downcast::<PtyOption>() {
+                Some(next) => next.0,
+                None => todo!("{next}"),
+            }
+        } {
+            self.write(target.clone(), next.clone());
+            for node in block {
+                self.evaluate(node);
+            }
         }
     }
 
