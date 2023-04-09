@@ -4,7 +4,7 @@ use std::{
 };
 
 use super::{
-    builtins::{PtyBool, PtyList, PtyNum, PtyStr, NULL},
+    builtins::{Module, PtyBool, PtyList, PtyNum, PtyStr, NULL},
     dict::Dict,
     function_args::FuncArgs,
     object::PettyObject,
@@ -136,7 +136,9 @@ impl Vm {
         };
 
         let mut items = Vec::with_capacity(args.len());
-        items.push(left);
+        if left.downcast_ref::<Module>().is_none() {
+            items.push(left);
+        }
         items.extend(args.iter().map(|node| self.evaluate(node)));
 
         let refs: Vec<_> = items.iter().collect();
