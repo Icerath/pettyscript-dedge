@@ -28,6 +28,7 @@ impl PettyObjectType for PtyRange {
             "__len__" | "len" => __LEN__.clone(),
             "__repr__" => __REPR__.clone(),
             "sum" => SUM.clone(),
+            "product" => PRODUCT.clone(),
 
             _ => todo!("{str}"),
         }
@@ -83,6 +84,15 @@ fn sum(this: &PtyRange) -> PtyNum {
     let mut sum = 0.0;
     while let Some(next) = this.next() {
         sum += next;
+    }
+    PtyNum(sum)
+}
+
+#[pettymethod]
+fn product(this: &PtyRange) -> PtyNum {
+    let mut sum = 0.0;
+    while let Some(next) = this.next() {
+        sum *= next;
     }
     PtyNum(sum)
 }
