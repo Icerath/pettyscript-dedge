@@ -34,16 +34,18 @@ impl Vm {
     pub fn new() -> Self {
         Self::default()
     }
+
     pub fn load_builtin(&mut self, name: &str, object: PettyObject) {
         self.write(name.into(), object);
     }
+
     pub fn write(&mut self, key: Arc<str>, value: PettyObject) {
-        if let Some(scope) = self.scopes.last_mut() {
-            scope.insert(key, value);
-        } else {
-            self.globals.lock().unwrap().insert(key, value);
-        }
+        match self.scopes.last_mut() {
+            Some(scope) => scope.insert(key, value),
+            None => self.globals.lock().unwrap().insert(key, value),
+        };
     }
+
     pub fn read(&mut self, key: &str) -> PettyObject {
         for scope in self.scopes.iter().rev() {
             if let Some(object) = scope.get(key) {
@@ -57,12 +59,15 @@ impl Vm {
             .unwrap_or_else(|| panic!("Not found: ({key})"))
             .clone()
     }
+
     pub fn new_scope(&mut self) {
         self.scopes.push(Dict::new());
     }
+
     pub fn drop_scope(&mut self) {
         self.scopes.pop();
     }
+
     pub fn spawn_thread(&self) -> Self {
         Vm {
             inner: self.inner.clone(),
@@ -86,7 +91,9 @@ impl Vm {
             }
             Node::Ident(ident) => return self.read(ident),
             Node::FuncCall(name, args) => return self.func_call(name, args),
-            Node::FuncDef(name, args, block) => self.func_def(name.clone(), args, block),
+            Node::FuncDef(name, args, block) => {
+                self.func_def(name.clone(), args.clone(), block.clone());
+            }
             Node::ReturnState(expr) => self.return_val = Some(self.evaluate(expr)),
             Node::UnaryOp(op, expr) => return self.unary_expr(*op, expr),
             Node::IfState(condition, block, or_else) => {
@@ -95,13 +102,14 @@ impl Vm {
             Node::WhileLoop(condition, block) => self.while_loop(condition, block),
             Node::ForLoop(target, iter, block) => self.for_loop(target, iter, block),
             Node::ClassDef(name, fields, methods) => {
-                self.class_def(name.clone(), fields.clone(), methods);
+                self.class_def(name.clone(), fields.clone(), methods.clone());
             }
-            Node::Closure(params, body) => return self.closure(params, body),
+            Node::Closure(params, body) => return self.closure(params.clone(), body.clone()),
             _ => todo!("{node:?}"),
         };
         NULL.clone()
     }
+
     pub fn execute_nodes(&mut self, nodes: &[Node]) {
         for node in nodes {
             if self.return_val.is_some() {
@@ -110,10 +118,12 @@ impl Vm {
             self.evaluate(node);
         }
     }
+
     pub fn set_eq(&mut self, name: Arc<str>, expr: &Node) {
         let value = self.evaluate(expr);
         self.write(name, value);
     }
+
     pub fn get_item(&mut self, left: &Node, right: &Node) -> PettyObject {
         let left = self.evaluate(left);
 
@@ -130,6 +140,7 @@ impl Vm {
         let refs: Vec<_> = items.iter().collect();
         function.call(self, &function, FuncArgs(&refs))
     }
+
     pub fn bin_expr(&mut self, op: BinOp, lhs: &Node, rhs: &Node) -> PettyObject {
         let lhs = self.evaluate(lhs);
         let rhs = self.evaluate(rhs);
@@ -139,6 +150,7 @@ impl Vm {
         let args = FuncArgs(&binding);
         function.call(self, &function, args)
     }
+
     pub fn unary_expr(&mut self, op: UnaryOp, expr: &Node) -> PettyObject {
         let inner = self.evaluate(expr);
         let function_name = op.into_petty_function();
@@ -147,25 +159,30 @@ impl Vm {
         let args = FuncArgs(&binding);
         function.call(self, &function, args)
     }
-    pub fn func_call(&mut self, name: &Arc<str>, args: &[Node]) -> PettyObject {
-        let args = self.evaluate_list(args);
+
+    pub fn func_call(&mut self, name: &str, args: &[Node]) -> PettyObject {
         let function = self.read(name);
+        let args = self.evaluate_list(args);
         function.call(
             self,
             &function,
             FuncArgs(args.iter().collect::<Vec<_>>().as_slice()),
         )
     }
+
     pub fn evaluate_list(&mut self, items: &[Node]) -> Vec<PettyObject> {
         items.iter().map(|arg| self.evaluate(arg)).collect()
     }
-    pub fn func_def(&mut self, name: Arc<str>, args: &Arc<[Arc<str>]>, block: &Arc<[Node]>) {
+
+    pub fn func_def(&mut self, name: Arc<str>, args: Arc<[Arc<str>]>, block: Arc<[Node]>) {
         let function = self.closure(args, block);
         self.write(name, function);
     }
-    pub fn closure(&mut self, args: &Arc<[Arc<str>]>, block: &Arc<[Node]>) -> PettyObject {
-        PettyFunction::new(args.clone(), block.clone(), self.scopes.clone()).into()
+
+    pub fn closure(&mut self, args: Arc<[Arc<str>]>, block: Arc<[Node]>) -> PettyObject {
+        PettyFunction::new(args, block, self.scopes.clone()).into()
     }
+
     pub fn if_statement(&mut self, condition: &Node, block: &[Node], or_else: Option<&Node>) {
         let condition = self.evaluate(condition);
         let condition = condition.call_method(self, "__bool__", FuncArgs(&[]));
@@ -177,6 +194,7 @@ impl Vm {
             self.evaluate(node);
         };
     }
+
     pub fn while_loop(&mut self, condition: &Node, block: &[Node]) {
         while self.return_val.is_none() && {
             let condition = self.evaluate(condition);
@@ -187,6 +205,7 @@ impl Vm {
             self.execute_nodes(block);
         }
     }
+
     pub fn for_loop(&mut self, target: &Arc<str>, iter: &Node, block: &[Node]) {
         let iter = self.evaluate(iter);
         let iter = iter.call_method(self, "__iter__", FuncArgs(&[&iter]));
@@ -207,10 +226,12 @@ impl Vm {
             };
         }
     }
-    pub fn class_def(&mut self, name: Arc<str>, fields: Arc<[Arc<str>]>, methods: &Arc<[Node]>) {
-        let class = PettyClass::new(fields, methods.clone());
+
+    pub fn class_def(&mut self, name: Arc<str>, fields: Arc<[Arc<str>]>, methods: Arc<[Node]>) {
+        let class = PettyClass::new(fields, methods);
         self.write(name, class.into());
     }
+
     pub fn create_literal(&mut self, literal: &Literal) -> PettyObject {
         match literal {
             #[allow(clippy::cast_sign_loss)]
