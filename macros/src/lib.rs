@@ -92,7 +92,7 @@ fn load_args(
                     #variables
                     let #name = args.next().expect("Too Few Arguments");
                     let Some(#name) = #name.as_any().downcast_ref::<#typ>() else {
-                        todo!();
+                        todo!("{}", #name);
                     };
                 );
                 out_args = quote!(
@@ -104,7 +104,7 @@ fn load_args(
                     #variables
                     let #name = args.next().expect("Too Few Arguments");
                     let Some(#name) = #name.as_any().downcast_ref::<#typ>() else {
-                        todo!();
+                        todo!("{}", #name);
                     };
                 );
                 out_args = quote!(

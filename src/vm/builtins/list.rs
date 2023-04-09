@@ -20,8 +20,8 @@ impl PettyObjectType for PtyList {
     fn get_item(&self, _vm: &mut Vm, _this: &PettyObject, str: &str) -> PettyObject {
         match str {
             "push" => PUSH.clone(),
-            "get" => GET.clone(),
-            "set" => SET.clone(),
+            "get" | "__get_index__" => GET.clone(),
+            "set" | "__set_index__" => SET.clone(),
             "len" => LEN.clone(),
             "__repr__" => __REPR__.clone(),
             "__add__" => __ADD__.clone(),

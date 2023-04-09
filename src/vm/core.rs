@@ -105,6 +105,8 @@ impl Vm {
                 self.class_def(name.clone(), fields.clone(), methods.clone());
             }
             Node::Closure(params, body) => return self.closure(params.clone(), body.clone()),
+            Node::GetItemIndex(ident, expr) => return self.get_item_index(ident, expr),
+            Node::SetItemIndex(ident, index, expr) => self.set_item_index(ident, index, expr),
             _ => todo!("{node:?}"),
         };
         NULL.clone()
@@ -230,6 +232,18 @@ impl Vm {
     pub fn class_def(&mut self, name: Arc<str>, fields: Arc<[Arc<str>]>, methods: Arc<[Node]>) {
         let class = PettyClass::new(fields, methods);
         self.write(name, class.into());
+    }
+
+    pub fn get_item_index(&mut self, ident: &Arc<str>, expr: &Node) -> PettyObject {
+        let value = self.evaluate(expr);
+        let object = self.read(ident);
+        object.call_method(self, "__get_index__", FuncArgs(&[&object, &value]))
+    }
+    pub fn set_item_index(&mut self, ident: &Arc<str>, index: &Node, expr: &Node) {
+        let index = self.evaluate(index);
+        let value = self.evaluate(expr);
+        let object = self.read(ident);
+        object.call_method(self, "__set_index__", FuncArgs(&[&object, &index, &value]));
     }
 
     pub fn create_literal(&mut self, literal: &Literal) -> PettyObject {
