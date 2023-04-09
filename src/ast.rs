@@ -198,6 +198,12 @@ impl Node {
     pub fn if_state(condition: Node, block: Vec<Node>, or_else: Option<Node>) -> Self {
         Self::IfState(Arc::new(condition), block.into(), or_else.map(Arc::new))
     }
+    pub fn while_loop(condition: Node, block: Vec<Node>) -> Self {
+        Self::WhileLoop(Arc::new(condition), block.into())
+    }
+    pub fn for_loop(target: &str, iter: Node, block: Vec<Node>) -> Self {
+        Self::ForLoop(target.into(), iter.into(), block.into())
+    }
     pub fn closure(args: Vec<&str>, body: &[Node]) -> Self {
         Self::Closure(vec_box_str(args), body.into())
     }

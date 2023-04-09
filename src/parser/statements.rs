@@ -71,7 +71,11 @@ fn while_statement(i: &str) -> IRes {
 fn for_loop(i: &str) -> IRes {
     preceded(
         keyword_name("for"),
-        cut(tuple((terminated(sp(ident), spar(':')), node_expr, block))),
+        cut(tuple((
+            terminated(sp(ident), keyword_name("in")),
+            node_expr,
+            block,
+        ))),
     )
     .map(|(name, expr, block)| Node::ForLoop(name, Arc::new(expr), block))
     .parse(i)

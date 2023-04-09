@@ -209,6 +209,28 @@ mod parser_tests {
         assert_expected(source, vec![expected]);
     }
     #[test]
+    fn while_loop() {
+        let source = "while i < 10 { i = i + 1; }";
+        let expected = Node::while_loop(
+            Node::bin_expr(BinOp::LT, Node::ident("i"), Node::literal(10)),
+            vec![Node::set_eq(
+                "i",
+                Node::bin_expr(BinOp::Add, Node::ident("i"), Node::literal(1)),
+            )],
+        );
+        assert_expected(source, vec![expected]);
+    }
+    #[test]
+    fn for_loop() {
+        let source = "for i in range(10) { print(i); }";
+        let expected = Node::for_loop(
+            "i",
+            Node::func_call("range", vec![Node::literal(10)]),
+            vec![Node::func_call("print", vec![Node::ident("i")])],
+        );
+        assert_expected(source, vec![expected]);
+    }
+    #[test]
     fn list_literal_exprs() {
         let source = r#"[1+2, pi(), "Hello, World!"];"#;
         let expected = Node::literal(vec![
