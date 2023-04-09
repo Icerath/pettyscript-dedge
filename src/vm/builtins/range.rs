@@ -7,6 +7,19 @@ pub struct PtyRange {
     current: Arc<Mutex<f64>>,
 }
 
+impl PtyRange {
+    #[inline]
+    pub fn next(&self) -> Option<f64> {
+        let mut current = self.current.lock().unwrap();
+        let prev_current = *current;
+        *current += self.step;
+        if *current > self.end {
+            return None;
+        }
+        Some(prev_current)
+    }
+}
+
 impl PettyObjectType for PtyRange {
     fn get_item(&self, _vm: &mut Vm, _this: &PettyObject, str: &str) -> PettyObject {
         match str {
@@ -14,6 +27,7 @@ impl PettyObjectType for PtyRange {
             "__next__" | "next" => __NEXT__.clone(),
             "__len__" | "len" => __LEN__.clone(),
             "__repr__" => __REPR__.clone(),
+            "sum" => SUM.clone(),
 
             _ => todo!("{str}"),
         }
@@ -48,13 +62,10 @@ fn __iter__(this: PtyRange) -> PtyRange {
 
 #[pettymethod]
 fn __next__(this: &PtyRange) -> PettyObject {
-    let mut current = this.current.lock().unwrap();
-    let prev_current = *current;
-    *current += this.step;
-    if *current > this.end {
-        return NONE.clone();
+    match this.next() {
+        Some(num) => PtyOption(Some(PtyNum(num).into())).into(),
+        None => NONE.clone(),
     }
-    PtyOption::new(Some(PtyNum(prev_current).into()))
 }
 
 #[pettymethod]
@@ -65,4 +76,13 @@ fn __len__(_this: PtyRange) -> PtyNum {
 #[pettymethod]
 fn __repr__(this: PtyRange) -> PtyStr {
     PtyStr(format!("{this}").into())
+}
+
+#[pettymethod]
+fn sum(this: &PtyRange) -> PtyNum {
+    let mut sum = 0.0;
+    while let Some(next) = this.next() {
+        sum += next;
+    }
+    PtyNum(sum)
 }
