@@ -61,7 +61,7 @@ fn __iter__(this: PtyRange) -> PtyRange {
 }
 
 #[pettymethod]
-fn __next__(this: PtyRange) -> PettyObject {
+fn __next__(this: &PtyRange) -> PettyObject {
     let mut current = this.current.lock().unwrap();
     let prev_current = *current;
     *current += this.step;
