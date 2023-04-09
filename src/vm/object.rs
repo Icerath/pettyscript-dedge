@@ -6,7 +6,7 @@ use super::{
 use std::{fmt, ops::Deref, sync::Arc};
 
 pub trait PettyObjectType: fmt::Display + Sync + Send {
-    fn get_item(&self, vm: &mut Vm, this: &PettyObject, str: &str) -> PettyObject;
+    fn get_item(&self, vm: &mut Vm, this: &PettyObject, key: &str) -> PettyObject;
     fn call(&self, vm: &mut Vm, this: &PettyObject, args: FuncArgs) -> PettyObject;
     fn as_any(&self) -> &dyn std::any::Any;
 }

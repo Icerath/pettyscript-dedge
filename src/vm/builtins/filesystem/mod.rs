@@ -1,10 +1,7 @@
-use std::sync::{Arc, Mutex};
-
+use super::{Module, PtyStr};
+use crate::vm::dict::Dict;
 use macros::pettymethod;
-
-use crate::vm::{builtins::PtyStr, dict::Dict};
-
-use super::module::Module;
+use std::sync::Mutex;
 
 pub fn init() -> Module {
     let mut dict = Dict::new();
