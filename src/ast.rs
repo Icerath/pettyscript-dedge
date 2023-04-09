@@ -19,6 +19,8 @@ pub enum Node {
     ClassDef(Arc<str>, Arc<[Arc<str>]>, Arc<[Node]>),
     Empty,
     SetEq(Arc<str>, Arc<Node>),
+    GetItemIndex(Arc<str>, Arc<Node>),
+    SetItemIndex(Arc<str>, Arc<Node>, Arc<Node>),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -159,6 +161,17 @@ impl fmt::Debug for Node {
                 .field("name", name)
                 .field("fields", fields)
                 .field("functions", functions)
+                .finish(),
+            Self::GetItemIndex(ident, expr) => f
+                .debug_struct("get_index")
+                .field("ident", ident)
+                .field("expr", expr)
+                .finish(),
+            Self::SetItemIndex(ident, index, expr) => f
+                .debug_struct("set_index")
+                .field("ident", ident)
+                .field("index", index)
+                .field("expr", expr)
                 .finish(),
         }
     }

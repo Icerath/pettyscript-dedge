@@ -305,6 +305,27 @@ mod parser_tests {
         );
         assert_expected(source, vec![expected]);
     }
+
+    #[test]
+    fn test_get_index() {
+        let source = "array[i + 1];";
+        let expected = Node::GetItemIndex(
+            "array".into(),
+            Node::bin_expr(BinOp::Add, Node::ident("i"), Node::literal(1)).into(),
+        );
+        assert_expected(source, vec![expected]);
+    }
+
+    #[test]
+    fn test_set_index() {
+        let source = "array[i] = i + 1; ";
+        let expected = Node::SetItemIndex(
+            "array".into(),
+            Node::ident("i").into(),
+            Node::bin_expr(BinOp::Add, Node::ident("i"), Node::literal(1)).into(),
+        );
+        assert_expected(source, vec![expected]);
+    }
 }
 
 #[cfg(test)]

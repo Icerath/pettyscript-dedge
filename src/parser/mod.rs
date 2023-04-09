@@ -49,7 +49,7 @@ fn node(input: &str) -> IRes {
 }
 fn terminated_expr(input: &str) -> IRes {
     err(
-        alt((set_equals, bin_expr)).terminated(cut(spar(';'))),
+        alt((set_equals, set_item_index, bin_expr)).terminated(cut(spar(';'))),
         ParseErr::TermExpr,
     )(input)
 }
@@ -66,6 +66,18 @@ fn set_equals(input: &str) -> IRes {
         |(ident, expr)| Node::SetEq(ident, Arc::new(expr)),
     )(input)
 }
+
+fn set_item_index(input: &str) -> IRes {
+    map(
+        separated_pair(
+            pair(sp(ident), delimited(spar('['), bin_expr, spar(']'))),
+            spar('='),
+            bin_expr,
+        ),
+        |((ident, index), expr)| Node::SetItemIndex(ident, index.into(), expr.into()),
+    )(input)
+}
+
 #[inline]
 fn node_expr(input: &str) -> IRes {
     bin_expr(input)
@@ -77,9 +89,17 @@ fn node_value_raw(input: &str) -> IRes {
     alt((
         literal.map(Node::Literal),
         function_call,
+        get_item_index,
         sp(ident).map(Node::Ident),
     ))(input)
 }
+fn get_item_index(input: &str) -> IRes {
+    map(
+        pair(sp(ident), delimited(spar('['), bin_expr, spar(']'))),
+        |(ident, expr)| Node::GetItemIndex(ident, expr.into()),
+    )(input)
+}
+
 fn unary_expr(input: &str) -> IRes {
     let unary_op = sp(alt((
         map(char('!'), |_| UnaryOp::Not),
