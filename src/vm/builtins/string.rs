@@ -12,6 +12,7 @@ impl PettyObjectType for PtyStr {
             "__repr__" => __REPR__.clone(),
             "__add__" => __ADD__.clone(),
             "__mul__" => __MUL__.clone(),
+            "__is_eq__" => __IS_EQ__.clone(),
             "format" => RawFunction(str_format).into(),
             _ => todo!(),
         }
@@ -41,6 +42,31 @@ fn __add__(lhs: &PtyStr, rhs: &PtyStr) -> PtyStr {
 fn __mul__(lhs: &PtyStr, rhs: PtyNum) -> PtyStr {
     #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     PtyStr(lhs.0.repeat(rhs.0.max(0.0) as usize).into())
+}
+
+#[pettymethod]
+fn __is_eq__(lhs: &PtyStr, rhs: &PtyStr) -> PettyObject {
+    PtyBool::new(lhs.0 == rhs.0)
+}
+
+#[pettymethod]
+fn __lt_eq__(lhs: &PtyStr, rhs: &PtyStr) -> PettyObject {
+    PtyBool::new(lhs.0 <= rhs.0)
+}
+
+#[pettymethod]
+fn __lt__(lhs: &PtyStr, rhs: &PtyStr) -> PettyObject {
+    PtyBool::new(lhs.0 < rhs.0)
+}
+
+#[pettymethod]
+fn __gt_eq__(lhs: &PtyStr, rhs: &PtyStr) -> PettyObject {
+    PtyBool::new(lhs.0 >= rhs.0)
+}
+
+#[pettymethod]
+fn __gt__(lhs: &PtyStr, rhs: &PtyStr) -> PettyObject {
+    PtyBool::new(lhs.0 > rhs.0)
 }
 
 // TODO - use #[pettymethod]
