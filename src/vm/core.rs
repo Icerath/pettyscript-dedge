@@ -201,8 +201,10 @@ impl Vm {
         let iter = self.evaluate(iter);
         let iter = iter.call_method(self, "__iter__", FuncArgs(&[&iter]));
 
+        let get_next = iter.get_item(self, &iter, "__next__");
+
         loop {
-            let next = iter.call_method(self, "__next__", FuncArgs(&[&iter]));
+            let next = get_next.call(self, &get_next, FuncArgs(&[&iter]));
             let Some(option) = next.downcast::<PtyOption>() else {
                 todo!("{next}");
             };
