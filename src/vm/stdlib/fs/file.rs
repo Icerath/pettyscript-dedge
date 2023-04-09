@@ -19,14 +19,14 @@ impl File {
 }
 
 impl PettyObjectType for File {
-    fn get_item(&self, vm: &mut Vm, this: &PettyObject, key: &str) -> PettyObject {
+    fn get_item(&self, _vm: &mut Vm, _this: &PettyObject, key: &str) -> PettyObject {
         match key {
             "__repr__" => __REPR__.clone(),
             "read" | "read_text" => READ.clone(),
             _ => todo!("{key}"),
         }
     }
-    fn call(&self, vm: &mut Vm, this: &PettyObject, args: FuncArgs) -> PettyObject {
+    fn call(&self, _vm: &mut Vm, _this: &PettyObject, _args: FuncArgs) -> PettyObject {
         todo!()
     }
     fn as_any(&self) -> &dyn std::any::Any {
@@ -60,5 +60,5 @@ pub fn read(this: &File) -> PtyStr {
 #[pettymethod]
 pub fn write(this: &File, content: &PtyStr) {
     let content = content.0.as_bytes();
-    this.inner.lock().unwrap().write(&content).unwrap();
+    this.inner.lock().unwrap().write_all(content).unwrap();
 }

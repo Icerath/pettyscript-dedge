@@ -2,7 +2,7 @@ use super::{
     petty_class::PettyClass, petty_function::PettyFunction, preallocated::PreAllocated, prelude::*,
 };
 use crate::ast::{BinOp, Literal, Node, UnaryOp};
-use std::ops::Deref;
+use std::{ops::Deref, sync::MutexGuard};
 
 #[derive(Default, Clone)]
 pub struct VirtualMachine {
@@ -17,6 +17,12 @@ pub struct Vm {
     pub scopes: Vec<Dict>,
 }
 
+impl VirtualMachine {
+    pub fn globals(&self) -> MutexGuard<Dict> {
+        self.globals.lock().unwrap()
+    }
+}
+
 impl Vm {
     pub fn new() -> Self {
         Self::default()
@@ -29,19 +35,18 @@ impl Vm {
     pub fn write(&mut self, key: Arc<str>, value: PettyObject) {
         match self.scopes.last_mut() {
             Some(scope) => scope.insert(key, value),
-            None => self.globals.lock().unwrap().insert(key, value),
+            None => self.globals().insert(key, value),
         };
     }
-
+    /// # Panics
+    /// - TODO
     pub fn read(&mut self, key: &str) -> PettyObject {
         for scope in self.scopes.iter().rev() {
             if let Some(object) = scope.get(key) {
                 return object.clone();
             }
         }
-        self.globals
-            .lock()
-            .unwrap()
+        self.globals()
             .get(key)
             .unwrap_or_else(|| panic!("Not found: ({key})"))
             .clone()
@@ -55,7 +60,9 @@ impl Vm {
         self.scopes.pop();
     }
 
-    pub fn spawn_thread(&self) -> Self {
+    #[inline]
+    #[must_use]
+    pub fn spawn_new(&self) -> Self {
         Vm {
             inner: self.inner.clone(),
             return_val: None,
@@ -65,6 +72,8 @@ impl Vm {
 }
 
 impl Vm {
+    /// # Panics
+    /// - TODO
     pub fn evaluate(&mut self, node: &Node) -> PettyObject {
         match node {
             Node::Globals(nodes) | Node::Block(nodes) => self.execute_nodes(nodes),
@@ -108,12 +117,12 @@ impl Vm {
         }
     }
 
-    pub fn set_eq(&mut self, name: Arc<str>, expr: &Node) {
+    fn set_eq(&mut self, name: Arc<str>, expr: &Node) {
         let value = self.evaluate(expr);
         self.write(name, value);
     }
 
-    pub fn get_item(&mut self, left: &Node, right: &Node) -> PettyObject {
+    fn get_item(&mut self, left: &Node, right: &Node) -> PettyObject {
         let left = self.evaluate(left);
 
         let (function, args) = match right {
@@ -132,7 +141,7 @@ impl Vm {
         function.call(self, &function, FuncArgs(&refs))
     }
 
-    pub fn bin_expr(&mut self, op: BinOp, lhs: &Node, rhs: &Node) -> PettyObject {
+    fn bin_expr(&mut self, op: BinOp, lhs: &Node, rhs: &Node) -> PettyObject {
         let lhs = self.evaluate(lhs);
         let rhs = self.evaluate(rhs);
         let function_name = op.into_petty_function();
@@ -142,7 +151,7 @@ impl Vm {
         function.call(self, &function, args)
     }
 
-    pub fn unary_expr(&mut self, op: UnaryOp, expr: &Node) -> PettyObject {
+    fn unary_expr(&mut self, op: UnaryOp, expr: &Node) -> PettyObject {
         let inner = self.evaluate(expr);
         let function_name = op.into_petty_function();
         let function = inner.get_item(self, &inner, function_name);
@@ -151,7 +160,7 @@ impl Vm {
         function.call(self, &function, args)
     }
 
-    pub fn func_call(&mut self, name: &str, args: &[Node]) -> PettyObject {
+    fn func_call(&mut self, name: &str, args: &[Node]) -> PettyObject {
         let function = self.read(name);
         let args = self.evaluate_list(args);
         function.call(
@@ -165,16 +174,16 @@ impl Vm {
         items.iter().map(|arg| self.evaluate(arg)).collect()
     }
 
-    pub fn func_def(&mut self, name: Arc<str>, args: Arc<[Arc<str>]>, block: Arc<[Node]>) {
+    fn func_def(&mut self, name: Arc<str>, args: Arc<[Arc<str>]>, block: Arc<[Node]>) {
         let function = self.closure(args, block);
         self.write(name, function);
     }
 
-    pub fn closure(&mut self, args: Arc<[Arc<str>]>, block: Arc<[Node]>) -> PettyObject {
+    fn closure(&mut self, args: Arc<[Arc<str>]>, block: Arc<[Node]>) -> PettyObject {
         PettyFunction::new(args, block, self.scopes.clone()).into()
     }
 
-    pub fn if_statement(&mut self, condition: &Node, block: &[Node], or_else: Option<&Node>) {
+    fn if_statement(&mut self, condition: &Node, block: &[Node], or_else: Option<&Node>) {
         let condition = self.evaluate(condition);
         let condition = condition.call_method(self, "__bool__", FuncArgs(&[]));
         let condition = condition.downcast_ref::<PtyBool>().expect("Expected Bool");
@@ -186,7 +195,7 @@ impl Vm {
         };
     }
 
-    pub fn while_loop(&mut self, condition: &Node, block: &[Node]) {
+    fn while_loop(&mut self, condition: &Node, block: &[Node]) {
         while self.return_val.is_none() && {
             let condition = self.evaluate(condition);
             let condition = condition.call_method(self, "__bool__", FuncArgs(&[]));
@@ -197,7 +206,7 @@ impl Vm {
         }
     }
 
-    pub fn for_loop(&mut self, target: &Arc<str>, iter: &Node, block: &[Node]) {
+    fn for_loop(&mut self, target: &Arc<str>, iter: &Node, block: &[Node]) {
         let iter = self.evaluate(iter);
         let iter = iter.call_method(self, "__iter__", FuncArgs(&[&iter]));
 
@@ -217,24 +226,24 @@ impl Vm {
         }
     }
 
-    pub fn class_def(&mut self, name: Arc<str>, fields: Arc<[Arc<str>]>, methods: Arc<[Node]>) {
+    fn class_def(&mut self, name: Arc<str>, fields: Arc<[Arc<str>]>, methods: Arc<[Node]>) {
         let class = PettyClass::new(fields, methods);
         self.write(name, class.into());
     }
 
-    pub fn get_item_index(&mut self, ident: &Arc<str>, expr: &Node) -> PettyObject {
+    fn get_item_index(&mut self, ident: &Arc<str>, expr: &Node) -> PettyObject {
         let value = self.evaluate(expr);
         let object = self.read(ident);
         object.call_method(self, "__get_index__", FuncArgs(&[&object, &value]))
     }
-    pub fn set_item_index(&mut self, ident: &Arc<str>, index: &Node, expr: &Node) {
+    fn set_item_index(&mut self, ident: &Arc<str>, index: &Node, expr: &Node) {
         let index = self.evaluate(index);
         let value = self.evaluate(expr);
         let object = self.read(ident);
         object.call_method(self, "__set_index__", FuncArgs(&[&object, &index, &value]));
     }
 
-    pub fn create_literal(&mut self, literal: &Literal) -> PettyObject {
+    fn create_literal(&mut self, literal: &Literal) -> PettyObject {
         match literal {
             #[allow(clippy::cast_sign_loss)]
             Literal::Int(int @ 0..=255) => self.preallocated.get(*int as usize).unwrap(),
@@ -253,7 +262,7 @@ impl BinOp {
     #[must_use]
     #[inline]
     /// # Panics
-    pub fn into_petty_function(self) -> &'static str {
+    fn into_petty_function(self) -> &'static str {
         match self {
             Self::Add => "__add__",
             Self::Sub => "__sub__",
@@ -276,7 +285,7 @@ impl UnaryOp {
     #[must_use]
     #[inline]
     /// # Panics
-    pub fn into_petty_function(self) -> &'static str {
+    fn into_petty_function(self) -> &'static str {
         match self {
             Self::Neg => "__neg__",
             Self::Not => "__not__",

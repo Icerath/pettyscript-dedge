@@ -22,7 +22,7 @@ pub struct ThreadHandle {
 impl ThreadHandle {
     #[inline]
     pub fn spawn(vm: &mut Vm, func: &PettyObject) -> Self {
-        let mut vm = vm.spawn_thread();
+        let mut vm = vm.spawn_new();
         let func = func.clone();
         let join_handle = std::thread::spawn(move || func.call(&mut vm, &func, FuncArgs(&[])));
         let id = join_handle.thread().id();
