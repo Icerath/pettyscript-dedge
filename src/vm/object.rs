@@ -42,6 +42,10 @@ impl PettyObject {
     pub fn downcast<T: PettyObjectType + Clone + 'static>(&self) -> Option<T> {
         self.as_any().downcast_ref::<T>().cloned()
     }
+    #[inline]
+    pub fn strong_count(&self) -> usize {
+        Arc::strong_count(&self.0)
+    }
 }
 impl<Pty: PettyObjectType + 'static> From<Pty> for PettyObject {
     fn from(value: Pty) -> Self {

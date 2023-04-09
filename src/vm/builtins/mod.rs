@@ -11,6 +11,7 @@ mod pty_bool;
 mod range;
 mod repr;
 mod string;
+mod strong_count;
 
 pub mod threading;
 
@@ -26,6 +27,8 @@ pub use range::RANGE;
 pub use string::PtyStr;
 use threading::thread::SPAWN_THREAD;
 
+use self::strong_count::STRONG_COUNT;
+
 use super::{core::Vm, object::PettyObject, raw_function::RawFunction};
 
 pub fn load_builtins(vm: &mut Vm) {
@@ -36,6 +39,7 @@ pub fn load_builtins(vm: &mut Vm) {
         ("Some", RawFunction(option::some).into()),
         ("sleep", RawFunction(threading::sleep::sleep).into()),
         ("spawn_thread", SPAWN_THREAD.clone()),
+        ("strong_count", STRONG_COUNT.clone()),
         ("fs", filesystem::init().into()),
         ("None", PtyOption(None).into()),
     ];
