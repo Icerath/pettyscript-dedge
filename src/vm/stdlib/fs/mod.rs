@@ -1,14 +1,15 @@
-use super::Module;
-use crate::vm::builtins::PtyStr;
-use crate::vm::dict::Dict;
-use macros::pettymethod;
-use std::sync::Mutex;
+mod file;
+
+use crate::vm::prelude::*;
+
+use self::file::OPEN;
 
 pub fn init() -> Module {
-    let mut dict = Dict::new();
-
-    dict.insert("__repr__".into(), __REPR__.clone());
-    dict.insert("read_text".into(), READ_TEXT.clone());
+    let dict = Dict::from([
+        ("__repr__".into(), __REPR__.clone()),
+        ("read_text".into(), READ_TEXT.clone()),
+        ("open".into(), OPEN.clone()),
+    ]);
 
     Module {
         name: "fs".into(),

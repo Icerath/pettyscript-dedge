@@ -61,3 +61,10 @@ fn str_format(vm: &mut Vm, _this: &PettyObject, args: FuncArgs) -> PettyObject {
     }
     PtyStr(output.into()).into()
 }
+
+impl From<String> for PtyStr {
+    #[inline]
+    fn from(value: String) -> Self {
+        PtyStr(value.into())
+    }
+}
