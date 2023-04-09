@@ -29,10 +29,10 @@ impl PettyObjectType for PtyOption {
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
-    fn call(&self, _vm: &Vm, _this: &PettyObject, _args: FuncArgs) -> PettyObject {
+    fn call(&self, _vm: &mut Vm, _this: &PettyObject, _args: FuncArgs) -> PettyObject {
         todo!()
     }
-    fn get_item(&self, _vm: &Vm, _this: &PettyObject, str: &str) -> PettyObject {
+    fn get_item(&self, _vm: &mut Vm, _this: &PettyObject, str: &str) -> PettyObject {
         match str {
             "unwrap" => UNWRAP.clone(),
             "is_some" => IS_SOME.clone(),
@@ -58,7 +58,7 @@ fn unwrap(opt: PtyOption) -> PettyObject {
 }
 
 #[pettymethod]
-fn __repr__(self_: &PtyOption, vm: &Vm) -> PtyStr {
+fn __repr__(self_: &PtyOption, vm: &mut Vm) -> PtyStr {
     match &self_.0 {
         Some(obj) => obj.force_repr(vm),
         None => PtyStr("None".into()),

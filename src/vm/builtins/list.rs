@@ -17,7 +17,7 @@ use super::PtyBool;
 pub struct PtyList(pub Arc<Mutex<Vec<PettyObject>>>);
 
 impl PettyObjectType for PtyList {
-    fn get_item(&self, _vm: &Vm, _this: &PettyObject, str: &str) -> PettyObject {
+    fn get_item(&self, _vm: &mut Vm, _this: &PettyObject, str: &str) -> PettyObject {
         match str {
             "push" => PUSH.clone(),
             "get" => GET.clone(),
@@ -31,7 +31,7 @@ impl PettyObjectType for PtyList {
             _ => todo!("{str}"),
         }
     }
-    fn call(&self, _vm: &Vm, _this: &PettyObject, _args: FuncArgs) -> PettyObject {
+    fn call(&self, _vm: &mut Vm, _this: &PettyObject, _args: FuncArgs) -> PettyObject {
         todo!()
     }
     fn as_any(&self) -> &dyn std::any::Any {
@@ -77,7 +77,7 @@ fn len(self_: PtyList) -> PtyNum {
 }
 
 #[pettymethod]
-fn __repr__(self_: &PtyList, vm: &Vm) -> PtyStr {
+fn __repr__(self_: &PtyList, vm: &mut Vm) -> PtyStr {
     let mut string = String::from("[");
     for (index, item) in self_.0.lock().unwrap().iter().enumerate() {
         let seperator = if index == 0 { "" } else { ", " };

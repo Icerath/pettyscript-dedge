@@ -6,8 +6,8 @@ use super::{
 use std::{fmt, ops::Deref, sync::Arc};
 
 pub trait PettyObjectType: fmt::Display + Sync + Send {
-    fn get_item(&self, vm: &Vm, this: &PettyObject, str: &str) -> PettyObject;
-    fn call(&self, vm: &Vm, this: &PettyObject, args: FuncArgs) -> PettyObject;
+    fn get_item(&self, vm: &mut Vm, this: &PettyObject, str: &str) -> PettyObject;
+    fn call(&self, vm: &mut Vm, this: &PettyObject, args: FuncArgs) -> PettyObject;
     fn as_any(&self) -> &dyn std::any::Any;
 }
 /// An actually petty object.
@@ -18,19 +18,19 @@ impl PettyObject {
     pub fn new<Pty: PettyObjectType + 'static>(object: Pty) -> Self {
         Self(Arc::new(object))
     }
-    pub fn call_method<'a>(&'a self, vm: &Vm, func: &str, args: FuncArgs<'a>) -> PettyObject {
+    pub fn call_method<'a>(&'a self, vm: &mut Vm, func: &str, args: FuncArgs<'a>) -> PettyObject {
         let mut args: Vec<&PettyObject> = args.0.to_vec();
         args.push(self);
         let function = self.get_item(vm, self, func);
         function.call(vm, &function, FuncArgs(&args))
     }
     #[inline]
-    pub fn repr(&self, vm: &Vm) -> Option<PtyStr> {
+    pub fn repr(&self, vm: &mut Vm) -> Option<PtyStr> {
         let repr = self.call_method(vm, "__repr__", FuncArgs(&[]));
         repr.downcast::<PtyStr>()
     }
     #[inline]
-    pub fn force_repr(&self, vm: &Vm) -> PtyStr {
+    pub fn force_repr(&self, vm: &mut Vm) -> PtyStr {
         self.repr(vm)
             .unwrap_or_else(|| panic!("{self} did not have repr"))
     }

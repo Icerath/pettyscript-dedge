@@ -19,14 +19,14 @@ pub struct ThreadHandle {
 }
 
 impl PettyObjectType for ThreadHandle {
-    fn get_item(&self, _vm: &Vm, _this: &PettyObject, str: &str) -> PettyObject {
+    fn get_item(&self, _vm: &mut Vm, _this: &PettyObject, str: &str) -> PettyObject {
         match str {
             "join" => JOIN.clone(),
             "__repr__" => __REPR__.clone(),
             _ => todo!("{str}"),
         }
     }
-    fn call(&self, _vm: &Vm, _this: &PettyObject, _args: FuncArgs) -> PettyObject {
+    fn call(&self, _vm: &mut Vm, _this: &PettyObject, _args: FuncArgs) -> PettyObject {
         todo!()
     }
     fn as_any(&self) -> &dyn std::any::Any {
@@ -35,10 +35,10 @@ impl PettyObjectType for ThreadHandle {
 }
 
 #[pettymethod]
-pub fn spawn_thread(vm: &Vm, func: &PettyObject) -> ThreadHandle {
-    let vm = vm.clone();
+pub fn spawn_thread(vm: &mut Vm, func: &PettyObject) -> ThreadHandle {
+    let mut vm = vm.spawn_thread();
     let func = func.clone();
-    let join_handle = std::thread::spawn(move || func.call(&vm, &func, FuncArgs(&[])));
+    let join_handle = std::thread::spawn(move || func.call(&mut vm, &func, FuncArgs(&[])));
     ThreadHandle {
         handle: Mutex::new(Some(join_handle)).into(),
     }

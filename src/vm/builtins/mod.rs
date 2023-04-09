@@ -24,7 +24,7 @@ pub use string::PtyStr;
 
 use super::{core::Vm, object::PettyObject, raw_function::RawFunction};
 
-pub fn load_builtins(vm: &Vm) {
+pub fn load_builtins(vm: &mut Vm) {
     let builtins = [
         ("print", RawFunction(print::print).into()),
         ("repr", RawFunction(repr::repr).into()),

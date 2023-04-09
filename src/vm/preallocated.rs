@@ -2,6 +2,7 @@ use crate::vm::builtins::PtyNum;
 
 use super::object::PettyObject;
 
+#[derive(Clone)]
 pub struct PreAllocated {
     ints: [PettyObject; 256],
 }

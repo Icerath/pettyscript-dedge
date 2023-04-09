@@ -18,10 +18,10 @@ pub static NULL_STR: Lazy<PettyObject> = Lazy::new(|| PtyStr("null".into()).into
 #[derive(Clone, Copy)]
 pub struct PtyNull;
 impl PettyObjectType for PtyNull {
-    fn call(&self, _vm: &Vm, _this: &PettyObject, _args: FuncArgs) -> PettyObject {
+    fn call(&self, _vm: &mut Vm, _this: &PettyObject, _args: FuncArgs) -> PettyObject {
         todo!()
     }
-    fn get_item(&self, _vm: &Vm, _this: &PettyObject, str: &str) -> PettyObject {
+    fn get_item(&self, _vm: &mut Vm, _this: &PettyObject, str: &str) -> PettyObject {
         match str {
             "__bool__" => __BOOL__.clone(),
             "__repr__" => __REPR__.clone(),

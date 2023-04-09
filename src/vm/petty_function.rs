@@ -24,10 +24,11 @@ impl PettyFunction {
     }
 }
 impl PettyObjectType for PettyFunction {
-    fn call(&self, vm: &Vm, _this: &PettyObject, args: FuncArgs) -> PettyObject {
+    fn call(&self, vm: &mut Vm, _this: &PettyObject, args: FuncArgs) -> PettyObject {
         for scope in &self.scopes {
-            vm.get().fields.scopes.push(scope.clone());
+            vm.scopes.push(scope.clone());
         }
+        vm.scopes.push(Dict::new());
         if self.args.len() != args.0.len() {
             todo!(
                 "Expected {} arguments, got {}.",
@@ -36,16 +37,15 @@ impl PettyObjectType for PettyFunction {
             );
         }
         for (param, &arg) in self.args.iter().zip(args.0.into_iter()) {
-            vm.get().fields.write(param.clone(), arg.clone());
+            vm.write(param.clone(), arg.clone());
         }
         vm.execute_nodes(&self.block);
-        for _ in 0..self.scopes.len() {
-            vm.get().fields.drop_scope();
+        for _ in 0..self.scopes.len() + 1 {
+            vm.drop_scope();
         }
-        vm.get().fields.drop_scope();
-        vm.get().return_val.take().unwrap_or_else(|| NULL.clone())
+        vm.return_val.take().unwrap_or_else(|| NULL.clone())
     }
-    fn get_item(&self, _vm: &Vm, _this: &PettyObject, _str: &str) -> PettyObject {
+    fn get_item(&self, _vm: &mut Vm, _this: &PettyObject, _str: &str) -> PettyObject {
         todo!()
     }
     fn as_any(&self) -> &dyn std::any::Any {
