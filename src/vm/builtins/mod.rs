@@ -9,14 +9,14 @@ mod option;
 mod print;
 mod pty_bool;
 mod range;
+mod ref_count;
 mod repr;
 mod string;
-mod strong_count;
 
 pub mod threading;
 
-use std::fmt;
-
+use self::ref_count::GETREFCOUNT;
+use super::{core::Vm, object::PettyObject, raw_function::RawFunction};
 pub use list::PtyList;
 pub use module::Module;
 pub use null::{PtyNull, NULL};
@@ -24,12 +24,9 @@ pub use number::PtyNum;
 pub use option::PtyOption;
 pub use pty_bool::PtyBool;
 pub use range::RANGE;
+use std::fmt;
 pub use string::PtyStr;
 use threading::thread::SPAWN_THREAD;
-
-use self::strong_count::STRONG_COUNT;
-
-use super::{core::Vm, object::PettyObject, raw_function::RawFunction};
 
 pub fn load_builtins(vm: &mut Vm) {
     let builtins = [
@@ -39,7 +36,7 @@ pub fn load_builtins(vm: &mut Vm) {
         ("Some", RawFunction(option::some).into()),
         ("sleep", RawFunction(threading::sleep::sleep).into()),
         ("spawn_thread", SPAWN_THREAD.clone()),
-        ("strong_count", STRONG_COUNT.clone()),
+        ("getrefcount", GETREFCOUNT.clone()),
         ("fs", filesystem::init().into()),
         ("None", PtyOption(None).into()),
     ];
