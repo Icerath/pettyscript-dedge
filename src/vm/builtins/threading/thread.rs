@@ -1,7 +1,7 @@
 use std::{
     fmt,
     sync::{Arc, Mutex},
-    thread::JoinHandle,
+    thread::{JoinHandle, ThreadId},
 };
 
 use macros::pettymethod;
@@ -15,6 +15,7 @@ use crate::vm::{
 
 #[derive(Clone)]
 pub struct ThreadHandle {
+    id: ThreadId,
     handle: Arc<Mutex<Option<JoinHandle<PettyObject>>>>,
 }
 
@@ -39,15 +40,17 @@ pub fn spawn_thread(vm: &mut Vm, func: &PettyObject) -> ThreadHandle {
     let mut vm = vm.spawn_thread();
     let func = func.clone();
     let join_handle = std::thread::spawn(move || func.call(&mut vm, &func, FuncArgs(&[])));
+    let id = join_handle.thread().id();
     ThreadHandle {
         handle: Mutex::new(Some(join_handle)).into(),
+        id,
     }
 }
 
 #[pettymethod]
 pub fn join(this: ThreadHandle) -> PettyObject {
-    let potato = this.handle.lock().unwrap().take().unwrap();
-    potato.join().unwrap()
+    let handle = this.handle.lock().unwrap().take().unwrap();
+    handle.join().unwrap()
 }
 
 #[pettymethod]
@@ -57,6 +60,6 @@ pub fn __repr__(this: ThreadHandle) -> PtyStr {
 
 impl fmt::Display for ThreadHandle {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{:?}", self.handle)
+        write!(f, "{:?}", self.id)
     }
 }
