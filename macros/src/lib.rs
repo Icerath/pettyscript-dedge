@@ -87,28 +87,21 @@ fn load_args(
                 variables = quote!(#variables let #name = args.next().expect("Too Few Arguments"););
                 out_args = quote!(#out_args #name, );
             }
-            _ if var.typ.as_str().starts_with('&') => {
+            str => {
+                let mut clone = quote!();
+                if !str.starts_with('&') {
+                    clone = quote!(.clone());
+                };
+
                 variables = quote!(
                     #variables
                     let #name = args.next().expect("Too Few Arguments");
-                    let Some(#name) = #name.as_any().downcast_ref::<#typ>() else {
+                    let Some(#name) = #name.downcast_ref::<#typ>() else {
                         todo!("{}", #name);
                     };
                 );
                 out_args = quote!(
-                    #out_args #name,
-                );
-            }
-            _ => {
-                variables = quote!(
-                    #variables
-                    let #name = args.next().expect("Too Few Arguments");
-                    let Some(#name) = #name.as_any().downcast_ref::<#typ>() else {
-                        todo!("{}", #name);
-                    };
-                );
-                out_args = quote!(
-                    #out_args #name.clone(),
+                    #out_args #name #clone,
                 );
             }
         }
