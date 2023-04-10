@@ -7,14 +7,22 @@ impl PettyObjectType for PtyStr {
     fn call(&self, _vm: &mut Vm, _this: &PettyObject, _args: FuncArgs) -> PettyObject {
         todo!("String is not Callable")
     }
-    fn get_item(&self, _vm: &mut Vm, _this: &PettyObject, str: &str) -> PettyObject {
-        match str {
+    fn get_item(&self, _vm: &mut Vm, _this: &PettyObject, key: &str) -> PettyObject {
+        match key {
             "__repr__" => __REPR__.clone(),
             "__add__" => __ADD__.clone(),
             "__mul__" => __MUL__.clone(),
             "__is_eq__" => __IS_EQ__.clone(),
-            "format" => RawFunction(str_format).into(),
-            _ => todo!(),
+            "upper" => UPPER.clone(),
+            "lower" => LOWER.clone(),
+            "find" => FIND.clone(),
+            "trim" => TRIM.clone(),
+            "trim_start" | "trim_left" => TRIM_START.clone(),
+            "trim_end" | "trim_right" => TRIM_END.clone(),
+            "trim_start_matches" | "trim_left_matches" => TRIM_START_MATCHES.clone(),
+            "trim_end_matches" | "trim_right_matches" => TRIM_END_MATCHES.clone(),
+            "format" => STR_FORMAT.clone(),
+            _ => todo!("{key}"),
         }
     }
     fn as_any(&self) -> &dyn std::any::Any {
@@ -113,6 +121,7 @@ fn trim_end_matches(this: &PtyStr, pat: &PtyStr) -> PtyStr {
 }
 
 // TODO - use #[pettymethod]
+pub static STR_FORMAT: Lazy<PettyObject> = Lazy::new(|| RawFunction(str_format).into());
 fn str_format(vm: &mut Vm, _this: &PettyObject, args: FuncArgs) -> PettyObject {
     let mut args = args.0.iter();
     let first_arg = args.next().unwrap();
