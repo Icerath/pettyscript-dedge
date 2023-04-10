@@ -70,7 +70,9 @@ pub fn some(obj: &PettyObject) -> PtyOption {
     PtyOption(Some(obj.clone()))
 }
 
-// #[pettymethod]
-// pub fn none() -> PtyOption {
-//     PtyOption(None)
-// }
+impl From<Option<PettyObject>> for PettyObject {
+    #[inline]
+    fn from(value: Option<PettyObject>) -> Self {
+        PtyOption::new(value)
+    }
+}

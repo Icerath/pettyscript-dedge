@@ -69,6 +69,49 @@ fn __gt__(lhs: &PtyStr, rhs: &PtyStr) -> PettyObject {
     PtyBool::new(lhs.0 > rhs.0)
 }
 
+#[pettymethod]
+fn upper(this: &PtyStr) -> PtyStr {
+    PtyStr(this.0.to_uppercase().into())
+}
+
+#[pettymethod]
+fn lower(this: &PtyStr) -> PtyStr {
+    PtyStr(this.0.to_lowercase().into())
+}
+
+#[pettymethod]
+fn find(this: &PtyStr, substr: &PtyStr) -> Option<PettyObject> {
+    #[allow(clippy::cast_precision_loss)]
+    this.0
+        .find(substr.0.as_ref())
+        .map(|i| PtyNum(i as f64).into())
+}
+
+#[pettymethod]
+fn trim(this: &PtyStr) -> PtyStr {
+    PtyStr(this.0.trim().into())
+}
+
+#[pettymethod]
+fn trim_start(this: &PtyStr) -> PtyStr {
+    PtyStr(this.0.trim_start().into())
+}
+
+#[pettymethod]
+fn trim_end(this: &PtyStr) -> PtyStr {
+    PtyStr(this.0.trim_end().into())
+}
+
+#[pettymethod]
+fn trim_start_matches(this: &PtyStr, pat: &PtyStr) -> PtyStr {
+    PtyStr(this.0.trim_start_matches(pat.0.as_ref()).into())
+}
+
+#[pettymethod]
+fn trim_end_matches(this: &PtyStr, pat: &PtyStr) -> PtyStr {
+    PtyStr(this.0.trim_end_matches(pat.0.as_ref()).into())
+}
+
 // TODO - use #[pettymethod]
 fn str_format(vm: &mut Vm, _this: &PettyObject, args: FuncArgs) -> PettyObject {
     let mut args = args.0.iter();
