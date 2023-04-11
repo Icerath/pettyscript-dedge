@@ -12,6 +12,7 @@ mod preallocated;
 pub mod prelude;
 mod raw_function;
 mod stdlib;
+mod tests;
 
 pub fn run_virtual_machine(ast: &ast::Node) -> Vec<PettyObject> {
     let mut vm = core::Vm::new();

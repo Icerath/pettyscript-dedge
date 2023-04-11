@@ -1,0 +1,11 @@
+assert_eq = std.test.assert_eq;
+
+hello_world = " hello, {}! ".format("world");
+
+assert_eq(hello_world, " hello, world! ");
+assert_eq(hello_world, " hello, " + "world! ");
+assert_eq(hello_world.trim(), "hello, world!");
+assert_eq(hello_world.trim_start(), "hello, world! ");
+assert_eq(hello_world.trim_end(), " hello, world!");
+assert_eq(hello_world.trim_start_matches(" hello, "), "world! ");
+assert_eq(hello_world.trim_end_matches(", world! "), " hello");
