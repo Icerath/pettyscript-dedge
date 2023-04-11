@@ -61,10 +61,10 @@ fn binop_cond(input: &str) -> IRes<BinOp> {
 }
 fn binop_comp(input: &str) -> IRes<BinOp> {
     sp(alt((
-        map(tag("<"), |_| BinOp::LT),
-        map(tag(">"), |_| BinOp::GT),
         map(tag("<="), |_| BinOp::LTEq),
         map(tag(">="), |_| BinOp::GTEq),
+        map(tag("<"), |_| BinOp::LT),
+        map(tag(">"), |_| BinOp::GT),
         map(tag("=="), |_| BinOp::IsEq),
         map(tag("!="), |_| BinOp::NotEq),
     )))(input)
