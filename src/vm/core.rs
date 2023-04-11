@@ -209,7 +209,12 @@ impl Vm {
             let condition = condition.downcast_ref::<PtyBool>().expect("Expected Bool");
             condition.0
         } {
-            self.execute_nodes(block);
+            for node in block {
+                if self.return_val.is_some() {
+                    return;
+                }
+                self.evaluate(node);
+            }
         }
     }
 
