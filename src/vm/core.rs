@@ -1,5 +1,6 @@
 use super::{
-    petty_class::PettyClass, petty_function::PettyFunction, preallocated::PreAllocated, prelude::*,
+    dict::insert_ref, petty_class::PettyClass, petty_function::PettyFunction,
+    preallocated::PreAllocated, prelude::*,
 };
 use crate::ast::{BinOp, Literal, Node, UnaryOp};
 use std::{ops::Deref, sync::MutexGuard};
@@ -31,12 +32,18 @@ impl Vm {
     pub fn load_builtin(&mut self, name: &str, object: PettyObject) {
         self.write(name.into(), object);
     }
-
-    pub fn write(&mut self, key: Arc<str>, value: PettyObject) {
+    pub fn write_ref(&mut self, key: &Arc<str>, value: PettyObject) {
+        if let Some(scope) = self.scopes.last_mut() {
+            insert_ref(scope, key, value);
+        } else {
+            insert_ref(&mut self.globals(), key, value);
+        };
+    }
+    pub fn write(&mut self, key: Arc<str>, value: PettyObject) -> Option<PettyObject> {
         match self.scopes.last_mut() {
             Some(scope) => scope.insert(key, value),
             None => self.globals().insert(key, value),
-        };
+        }
     }
     /// # Panics
     /// - TODO
@@ -77,7 +84,7 @@ impl Vm {
     pub fn evaluate(&mut self, node: &Node) -> PettyObject {
         match node {
             Node::Globals(nodes) | Node::Block(nodes) => self.execute_nodes(nodes),
-            Node::SetEq(name, expr) => self.set_eq(name.clone(), expr),
+            Node::SetEq(name, expr) => self.set_eq(name, expr),
             Node::BinExpr(op, nodes) if *op == BinOp::GetItem => {
                 return self.get_item(&nodes.0, &nodes.1)
             }
@@ -88,7 +95,7 @@ impl Vm {
             Node::Ident(ident) => return self.read(ident),
             Node::FuncCall(name, args) => return self.func_call(name, args),
             Node::FuncDef(name, args, block) => {
-                self.func_def(name.clone(), args.clone(), block.clone());
+                self.func_def(name, args.clone(), block.clone());
             }
             Node::ReturnState(expr) => self.return_val = Some(self.evaluate(expr)),
             Node::UnaryOp(op, expr) => return self.unary_expr(*op, expr),
@@ -98,7 +105,7 @@ impl Vm {
             Node::WhileLoop(condition, block) => self.while_loop(condition, block),
             Node::ForLoop(target, iter, block) => self.for_loop(target, iter, block),
             Node::ClassDef(name, fields, methods) => {
-                self.class_def(name.clone(), fields.clone(), methods.clone());
+                self.class_def(name, fields.clone(), methods.clone());
             }
             Node::Closure(params, body) => return self.closure(params.clone(), body.clone()),
             Node::GetItemIndex(ident, expr) => return self.get_item_index(ident, expr),
@@ -117,9 +124,9 @@ impl Vm {
         }
     }
 
-    fn set_eq(&mut self, name: Arc<str>, expr: &Node) {
+    fn set_eq(&mut self, name: &Arc<str>, expr: &Node) {
         let value = self.evaluate(expr);
-        self.write(name, value);
+        self.write_ref(name, value);
     }
 
     fn get_item(&mut self, left: &Node, right: &Node) -> PettyObject {
@@ -174,9 +181,9 @@ impl Vm {
         items.iter().map(|arg| self.evaluate(arg)).collect()
     }
 
-    fn func_def(&mut self, name: Arc<str>, args: Arc<[Arc<str>]>, block: Arc<[Node]>) {
+    fn func_def(&mut self, name: &Arc<str>, args: Arc<[Arc<str>]>, block: Arc<[Node]>) {
         let function = self.closure(args, block);
-        self.write(name, function);
+        self.write_ref(name, function);
     }
 
     fn closure(&mut self, args: Arc<[Arc<str>]>, block: Arc<[Node]>) -> PettyObject {
@@ -219,16 +226,16 @@ impl Vm {
                 None => todo!("{next}"),
             }
         } {
-            self.write(target.clone(), next.clone());
+            self.write_ref(target, next.clone());
             for node in block {
                 self.evaluate(node);
             }
         }
     }
 
-    fn class_def(&mut self, name: Arc<str>, fields: Arc<[Arc<str>]>, methods: Arc<[Node]>) {
+    fn class_def(&mut self, name: &Arc<str>, fields: Arc<[Arc<str>]>, methods: Arc<[Node]>) {
         let class = PettyClass::new(fields, methods);
-        self.write(name, class.into());
+        self.write_ref(name, class.into());
     }
 
     fn get_item_index(&mut self, ident: &Arc<str>, expr: &Node) -> PettyObject {

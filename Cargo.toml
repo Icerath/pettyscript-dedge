@@ -12,3 +12,4 @@ nom-supreme = "0.8.0"
 thiserror = "1.0.38"
 macros = { path = "./macros" }
 once_cell = "1.17.1"
+hashbrown = "0.13.2"

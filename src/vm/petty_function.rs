@@ -37,7 +37,7 @@ impl PettyObjectType for PettyFunction {
             );
         }
         for (param, &arg) in self.args.iter().zip(args.0.iter()) {
-            vm.write(param.clone(), arg.clone());
+            vm.write_ref(param, arg.clone());
         }
         vm.execute_nodes(&self.block);
         for _ in 0..self.scopes.len() + 1 {
