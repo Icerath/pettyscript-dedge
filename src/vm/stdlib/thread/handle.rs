@@ -56,7 +56,7 @@ pub fn join(this: ThreadHandle) -> PettyObject {
 }
 
 #[pettymethod]
-pub fn __repr__(this: ThreadHandle) -> PtyStr {
+fn __repr__(this: ThreadHandle) -> PtyStr {
     PtyStr(format!("{this}").into())
 }
 

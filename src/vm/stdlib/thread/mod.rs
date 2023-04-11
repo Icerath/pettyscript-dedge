@@ -1,4 +1,5 @@
 mod handle;
+mod pool;
 
 use crate::vm::{
     builtins::{Module, PtyNum},
@@ -14,6 +15,7 @@ pub fn init() -> Module {
     let dict = Dict::from([
         ("sleep".into(), SLEEP.clone()),
         ("spawn".into(), SPAWN.clone()),
+        ("ThreadPool".into(), pool::__INIT__.clone()),
     ]);
     Module {
         name: "thread".into(),
