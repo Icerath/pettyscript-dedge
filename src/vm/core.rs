@@ -221,13 +221,13 @@ impl Vm {
 
         while let Some(next) = {
             let next = get_next.call(self, &get_next, FuncArgs(&[&iter]));
-            match next.downcast::<PtyOption>() {
-                Some(next) => next.0,
-                None => todo!("{next}"),
-            }
+            next.downcast::<PtyOption>().unwrap().0
         } {
-            self.write_ref(target, next.clone());
+            self.write_ref(target, next);
             for node in block {
+                if self.return_val.is_some() {
+                    return;
+                }
                 self.evaluate(node);
             }
         }

@@ -40,7 +40,7 @@ impl PettyObjectType for PettyFunction {
             vm.write_ref(param, arg.clone());
         }
         vm.execute_nodes(&self.block);
-        for _ in 0..self.scopes.len() + 1 {
+        for _ in 0..=self.scopes.len() {
             vm.drop_scope();
         }
         vm.return_val.take().unwrap_or_else(|| NULL.clone())
