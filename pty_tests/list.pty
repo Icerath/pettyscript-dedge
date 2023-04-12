@@ -1,0 +1,14 @@
+assert = std.test.assert;
+assert_eq = std.test.assert_eq;
+
+list = [];
+
+assert_eq(list, []);
+list.push(10);
+assert_eq(list, [10]);
+assert_eq(list.len(), 1);
+assert(list.contains(10));
+assert(!(list.contains(20)));
+list.push(20);
+assert_eq(list.find(20).unwrap(), 1);
+assert_eq(list.get(1).unwrap(), 20);

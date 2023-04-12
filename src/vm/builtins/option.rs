@@ -22,13 +22,13 @@ impl PettyObjectType for PtyOption {
     fn call(&self, _vm: &mut Vm, _this: &PettyObject, _args: FuncArgs) -> PettyObject {
         todo!()
     }
-    fn get_item(&self, _vm: &mut Vm, _this: &PettyObject, str: &str) -> PettyObject {
-        match str {
+    fn get_item(&self, _vm: &mut Vm, _this: &PettyObject, key: &str) -> PettyObject {
+        match key {
             "unwrap" => UNWRAP.clone(),
             "is_some" => IS_SOME.clone(),
             "is_none" => IS_NONE.clone(),
             "__repr__" => __REPR__.clone(),
-            _ => todo!(),
+            _ => todo!("{key}"),
         }
     }
 }
